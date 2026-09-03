@@ -2,687 +2,1297 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Telecore AI-Mesh | Telebirr Merchant Dashboard</title>
-    <script src="https://cdn.tailwindcss.com">
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tele-Safe AI — Ethiopian Digital Wallet Forensics</title>
     <style>
         :root {
-            --bg-primary: #0a0a12;
-            --bg-card: #12121f;
-            --bg-card-hover: #1a1a2e;
-            --border-glow: #2a2a4a;
-            --neon-orange: #ff6b35;
-            --neon-purple: #9b30ff;
-            --neon-green: #00e676;
-            --neon-red: #ff1744;
-            --neon-amber: #ffab00;
-            --text-primary: #e8e8f0;
-            --text-secondary: #a0a0b8;
-            --glass-bg: rgba(18, 18, 31, 0.75);
-            --glass-border: rgba(255, 255, 255, 0.06);
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-card: #1a1f2e;
+            --bg-card-hover: #1e2433;
+            --bg-input: #0d1220;
+            --border: #2a3040;
+            --border-accent: #3a4055;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --green: #10b981;
+            --green-dark: #059669;
+            --green-glow: rgba(16, 185, 129, 0.2);
+            --red: #ef4444;
+            --red-dark: #dc2626;
+            --red-glow: rgba(239, 68, 68, 0.2);
+            --gold: #f59e0b;
+            --gold-dark: #d97706;
+            --gold-glow: rgba(245, 158, 11, 0.15);
+            --ethio-green: #078930;
+            --ethio-yellow: #fcdd09;
+            --ethio-red: #da121a;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --shadow-glow: 0 0 40px rgba(0, 0, 0, 0.6);
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
-            min-height: 100vh; min-height: 100dvh;
+            min-height: 100vh;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
             overflow-x: hidden;
-            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
         }
+
         body::before {
-            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background-image:
-                radial-gradient(circle at 50% 0%, rgba(155, 48, 255, 0.04) 0%, transparent 60%),
-                radial-gradient(circle at 100% 100%, rgba(255, 107, 53, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 0% 100%, rgba(0, 230, 118, 0.02) 0%, transparent 40%);
-            pointer-events: none; z-index: 0;
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(7, 137, 48, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 50%, rgba(16, 185, 129, 0.02) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
         }
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-            border: 1px solid var(--glass-border);
-            border-radius: 1.25rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.02);
-            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+
+        .app-container {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 24px 20px 60px;
+            position: relative;
+            z-index: 1;
         }
-        .glass-card:hover { border-color: rgba(255, 255, 255, 0.1); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.04); }
-        .glass-card.active-glow { border-color: rgba(255, 107, 53, 0.35); box-shadow: 0 0 25px rgba(255, 107, 53, 0.12), 0 0 60px rgba(155, 48, 255, 0.08), 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 0 20px rgba(255, 107, 53, 0.03); }
-        .glass-card.active-glow-purple { border-color: rgba(155, 48, 255, 0.35); box-shadow: 0 0 25px rgba(155, 48, 255, 0.12), 0 0 60px rgba(255, 107, 53, 0.08), 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 0 20px rgba(155, 48, 255, 0.03); }
-        .tab-btn {
-            position: relative; transition: all 0.35s ease; border-radius: 0.75rem;
-            padding: 0.7rem 1.1rem; font-weight: 600; font-size: 0.82rem; letter-spacing: 0.02em;
-            cursor: pointer; user-select: none; -webkit-user-select: none; white-space: nowrap;
-            border: 1.5px solid transparent; background: transparent; color: var(--text-secondary);
+
+        /* Header */
+        .app-header {
+            text-align: center;
+            padding: 28px 0 20px;
+            position: relative;
         }
-        .tab-btn:hover { color: var(--text-primary); background: rgba(255, 255, 255, 0.04); }
-        .tab-btn.active-tab { color: #fff; background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 107, 53, 0.3); box-shadow: 0 0 20px rgba(255, 107, 53, 0.08), 0 0 40px rgba(155, 48, 255, 0.05); }
-        .tab-btn.active-tab-purple { color: #fff; background: rgba(255, 255, 255, 0.06); border-color: rgba(155, 48, 255, 0.3); box-shadow: 0 0 20px rgba(155, 48, 255, 0.08), 0 0 40px rgba(255, 107, 53, 0.05); }
-        .tab-indicator { position: absolute; bottom: -1.5px; left: 20%; right: 20%; height: 2.5px; border-radius: 2px; background: linear-gradient(90deg, var(--neon-orange), var(--neon-purple)); box-shadow: 0 0 10px rgba(255, 107, 53, 0.6), 0 0 20px rgba(155, 48, 255, 0.4); transition: all 0.4s ease; }
-        @keyframes pulse-red { 0%, 100% { box-shadow: 0 0 8px rgba(255, 23, 68, 0.3), 0 0 20px rgba(255, 23, 68, 0.15); } 50% { box-shadow: 0 0 20px rgba(255, 23, 68, 0.6), 0 0 45px rgba(255, 23, 68, 0.3); } }
-        @keyframes pulse-amber { 0%, 100% { box-shadow: 0 0 8px rgba(255, 171, 0, 0.3), 0 0 20px rgba(255, 171, 0, 0.15); } 50% { box-shadow: 0 0 20px rgba(255, 171, 0, 0.6), 0 0 45px rgba(255, 171, 0, 0.3); } }
-        @keyframes pulse-green { 0%, 100% { box-shadow: 0 0 8px rgba(0, 230, 118, 0.25), 0 0 20px rgba(0, 230, 118, 0.1); } 50% { box-shadow: 0 0 18px rgba(0, 230, 118, 0.5), 0 0 40px rgba(0, 230, 118, 0.2); } }
-        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes scanline { 0% { top: -10%; } 100% { top: 110%; } }
-        .pulse-red { animation: pulse-red 1.4s ease-in-out infinite; }
-        .pulse-amber { animation: pulse-amber 1.4s ease-in-out infinite; }
-        .pulse-green { animation: pulse-green 2s ease-in-out infinite; }
-        .fade-in-up { animation: fadeInUp 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-        .btn-neon-analyze {
-            background: linear-gradient(135deg, #ff6b35 0%, #ff4500 20%, #d93bff 55%, #9b30ff 80%, #6a0dad 100%);
-            background-size: 200% 200%; animation: shimmer 3.5s ease infinite;
-            color: #fff; font-weight: 700; letter-spacing: 0.04em; border: none; border-radius: 0.85rem;
-            padding: 0.9rem 1.6rem; font-size: 0.9rem; cursor: pointer; transition: all 0.35s ease;
-            box-shadow: 0 4px 24px rgba(255, 107, 53, 0.3), 0 4px 24px rgba(155, 48, 255, 0.3);
-            position: relative; overflow: hidden; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        .app-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--ethio-green), var(--gold), var(--ethio-red));
+            border-radius: 2px;
         }
-        .btn-neon-analyze:hover { box-shadow: 0 6px 36px rgba(255, 107, 53, 0.45), 0 6px 36px rgba(155, 48, 255, 0.45); transform: translateY(-1.5px); background-size: 220% 220%; }
-        .btn-neon-analyze:active { transform: translateY(0px) scale(0.98); box-shadow: 0 2px 12px rgba(255, 107, 53, 0.25), 0 2px 12px rgba(155, 48, 255, 0.25); }
-        .btn-neon-analyze:disabled { opacity: 0.6; cursor: not-allowed; transform: none; animation: none; background: linear-gradient(135deg, #555, #444); box-shadow: none; }
-        .progress-glass { background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 9999px; overflow: hidden; position: relative; height: 14px; }
-        .progress-glass .progress-fill { height: 100%; border-radius: 9999px; background: linear-gradient(90deg, #ff6b35, #ff4500, #d93bff, #9b30ff, #6a0dad); background-size: 300% 100%; animation: shimmer 1.8s ease infinite; transition: width 0.15s ease-out; box-shadow: 0 0 12px rgba(255, 107, 53, 0.5), 0 0 24px rgba(155, 48, 255, 0.4); }
-        .scanline-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; overflow: hidden; border-radius: 0.75rem; }
-        .scanline-overlay::after { content: ''; position: absolute; left: 0; right: 0; height: 2px; background: rgba(255, 107, 53, 0.5); box-shadow: 0 0 20px rgba(255, 107, 53, 0.6), 0 0 40px rgba(155, 48, 255, 0.3); animation: scanline 2.8s linear infinite; opacity: 0.6; }
-        .upload-zone { border: 2.5px dashed rgba(255, 255, 255, 0.12); border-radius: 1rem; padding: 2rem 1.2rem; text-align: center; cursor: pointer; transition: all 0.35s ease; background: rgba(255, 255, 255, 0.02); position: relative; overflow: hidden; }
-        .upload-zone:hover { border-color: rgba(255, 107, 53, 0.4); background: rgba(255, 107, 53, 0.04); box-shadow: 0 0 30px rgba(255, 107, 53, 0.08); }
-        .btn-change-image { position: absolute; top: 8px; right: 8px; width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #ff6b35, #9b30ff); color: #fff; font-size: 1.4rem; font-weight: 300; border: 2px solid rgba(255, 255, 255, 0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 18px rgba(255, 107, 53, 0.4), 0 4px 18px rgba(155, 48, 255, 0.3); transition: all 0.3s ease; z-index: 10; line-height: 1; padding: 0; -webkit-tap-highlight-color: transparent; }
-        .btn-change-image:hover { box-shadow: 0 6px 28px rgba(255, 107, 53, 0.55), 0 6px 28px rgba(155, 48, 255, 0.4); transform: scale(1.08); }
-        .btn-change-image:active { transform: scale(0.92); }
-        .status-badge { transition: all 0.4s ease; border-radius: 9999px; padding: 0.3rem 0.8rem; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap; }
-        .status-online { background: rgba(0, 230, 118, 0.12); color: var(--neon-green); border: 1px solid rgba(0, 230, 118, 0.35); box-shadow: 0 0 12px rgba(0, 230, 118, 0.15); }
-        .status-offline { background: rgba(255, 171, 0, 0.12); color: var(--neon-amber); border: 1px solid rgba(255, 171, 0, 0.35); box-shadow: 0 0 12px rgba(255, 171, 0, 0.15); }
-        .sms-textarea { background: rgba(0, 0, 0, 0.35); border: 1.5px solid rgba(255, 255, 255, 0.1); border-radius: 0.85rem; padding: 1rem; color: var(--text-primary); font-size: 0.85rem; font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace; line-height: 1.55; transition: all 0.3s ease; resize: vertical; min-height: 140px; width: 100%; outline: none; }
-        .sms-textarea:focus { border-color: rgba(255, 107, 53, 0.45); box-shadow: 0 0 18px rgba(255, 107, 53, 0.1), 0 0 30px rgba(155, 48, 255, 0.06); background: rgba(0, 0, 0, 0.45); }
-        .sms-textarea::placeholder { color: rgba(160, 160, 184, 0.5); }
-        .result-card { border-radius: 0.9rem; padding: 1.2rem 1.1rem; transition: all 0.4s ease; animation: fadeInUp 0.5s ease forwards; }
-        .result-legit { background: rgba(0, 230, 118, 0.07); border: 1.5px solid rgba(0, 230, 118, 0.35); box-shadow: 0 0 24px rgba(0, 230, 118, 0.12), 0 0 50px rgba(0, 230, 118, 0.04); }
-        .result-critical { background: rgba(255, 23, 68, 0.07); border: 1.5px solid rgba(255, 23, 68, 0.35); box-shadow: 0 0 24px rgba(255, 23, 68, 0.12), 0 0 50px rgba(255, 23, 68, 0.04); animation: pulse-red 1.4s ease-in-out infinite; }
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
-        .hidden { display: none !important; }
-        .logo-gradient { background: linear-gradient(135deg, #ff6b35, #ff4500, #d93bff, #9b30ff); background-size: 200% 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: shimmer 4s ease infinite; font-weight: 800; letter-spacing: -0.02em; }
-        .content-wrapper { position: relative; z-index: 1; }
-        .tab-content-panel { transition: opacity 0.35s ease, transform 0.35s ease; opacity: 0; transform: translateY(8px); pointer-events: none; }
-        .tab-content-panel.active-panel { opacity: 1; transform: translateY(0); pointer-events: auto; }
-        .api-input {
-            background: rgba(0, 0, 0, 0.35);
-            border: 1.5px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0.85rem;
-            padding: 0.8rem 1rem;
-            color: var(--text-primary);
+        .logo-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(7, 137, 48, 0.25), rgba(245, 158, 11, 0.15));
+            border: 2px solid rgba(7, 137, 48, 0.5);
+            margin-bottom: 14px;
+            font-size: 32px;
+            box-shadow: 0 0 30px rgba(7, 137, 48, 0.2);
+        }
+        .app-title {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 0%, #a5f3fc 40%, #fbbf24 70%, #ffffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 4px;
+        }
+        .app-subtitle {
             font-size: 0.85rem;
-            transition: all 0.3s ease;
-            width: 100%;
-            outline: none;
-            font-family: 'SF Mono', 'Fira Code', monospace;
-            letter-spacing: 0.02em;
+            color: var(--text-muted);
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            font-weight: 500;
         }
-        .api-input:focus {
-            border-color: rgba(255, 107, 53, 0.45);
-            box-shadow: 0 0 18px rgba(255, 107, 53, 0.1), 0 0 30px rgba(155, 48, 255, 0.06);
-            background: rgba(0, 0, 0, 0.45);
+        .app-tagline {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            letter-spacing: 0.5px;
         }
-        .api-input::placeholder { color: rgba(160, 160, 184, 0.5); }
-        .api-link {
-            color: var(--neon-orange);
-            text-decoration: none;
-            font-size: 0.65rem;
+
+        /* Main Card */
+        .main-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+            margin-top: 24px;
+            transition: var(--transition);
+        }
+        .main-card:hover {
+            border-color: var(--border-accent);
+        }
+
+        .card-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .card-header-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+        }
+        .card-header-badge {
+            font-size: 0.7rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--gold);
+            border: 1px solid rgba(245, 158, 11, 0.3);
             font-weight: 600;
-            transition: color 0.2s;
+            letter-spacing: 0.5px;
         }
-        .api-link:hover { color: var(--neon-purple); text-decoration: underline; }
-        @media (max-width: 380px) {
-            .tab-btn { font-size: 0.7rem; padding: 0.55rem 0.7rem; }
-            .btn-neon-analyze { font-size: 0.78rem; padding: 0.75rem 1.2rem; }
+
+        .card-body {
+            padding: 20px 24px;
+        }
+
+        /* Textarea */
+        .input-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+        }
+        .input-textarea {
+            width: 100%;
+            min-height: 180px;
+            padding: 16px 18px;
+            background: var(--bg-input);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            resize: vertical;
+            transition: var(--transition);
+            outline: none;
+            letter-spacing: 0.2px;
+        }
+        .input-textarea:focus {
+            border-color: rgba(245, 158, 11, 0.5);
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.08);
+        }
+        .input-textarea::placeholder {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Buttons */
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            outline: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: #ffffff;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+            flex: 1;
+            min-width: 200px;
+            justify-content: center;
+            font-size: 0.9rem;
+            padding: 14px 28px;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #10b981, #34d399);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.2);
+        }
+        .btn-secondary {
+            background: var(--bg-card-hover);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-accent);
+            font-size: 0.75rem;
+            padding: 10px 16px;
+            letter-spacing: 0.5px;
+        }
+        .btn-secondary:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+            background: rgba(245, 158, 11, 0.08);
+            transform: translateY(-1px);
+        }
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            font-size: 0.75rem;
+            padding: 10px 16px;
+            letter-spacing: 0.5px;
+        }
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.6);
+        }
+
+        /* Sample chips */
+        .sample-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+        .sample-chip {
+            font-size: 0.7rem;
+            padding: 6px 14px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            font-family: inherit;
+        }
+        .sample-chip:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+            background: rgba(245, 158, 11, 0.07);
+        }
+
+        /* Results */
+        .results-section {
+            margin-top: 24px;
+            display: none;
+            animation: fadeInUp 0.5s ease-out;
+        }
+        .results-section.visible {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(16, 185, 129, 0.6);
+            }
+        }
+        @keyframes pulseRed {
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(239, 68, 68, 0.6);
+            }
+        }
+
+        .result-card {
+            border-radius: var(--radius-lg);
+            padding: 28px 24px;
+            border: 2px solid;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        .result-card.pass {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(5, 150, 105, 0.06));
+            border-color: var(--green);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .result-card.fail {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(220, 38, 38, 0.06));
+            border-color: var(--red);
+            animation: pulseRed 2s ease-in-out infinite;
+        }
+
+        .result-icon {
+            font-size: 3rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .result-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            margin-bottom: 4px;
+        }
+        .result-card.pass .result-title {
+            color: var(--green);
+        }
+        .result-card.fail .result-title {
+            color: var(--red);
+        }
+        .result-detail {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+        .result-card.pass .result-detail {
+            color: #a7f3d0;
+        }
+        .result-card.fail .result-detail {
+            color: #fca5a5;
+        }
+
+        /* Individual test results */
+        .test-results {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .test-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 18px;
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        .test-item.pass-item {
+            border-left: 3px solid var(--green);
+            background: rgba(16, 185, 129, 0.04);
+        }
+        .test-item.fail-item {
+            border-left: 3px solid var(--red);
+            background: rgba(239, 68, 68, 0.04);
+        }
+        .test-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .test-content {
+            flex: 1;
+        }
+        .test-name {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            letter-spacing: 0.2px;
+        }
+        .test-description {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+
+        /* Extracted data */
+        .extracted-data {
+            margin-top: 20px;
+            padding: 18px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+        .extracted-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+        .data-item {
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .data-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+        }
+        .data-value {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-top: 2px;
+            font-family: 'SF Mono', 'Cascadia Code', monospace;
+        }
+        .data-value.amount {
+            color: var(--gold);
+        }
+        .data-value.balance {
+            color: var(--green);
+        }
+        .data-value.ref {
+            color: #60a5fa;
+        }
+
+        /* Footer */
+        .app-footer {
+            text-align: center;
+            margin-top: 32px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+        .app-footer a {
+            color: var(--gold);
+            text-decoration: none;
+        }
+        .app-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .app-container {
+                padding: 16px 12px 40px;
+            }
+            .app-title {
+                font-size: 1.5rem;
+            }
+            .card-header {
+                padding: 16px 18px 12px;
+            }
+            .card-body {
+                padding: 16px 18px;
+            }
+            .result-card {
+                padding: 20px 16px;
+            }
+            .result-title {
+                font-size: 1.1rem;
+            }
+            .btn-primary {
+                font-size: 0.8rem;
+                padding: 12px 20px;
+            }
+            .data-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .input-textarea {
+                min-height: 140px;
+                font-size: 0.78rem;
+            }
+        }
+        @media (max-width: 400px) {
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+            .btn-row {
+                flex-direction: column;
+            }
+            .btn-primary {
+                width: 100%;
+            }
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-accent);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
         }
     </style>
 </head>
 <body>
-    <div class="content-wrapper max-w-md mx-auto px-4 pb-8 pt-3 min-h-screen flex flex-col">
 
-        <!-- HEADER WITH NETWORK STATUS -->
-        <header class="flex items-center justify-between py-4 mb-2">
-            <div class="flex items-center gap-2.5">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/25">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                    </svg>
-                </div>
-                <div>
-                    <h1 class="text-lg font-extrabold leading-tight"><span class="logo-gradient">Telecore AI-Mesh</span></h1>
-                    <p class="text-[0.62rem] text-gray-400 tracking-widest uppercase font-medium">Telebirr Merchant</p>
-                </div>
-            </div>
-            <div id="networkStatusContainer" class="flex flex-col items-end gap-1">
-                <span id="statusBadge" class="status-badge status-online">
-                    <span id="statusDot" class="w-1.5 h-1.5 rounded-full bg-green-400 shadow-[0_0_6px_rgba(0,230,118,0.8)]"></span>
-                    <span id="statusText">ONLINE</span>
-                </span>
-                <span id="statusSubText" class="text-[0.6rem] text-green-400 font-semibold tracking-wider">LIVE / CELLULAR DATA</span>
-            </div>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-badge">🛡️</div>
+            <h1 class="app-title">Tele-Safe AI</h1>
+            <div class="app-subtitle">Ethiopian Digital Wallet Forensics</div>
+            <div class="app-tagline">Telebirr &amp; CBE Transaction Text Auditor — 100% Local</div>
         </header>
 
-        <!-- TABS NAVIGATION -->
-        <nav class="flex gap-1.5 mb-4 p-1 rounded-2xl bg-white/[0.03] border border-white/[0.06] backdrop-blur-sm">
-            <button id="tabSmsBtn" class="tab-btn active-tab flex-1 relative" onclick="switchTab('sms')">
-                📱 SMS Certification
-                <span id="tabSmsIndicator" class="tab-indicator"></span>
-            </button>
-            <button id="tabScreenshotBtn" class="tab-btn flex-1 relative" onclick="switchTab('screenshot')">
-                📸 Screenshot Certification
-                <span id="tabScreenshotIndicator" class="tab-indicator hidden"></span>
-            </button>
-        </nav>
+        <!-- Main Scanner Card -->
+        <div class="main-card">
+            <div class="card-header">
+                <span class="card-header-title">🔍 Text Forensic Scanner</span>
+                <span class="card-header-badge">⚡ Local Analysis Engine</span>
+            </div>
+            <div class="card-body">
+                <label class="input-label" for="smsInput">📩 Paste SMS or Telegram transaction text</label>
+                <textarea id="smsInput" class="input-textarea" placeholder="Paste your Telebirr or CBE SMS/Telegram text here..." spellcheck="false"></textarea>
 
-        <!-- MAIN CONTENT -->
-        <main class="flex-1 flex flex-col gap-4">
-
-            <!-- SMS CERTIFICATION PANEL -->
-            <div id="panelSms" class="tab-content-panel active-panel flex flex-col gap-4">
-                <div class="glass-card active-glow p-5 flex flex-col gap-4">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xl">🔐</span>
-                        <h2 class="text-sm font-bold tracking-wide text-white/90 uppercase">SMS Fraud Verification</h2>
-                    </div>
-                    <p class="text-[0.72rem] text-gray-400 leading-relaxed">Paste the full Telebirr SMS alert below. The AI engine verifies sender authenticity, transaction hash, and structural integrity.</p>
-                    <textarea id="smsInput" class="sms-textarea" placeholder="Paste Telebirr SMS Here for Verification&#10;&#10;Example:&#10;Telebirr: Your payment of ETB 1,250.00 to ABC Store completed.&#10;Ref: TB123456789. Ethio telecom. Balance: ETB 4,750.00" rows="5"></textarea>
-                    <button id="btnVerifySms" onclick="verifySms()" class="btn-neon-analyze !rounded-xl !py-3 !text-sm">
-                        <span>🔍</span> Verify Transaction
-                    </button>
-                    <div id="smsResultContainer" class="hidden"></div>
+                <div class="sample-row" id="sampleRow">
+                    <button class="sample-chip" data-sample="telebirr_credit">📲 Telebirr Credit</button>
+                    <button class="sample-chip" data-sample="cbe_credit">🏦 CBE Credit</button>
+                    <button class="sample-chip" data-sample="telebirr_debit">💸 Telebirr Debit</button>
+                    <button class="sample-chip" data-sample="fraud">🚨 Tampered (Fraud)</button>
+                    <button class="sample-chip" data-sample="fraud2">🚨 Math Inconsistency</button>
                 </div>
-                <div class="glass-card p-3.5 flex items-center gap-3 text-[0.65rem] text-gray-400 border-white/[0.06]">
-                    <span class="text-base">🛡️</span>
-                    <span>Detection engine checks for <span class="text-orange-400 font-semibold">'telebirr'</span>, <span class="text-purple-400 font-semibold">'Ethio telecom'</span>, and <span class="text-green-400 font-semibold">'ETB'</span> markers — plus 14 structural heuristics.</span>
+
+                <div class="btn-row">
+                    <button id="scanBtn" class="btn btn-primary">🔒 RUN FORENSIC SCAN</button>
+                    <button id="clearBtn" class="btn btn-secondary">✕ Clear</button>
                 </div>
             </div>
+        </div>
 
-            <!-- SCREENSHOT CERTIFICATION PANEL -->
-            <div id="panelScreenshot" class="tab-content-panel flex flex-col gap-4">
-                <div class="glass-card active-glow-purple p-5 flex flex-col gap-4">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xl">🖼️</span>
-                        <h2 class="text-sm font-bold tracking-wide text-white/90 uppercase">AI Screenshot Forensic Scan</h2>
-                    </div>
-                    <p class="text-[0.72rem] text-gray-400 leading-relaxed">Upload a Telebirr transaction screenshot. Our AI engine uses Google Gemini Vision to analyze authenticity and detect tampering.</p>
-
-                    <!-- API KEY INPUT -->
-                    <div class="flex flex-col gap-1.5">
-                        <label for="apiKeyInput" class="text-[0.7rem] text-gray-300 font-semibold tracking-wide uppercase">Enter Gemini API Key for Authentication</label>
-                        <input type="password" id="apiKeyInput" class="api-input" placeholder="AIzaSy... (paste your key here)" autocomplete="off" />
-                        <div class="flex items-center justify-between">
-                            <a href="https://ai.google.dev/" target="_blank" rel="noopener noreferrer" class="api-link">🔑 Get Free Key from Google AI Studio</a>
-                            <button onclick="toggleApiKeyVisibility()" class="text-gray-400 hover:text-white text-[0.6rem] font-medium transition-colors">👁️ Show</button>
-                        </div>
-                    </div>
-
-                    <!-- Upload / Preview Zone -->
-                    <div id="uploadZoneContainer" class="relative">
-                        <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleFileUpload(event)" />
-                        <div id="uploadPrompt" class="upload-zone" onclick="document.getElementById('fileInput').click()">
-                            <div class="flex flex-col items-center gap-3 py-2">
-                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500/20 to-purple-600/20 border border-white/10 flex items-center justify-center">
-                                    <svg class="w-7 h-7 text-orange-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-semibold text-white/85">Upload or Capture Telebirr Screenshot</p>
-                                    <p class="text-[0.65rem] text-gray-400 mt-1">Tap to select from gallery or camera</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="imagePreviewContainer" class="hidden relative rounded-xl overflow-hidden border border-white/10 bg-black/20">
-                            <img id="previewImage" src="" alt="Screenshot preview" class="w-full h-56 object-cover rounded-xl" />
-                            <div class="scanline-overlay"></div>
-                            <button id="btnChangeImage" class="btn-change-image" onclick="changeImage()" title="Change Image / Upload New" aria-label="Change image">+</button>
-                            <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between px-3 py-1.5 bg-black/55 backdrop-blur-md rounded-lg border border-white/10">
-                                <span id="fileNameDisplay" class="text-[0.62rem] text-gray-300 truncate max-w-[70%] font-mono"></span>
-                                <span class="text-[0.55rem] text-green-400 font-semibold tracking-wider">✓ LOADED</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button id="btnAnalyze" onclick="analyzeScreenshot()" class="btn-neon-analyze" disabled>
-                        <span>🤖</span> Analyze Screenshot with AI
-                    </button>
-
-                    <!-- Progress Bar -->
-                    <div id="progressContainer" class="hidden flex flex-col gap-2">
-                        <div class="flex items-center justify-between text-[0.6rem] text-gray-400">
-                            <span id="progressLabel">Sending to Gemini Vision API...</span>
-                            <span id="progressPercent" class="font-bold text-orange-400">0%</span>
-                        </div>
-                        <div class="progress-glass">
-                            <div id="progressFill" class="progress-fill" style="width:0%"></div>
-                        </div>
-                    </div>
-
-                    <div id="analysisResultContainer" class="hidden"></div>
-                </div>
-                <div class="glass-card p-3.5 flex items-center gap-3 text-[0.65rem] text-gray-400 border-white/[0.06]">
-                    <span class="text-base">🧠</span>
-                    <span>Powered by Google Gemini Vision API — key is never stored, only used for this session.</span>
-                </div>
+        <!-- Results Section -->
+        <div id="resultsSection" class="results-section">
+            <div id="resultCard" class="result-card">
+                <!-- Dynamically populated -->
             </div>
-        </main>
+        </div>
 
-        <footer class="mt-5 pt-3 pb-1 text-center text-[0.6rem] text-gray-500 border-t border-white/[0.05]">
-            <p>Telecore AI-Mesh v2.4 • Offline Mesh-Ready • Gemini Vision API</p>
+        <!-- Footer -->
+        <footer class="app-footer">
+            Tele-Safe AI &bull; Client-Side Forensic Engine &bull; Runs 100% Locally &bull; No External APIs
         </footer>
     </div>
 
     <script>
-        // ===== GLOBAL STATE =====
-        let currentTab = 'sms';
-        let screenshotLoaded = false;
-        let analysisInProgress = false;
-        let isOnline = navigator.onLine;
-        let currentImageDataURL = null;
+        (function() {
+            'use strict';
 
-        // ===== TAB SWITCHING =====
-        function switchTab(tab) {
-            currentTab = tab;
-            const smsBtn = document.getElementById('tabSmsBtn');
-            const ssBtn = document.getElementById('tabScreenshotBtn');
-            const smsPanel = document.getElementById('panelSms');
-            const ssPanel = document.getElementById('panelScreenshot');
-            const smsIndicator = document.getElementById('tabSmsIndicator');
-            const ssIndicator = document.getElementById('tabScreenshotIndicator');
+            // ─── DOM References ───────────────────────────────────────────
+            const smsInput = document.getElementById('smsInput');
+            const scanBtn = document.getElementById('scanBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const resultsSection = document.getElementById('resultsSection');
+            const resultCard = document.getElementById('resultCard');
+            const sampleRow = document.getElementById('sampleRow');
 
-            smsBtn.classList.remove('active-tab', 'active-tab-purple');
-            ssBtn.classList.remove('active-tab', 'active-tab-purple');
-            smsPanel.classList.remove('active-panel');
-            ssPanel.classList.remove('active-panel');
-            smsIndicator.classList.add('hidden');
-            ssIndicator.classList.add('hidden');
-
-            if (tab === 'sms') {
-                smsBtn.classList.add('active-tab');
-                smsPanel.classList.add('active-panel');
-                smsIndicator.classList.remove('hidden');
-            } else {
-                ssBtn.classList.add('active-tab-purple');
-                ssPanel.classList.add('active-panel');
-                ssIndicator.classList.remove('hidden');
-            }
-        }
-
-        // ===== NETWORK STATUS DETECTOR =====
-        function updateNetworkStatus() {
-            const badge = document.getElementById('statusBadge');
-            const dot = document.getElementById('statusDot');
-            const text = document.getElementById('statusText');
-            const subText = document.getElementById('statusSubText');
-
-            if (isOnline) {
-                badge.className = 'status-badge status-online pulse-green';
-                dot.className = 'w-1.5 h-1.5 rounded-full bg-green-400 shadow-[0_0_6px_rgba(0,230,118,0.8)]';
-                text.textContent = 'ONLINE';
-                subText.textContent = 'LIVE / CELLULAR DATA';
-                subText.className = 'text-[0.6rem] text-green-400 font-semibold tracking-wider';
-            } else {
-                badge.className = 'status-badge status-offline pulse-amber';
-                dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(255,171,0,0.8)]';
-                text.textContent = 'OFFLINE';
-                subText.textContent = 'MESH ACTIVE';
-                subText.className = 'text-[0.6rem] text-amber-400 font-bold tracking-wider';
-            }
-        }
-
-        window.addEventListener('online', function() {
-            isOnline = true;
-            updateNetworkStatus();
-            console.log('[Network] Back online — switching to LIVE');
-        });
-        window.addEventListener('offline', function() {
-            isOnline = false;
-            updateNetworkStatus();
-            console.log('[Network] Offline detected — MESH ACTIVE engaged');
-        });
-        // Poll as fallback
-        setInterval(function() {
-            const currentState = navigator.onLine;
-            if (currentState !== isOnline) {
-                isOnline = currentState;
-                updateNetworkStatus();
-                console.log('[Network] Polled state change →', currentState ? 'ONLINE' : 'OFFLINE');
-            }
-        }, 2000);
-        updateNetworkStatus();
-
-        // ===== SMS VERIFICATION =====
-        function verifySms() {
-            const input = document.getElementById('smsInput');
-            const resultContainer = document.getElementById('smsResultContainer');
-            const smsText = input.value.trim();
-
-            if (smsText.length < 10) {
-                input.style.borderColor = 'rgba(255, 171, 0, 0.5)';
-                input.style.boxShadow = '0 0 16px rgba(255, 171, 0, 0.12)';
-                setTimeout(() => { input.style.borderColor = ''; input.style.boxShadow = ''; }, 1800);
-                return;
-            }
-
-            const lowerText = smsText.toLowerCase();
-            const hasTelebirr = lowerText.includes('telebirr');
-            const hasEthioTelecom = lowerText.includes('ethio telecom') || lowerText.includes('ethiotelecom');
-            const hasETB = lowerText.includes('etb');
-            const hasAmount = /\d+(\.\d+)?\s*(etb|birr)/i.test(smsText);
-            const hasRef = /(ref|reference|txn|transaction)\s*[:#]?\s*\w+/i.test(smsText);
-
-            const isLegit = hasTelebirr && hasEthioTelecom && hasETB;
-            resultContainer.classList.remove('hidden');
-            resultContainer.innerHTML = '';
-
-            if (isLegit) {
-                const card = document.createElement('div');
-                card.className = 'result-card result-legit';
-                card.innerHTML = `
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl mt-0.5">✅</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-green-400 text-sm tracking-wide">LEGIT TRANSACTION</h3>
-                            <p class="text-green-300/70 text-[0.72rem] mt-1 leading-relaxed">All critical markers verified. Transaction structure is authentic.</p>
-                            <div class="flex flex-wrap gap-1.5 mt-2.5">
-                                <span class="text-[0.55rem] px-2 py-0.5 rounded-full bg-green-400/10 border border-green-400/25 text-green-400 font-mono">✓ telebirr</span>
-                                <span class="text-[0.55rem] px-2 py-0.5 rounded-full bg-green-400/10 border border-green-400/25 text-green-400 font-mono">✓ Ethio telecom</span>
-                                <span class="text-[0.55rem] px-2 py-0.5 rounded-full bg-green-400/10 border border-green-400/25 text-green-400 font-mono">✓ ETB</span>
-                                ${hasAmount ? '<span class="text-[0.55rem] px-2 py-0.5 rounded-full bg-green-400/10 border border-green-400/25 text-green-400 font-mono">✓ Amount</span>' : ''}
-                                ${hasRef ? '<span class="text-[0.55rem] px-2 py-0.5 rounded-full bg-green-400/10 border border-green-400/25 text-green-400 font-mono">✓ Ref</span>' : ''}
-                            </div>
-                        </div>
-                    </div>
-                `;
-                resultContainer.appendChild(card);
-                input.style.borderColor = 'rgba(0, 230, 118, 0.4)';
-            } else {
-                const card = document.createElement('div');
-                card.className = 'result-card result-critical';
-                card.innerHTML = `
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl mt-0.5">🚨</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-red-400 text-sm tracking-wide">CRITICAL WARNING</h3>
-                            <p class="text-red-300/70 text-[0.72rem] mt-1 leading-relaxed">Forged or suspicious transaction pattern detected. Structural integrity check failed.</p>
-                            <div class="flex flex-wrap gap-1.5 mt-2.5">
-                                ${!hasTelebirr ? '<span class="text-[0.55rem] px-2 py-0.5 rounded-full bg-red-400/10 border border-red-400/25 text-red-400 font-mono">✗ missing "telebirr"</span>' : '<span class="text-[0.55rem] px-2 py-0.5 rounded-full bg-green-400/10 border border-green-400/25 text-green-400 font-mono">✓ telebirr</span>'}
-                                ${!hasEthioTelecom ? '<span class="text-[0.55rem] px-2 py-0.5 rounded-full bg-red-400/10 border border-red-400/25 text-red-400 font-mono">✗ missing "Ethio telecom"</span>' : '<span class="text-[0.55rem] px-2 py-0.5 rounded-full bg-green-400/10 border border-green-400/25 text-green-400 font-mono">✓ Ethio telecom</span>'}
-                                ${!hasETB ? '<span class="text-[0.55rem] px-2 py-0.5 rounded-full bg-red-400/10 border border-red-400/25 text-red-400 font-mono">✗ missing "ETB"</span>' : '<span class="text-[0.55rem] px-2 py-0.5 rounded-full bg-green-400/10 border border-green-400/25 text-green-400 font-mono">✓ ETB</span>'}
-                            </div>
-                        </div>
-                    </div>
-                `;
-                resultContainer.appendChild(card);
-                input.style.borderColor = 'rgba(255, 23, 68, 0.5)';
-                input.style.boxShadow = '0 0 18px rgba(255, 23, 68, 0.1)';
-            }
-            setTimeout(() => { input.style.borderColor = ''; input.style.boxShadow = ''; }, 2500);
-        }
-
-        // ===== SCREENSHOT UPLOAD & PREVIEW =====
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                currentImageDataURL = e.target.result;
-                const previewImg = document.getElementById('previewImage');
-                const previewContainer = document.getElementById('imagePreviewContainer');
-                const uploadPrompt = document.getElementById('uploadPrompt');
-                const fileNameDisplay = document.getElementById('fileNameDisplay');
-                const analyzeBtn = document.getElementById('btnAnalyze');
-
-                previewImg.src = currentImageDataURL;
-                previewContainer.classList.remove('hidden');
-                uploadPrompt.classList.add('hidden');
-                fileNameDisplay.textContent = file.name.length > 35 ? file.name.substring(0, 32) + '...' : file.name;
-                screenshotLoaded = true;
-                analyzeBtn.disabled = false;
-                analyzeBtn.style.opacity = '1';
-
-                document.getElementById('analysisResultContainer').classList.add('hidden');
-                document.getElementById('analysisResultContainer').innerHTML = '';
-                document.getElementById('progressContainer').classList.add('hidden');
+            // ─── Sample Texts ─────────────────────────────────────────────
+            const SAMPLE_TEXTS = {
+                telebirr_credit: 'Ethio telecom: Your telebirr account has received ETB 2,500.00 from ABEBE KEBEDE (Phone: 0912345678). Your previous balance was ETB 3,200.00. Your current balance is ETB 5,700.00. Reference: TB4829130456. Date: 2025-07-21 14:35:00',
+                cbe_credit: 'Commercial Bank of Ethiopia: Your account has been credited with ETB 10,000.00 from CHALA TRADING PLC. Your previous balance was ETB 45,500.00. Your current balance is ETB 55,500.00. Ref: FT2025072109B6X2. Date: 2025-07-21 09:12:45',
+                telebirr_debit: 'Ethio telecom: Your telebirr account has transferred ETB 800.00 to MESERET ALEMU (Phone: 0923456789). Your previous balance was ETB 4,000.00. Your current balance is ETB 3,200.00. Reference: TB7728193451. Date: 2025-07-20 18:22:10',
+                fraud: 'Ethio telecom: Your telebirr account has received ETB 25,000.00 from ABEBE KEBEDE (Phone: 0912345678). Your previous balance was ETB 3,200.00. Your current balance is ETB 5,700.00. Reference: TB123. Date: 2025-07-21 14:35:00',
+                fraud2: 'Commercial Bank of Ethiopia: Your account has been credited with ETB 50,000.00 from CHALA TRADING PLC. Your previous balance was ETB 45,500.00. Your current balance is ETB 55,500.00. Ref: FT2025072109B6X2. Date: 2025-02-30 09:12:45'
             };
-            reader.readAsDataURL(file);
-        }
 
-        function changeImage() {
-            const fileInput = document.getElementById('fileInput');
-            const previewContainer = document.getElementById('imagePreviewContainer');
-            const uploadPrompt = document.getElementById('uploadPrompt');
-            const previewImg = document.getElementById('previewImage');
-            const analyzeBtn = document.getElementById('btnAnalyze');
-            const resultContainer = document.getElementById('analysisResultContainer');
+            // ─── Regex Patterns ───────────────────────────────────────────
+            const REGEX = {
+                // Platform detection
+                telebirrKeyword: /(ethio\s*telecom|telebirr|ethiotelecom)/i,
+                cbeKeyword: /(commercial\s*bank\s*of\s*ethiopia|\bCBE\b|commercial\s*bank)/i,
 
-            fileInput.value = '';
-            previewImg.src = '';
-            currentImageDataURL = null;
-            previewContainer.classList.add('hidden');
-            uploadPrompt.classList.remove('hidden');
-            screenshotLoaded = false;
-            analyzeBtn.disabled = true;
-            analyzeBtn.style.opacity = '0.6';
-            resultContainer.classList.add('hidden');
-            resultContainer.innerHTML = '';
-            document.getElementById('progressContainer').classList.add('hidden');
+                // Transaction ID patterns
+                telebirrID: /(?:TB|TBR|TBF)\s*\d{8,15}/i,
+                telebirrIDAlt: /\b(?:TB|TBR|TBF)\d{8,15}\b/i,
+                cbeID: /\bFT\d{10,16}\b/i,
+                cbeIDAlt: /(?:CBE|Ref)\s*[:#]?\s*([A-Z0-9]{8,20})/i,
+                genericRef: /\b(?:reference|ref|trx|txn)\s*[:#]?\s*([A-Z0-9]{8,20})\b/i,
 
-            setTimeout(() => { fileInput.click(); }, 50);
-        }
+                // Amount extraction — with currency
+                amountETB: /ETB\s*([\d,]+(?:\.\d{1,2})?)/gi,
+                amountBirr: /\bbirr\s*([\d,]+(?:\.\d{1,2})?)/gi,
+                amountBr: /\bBr\.?\s*([\d,]+(?:\.\d{1,2})?)/gi,
 
-        // Toggle API key visibility
-        function toggleApiKeyVisibility() {
-            const apiInput = document.getElementById('apiKeyInput');
-            const type = apiInput.type === 'password' ? 'text' : 'password';
-            apiInput.type = type;
-        }
+                // Previous balance
+                prevBalance: /previous\s*balance\s*(?:was|is|:)?\s*(?:ETB\s*)?([\d,]+(?:\.\d{1,2})?)/i,
+                prevBalanceAlt: /balance\s*before\s*(?:was|is|:)?\s*(?:ETB\s*)?([\d,]+(?:\.\d{1,2})?)/i,
+                prevBalanceAlt2: /old\s*balance\s*(?:was|is|:)?\s*(?:ETB\s*)?([\d,]+(?:\.\d{1,2})?)/i,
 
-        // ===== GEMINI VISION API ANALYSIS =====
-        async function analyzeScreenshot() {
-            if (!screenshotLoaded || analysisInProgress || !currentImageDataURL) return;
+                // Current balance
+                currentBalance: /(?:current|new|available|remaining)\s*balance\s*(?:is|:|was)?\s*(?:ETB\s*)?([\d,]+(?:\.\d{1,2})?)/i,
+                currentBalanceSimple: /balance\s*(?:is|:|was)?\s*(?:ETB\s*)?([\d,]+(?:\.\d{1,2})?)/i,
 
-            // Get API key from user input
-            const apiKey = document.getElementById('apiKeyInput').value.trim();
-            if (!apiKey) {
-                showErrorResult('Please enter a valid API Key to connect with Google AI');
-                return;
+                // Transaction amount (received/credited/sent/transferred/paid)
+                receivedAmount: /(?:received|credited|deposited)\s+(?:ETB\s*)?([\d,]+(?:\.\d{1,2})?)/i,
+                sentAmount: /(?:transferred|sent|paid|debited|withdrawn)\s+(?:ETB\s*)?([\d,]+(?:\.\d{1,2})?)/i,
+                amountAfterKeyword: /(?:amount\s*of)\s*(?:ETB\s*)?([\d,]+(?:\.\d{1,2})?)/i,
+
+                // Timestamp
+                dateTimeFull: /(\d{4})[-/](\d{1,2})[-/](\d{1,2})[T\s]+(\d{1,2}):(\d{2})(?::(\d{2}))?/,
+                dateTimeSlash: /(\d{1,2})[/](\d{1,2})[/](\d{4})[T\s]+(\d{1,2}):(\d{2})(?::(\d{2}))?/,
+                dateOnly: /(\d{4})[-/](\d{1,2})[-/](\d{1,2})/,
+                timeOnly: /(\d{1,2}):(\d{2})(?::(\d{2}))?/,
+
+                // Credit/debit detection
+                creditKeyword: /(received|credited|deposited|incoming|added)/i,
+                debitKeyword: /(transferred|sent|paid|debited|withdrawn|outgoing|deducted)/i,
+            };
+
+            // ─── Utility Functions ────────────────────────────────────────
+            function parseNumber(str) {
+                if (!str) return null;
+                const cleaned = str.replace(/,/g, '').trim();
+                const num = parseFloat(cleaned);
+                return isNaN(num) ? null : num;
             }
 
-            analysisInProgress = true;
-            const progressContainer = document.getElementById('progressContainer');
-            const progressFill = document.getElementById('progressFill');
-            const progressLabel = document.getElementById('progressLabel');
-            const progressPercent = document.getElementById('progressPercent');
-            const resultContainer = document.getElementById('analysisResultContainer');
-            const analyzeBtn = document.getElementById('btnAnalyze');
-
-            resultContainer.classList.add('hidden');
-            resultContainer.innerHTML = '';
-            progressContainer.classList.remove('hidden');
-            analyzeBtn.disabled = true;
-            analyzeBtn.style.opacity = '0.6';
-
-            // Reset progress
-            progressFill.style.width = '0%';
-            progressPercent.textContent = '0%';
-            progressLabel.textContent = 'Sending to Gemini Vision API...';
-
-            let progress = 0;
-            const progressInterval = setInterval(() => {
-                if (progress < 90) {
-                    progress += Math.random() * 5;
-                    if (progress > 90) progress = 90;
-                    progressFill.style.width = progress + '%';
-                    progressPercent.textContent = Math.round(progress) + '%';
-                    if (progress < 40) progressLabel.textContent = 'Uploading image...';
-                    else if (progress < 70) progressLabel.textContent = 'Waiting for Gemini analysis...';
-                    else progressLabel.textContent = 'Processing AI response...';
+            function extractAllAmounts(text) {
+                const amounts = [];
+                const patterns = [REGEX.amountETB, REGEX.amountBirr, REGEX.amountBr];
+                patterns.forEach(pattern => {
+                    pattern.lastIndex = 0;
+                    let match;
+                    while ((match = pattern.exec(text)) !== null) {
+                        const val = parseNumber(match[1]);
+                        if (val !== null) amounts.push(val);
+                    }
+                });
+                // Also try generic number extraction after currency keywords
+                const genericPattern = /(?:ETB|Birr|Br\.?)\s*([\d,]+(?:\.\d{1,2})?)/gi;
+                genericPattern.lastIndex = 0;
+                let gm;
+                while ((gm = genericPattern.exec(text)) !== null) {
+                    const val = parseNumber(gm[1]);
+                    if (val !== null && !amounts.includes(val)) amounts.push(val);
                 }
-            }, 200);
+                return amounts;
+            }
 
-            try {
-                const base64Data = currentImageDataURL.split(',')[1];
-                const mimeType = currentImageDataURL.split(';')[0].split(':')[1] || 'image/png';
+            function isLeapYear(year) {
+                return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+            }
 
-                const promptText = 'Analyze this image. Is it a genuine, unedited Telebirr or Ethio Telecom transaction screenshot, or does it look modified, edited, or fake? Reply in a strict JSON format only: {"status": "AUTHENTIC" or "FORGED", "score": percentage_confidence, "reason": "short explanation in English"}';
+            function daysInMonth(month, year) {
+                const days = [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                return days[month - 1] || 0;
+            }
 
-                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+            function identifyPlatform(text) {
+                const isTelebirr = REGEX.telebirrKeyword.test(text);
+                const isCBE = REGEX.cbeKeyword.test(text);
+                if (isTelebirr && isCBE) return 'ambiguous';
+                if (isTelebirr) return 'telebirr';
+                if (isCBE) return 'cbe';
+                return 'unknown';
+            }
 
-                const requestBody = {
-                    contents: [
-                        {
-                            parts: [
-                                { text: promptText },
-                                { inline_data: { mime_type: mimeType, data: base64Data } }
-                            ]
+            function findTimestamp(text) {
+                // Try full datetime formats
+                let match = REGEX.dateTimeFull.exec(text);
+                if (match) {
+                    return {
+                        year: parseInt(match[1]),
+                        month: parseInt(match[2]),
+                        day: parseInt(match[3]),
+                        hour: parseInt(match[4]),
+                        minute: parseInt(match[5]),
+                        second: match[6] ? parseInt(match[6]) : 0,
+                        raw: match[0]
+                    };
+                }
+                match = REGEX.dateTimeSlash.exec(text);
+                if (match) {
+                    return {
+                        year: parseInt(match[3]),
+                        month: parseInt(match[2]),
+                        day: parseInt(match[1]),
+                        hour: parseInt(match[4]),
+                        minute: parseInt(match[5]),
+                        second: match[6] ? parseInt(match[6]) : 0,
+                        raw: match[0]
+                    };
+                }
+                // Date only
+                match = REGEX.dateOnly.exec(text);
+                if (match) {
+                    return {
+                        year: parseInt(match[1]),
+                        month: parseInt(match[2]),
+                        day: parseInt(match[3]),
+                        hour: null,
+                        minute: null,
+                        second: null,
+                        raw: match[0]
+                    };
+                }
+                return null;
+            }
+
+            function validateTimestamp(ts) {
+                if (!ts) return { valid: false, reason: 'No date/time string found in text.' };
+                if (ts.year < 2000 || ts.year > 2035) {
+                    return { valid: false, reason: `Year ${ts.year} is outside plausible range (2000-2035).` };
+                }
+                if (ts.month < 1 || ts.month > 12) {
+                    return { valid: false, reason: `Month ${ts.month} is invalid (must be 1-12).` };
+                }
+                const maxDay = daysInMonth(ts.month, ts.year);
+                if (ts.day < 1 || ts.day > maxDay) {
+                    return { valid: false, reason: `Day ${ts.day} is invalid for month ${ts.month}, year ${ts.year} (max: ${maxDay}).` };
+                }
+                if (ts.hour !== null) {
+                    if (ts.hour < 0 || ts.hour > 23) {
+                        return { valid: false, reason: `Hour ${ts.hour} is invalid (must be 0-23).` };
+                    }
+                    if (ts.minute < 0 || ts.minute > 59) {
+                        return { valid: false, reason: `Minute ${ts.minute} is invalid (must be 0-59).` };
+                    }
+                    if (ts.second !== null && (ts.second < 0 || ts.second > 59)) {
+                        return { valid: false, reason: `Second ${ts.second} is invalid (must be 0-59).` };
+                    }
+                }
+                return { valid: true, reason: 'Timestamp is mathematically valid.' };
+            }
+
+            function checkTransactionID(text, platform) {
+                const results = { valid: false, details: '', rawID: null };
+
+                if (platform === 'telebirr') {
+                    // Check Telebirr ID format
+                    const tbMatch = REGEX.telebirrID.exec(text) || REGEX.telebirrIDAlt.exec(text);
+                    if (tbMatch) {
+                        const id = tbMatch[0].replace(/\s+/g, '');
+                        results.rawID = id;
+                        const digits = id.replace(/[^0-9]/g, '');
+                        if (digits.length >= 8 && digits.length <= 15) {
+                            results.valid = true;
+                            results.details = `Telebirr ID "${id}" matches official structure (${digits.length} digits).`;
+                        } else {
+                            results.valid = false;
+                            results.details =
+                                `Telebirr ID "${id}" has ${digits.length} digits — expected 8-15 digits in official format.`;
                         }
-                    ]
+                    } else {
+                        // Check generic reference
+                        const genMatch = REGEX.genericRef.exec(text);
+                        if (genMatch) {
+                            const id = genMatch[1];
+                            results.rawID = id;
+                            results.valid = false;
+                            results.details = `Reference "${id}" does not match Telebirr official ID pattern (TB + 8-15 digits).`;
+                        } else {
+                            results.valid = false;
+                            results.details = 'No transaction reference ID found in the text.';
+                        }
+                    }
+                } else if (platform === 'cbe') {
+                    const ftMatch = REGEX.cbeID.exec(text);
+                    const cbeAltMatch = REGEX.cbeIDAlt.exec(text);
+                    if (ftMatch) {
+                        const id = ftMatch[0];
+                        results.rawID = id;
+                        const digits = id.replace(/[^0-9]/g, '');
+                        if (digits.length >= 10 && digits.length <= 16) {
+                            results.valid = true;
+                            results.details = `CBE ID "${id}" matches official structure (FT + 10-16 alphanumeric).`;
+                        } else {
+                            results.valid = false;
+                            results.details =
+                                `CBE ID "${id}" has ${digits.length} digits — expected 10-16 in official FT format.`;
+                        }
+                    } else if (cbeAltMatch) {
+                        const id = cbeAltMatch[1] || cbeAltMatch[0];
+                        results.rawID = id;
+                        results.valid = false;
+                        results.details = `Reference "${id}" does not match CBE official FT pattern.`;
+                    } else {
+                        const genMatch = REGEX.genericRef.exec(text);
+                        if (genMatch) {
+                            results.rawID = genMatch[1];
+                            results.valid = false;
+                            results.details = `Reference "${genMatch[1]}" does not match CBE official FT ID format.`;
+                        } else {
+                            results.valid = false;
+                            results.details = 'No transaction reference ID found in the text.';
+                        }
+                    }
+                } else if (platform === 'unknown') {
+                    // Try both patterns
+                    const tbMatch = REGEX.telebirrID.exec(text) || REGEX.telebirrIDAlt.exec(text);
+                    const ftMatch = REGEX.cbeID.exec(text);
+                    if (tbMatch) {
+                        const id = tbMatch[0].replace(/\s+/g, '');
+                        results.rawID = id;
+                        const digits = id.replace(/[^0-9]/g, '');
+                        results.valid = digits.length >= 8 && digits.length <= 15;
+                        results.details = results.valid ?
+                            `Telebirr-style ID "${id}" found (platform not explicitly stated).` :
+                            `ID "${id}" found but platform not identified and format may not be official.`;
+                    } else if (ftMatch) {
+                        const id = ftMatch[0];
+                        results.rawID = id;
+                        const digits = id.replace(/[^0-9]/g, '');
+                        results.valid = digits.length >= 10 && digits.length <= 16;
+                        results.details = results.valid ?
+                            `CBE-style ID "${id}" found (platform not explicitly stated).` :
+                            `ID "${id}" found but platform not identified and format may not be official.`;
+                    } else {
+                        results.valid = false;
+                        results.details = 'No transaction ID found and platform not identified.';
+                    }
+                } else {
+                    results.valid = false;
+                    results.details = 'Ambiguous platform — both Telebirr and CBE keywords detected. Cannot verify ID against a single standard.';
+                }
+                return results;
+            }
+
+            function checkKeywords(text, platform) {
+                const results = { valid: false, details: '', foundKeywords: [] };
+                const hasTelebirr = REGEX.telebirrKeyword.test(text);
+                const hasCBE = REGEX.cbeKeyword.test(text);
+
+                if (hasTelebirr) results.foundKeywords.push('Ethio telecom / Telebirr');
+                if (hasCBE) results.foundKeywords.push('Commercial Bank of Ethiopia / CBE');
+
+                if (platform === 'telebirr') {
+                    if (hasTelebirr && !hasCBE) {
+                        results.valid = true;
+                        results.details = 'Official Telebirr keyword detected: "Ethio telecom" or "telebirr".';
+                    } else if (hasTelebirr && hasCBE) {
+                        results.valid = false;
+                        results.details = 'Both Telebirr and CBE keywords found — ambiguous source.';
+                    } else {
+                        results.valid = false;
+                        results.details = 'No official Telebirr keyword ("Ethio telecom" / "telebirr") detected.';
+                    }
+                } else if (platform === 'cbe') {
+                    if (hasCBE && !hasTelebirr) {
+                        results.valid = true;
+                        results.details = 'Official CBE keyword detected: "Commercial Bank of Ethiopia" / "CBE".';
+                    } else if (hasCBE && hasTelebirr) {
+                        results.valid = false;
+                        results.details = 'Both CBE and Telebirr keywords found — ambiguous source.';
+                    } else {
+                        results.valid = false;
+                        results.details = 'No official CBE keyword ("Commercial Bank of Ethiopia" / "CBE") detected.';
+                    }
+                } else if (platform === 'unknown') {
+                    results.valid = false;
+                    results.details = 'No recognized platform keyword found. Text must contain "Ethio telecom", "telebirr", or "Commercial Bank of Ethiopia".';
+                } else {
+                    results.valid = false;
+                    results.details = 'Ambiguous platform identification.';
+                }
+                return results;
+            }
+
+            function checkMathBalance(text, platform) {
+                const results = {
+                    valid: false,
+                    details: '',
+                    amount: null,
+                    currentBalance: null,
+                    previousBalance: null,
+                    isCredit: null,
+                    mathCheck: null
                 };
 
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(requestBody)
-                });
+                // Determine credit or debit
+                const isCredit = REGEX.creditKeyword.test(text);
+                const isDebit = REGEX.debitKeyword.test(text);
 
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    const errorMessage = errorData.error?.message || `API request failed with status ${response.status}`;
-                    throw new Error(errorMessage);
+                // Extract previous balance
+                let prevMatch = REGEX.prevBalance.exec(text);
+                if (!prevMatch) prevMatch = REGEX.prevBalanceAlt.exec(text);
+                if (!prevMatch) prevMatch = REGEX.prevBalanceAlt2.exec(text);
+                const prevBalance = prevMatch ? parseNumber(prevMatch[1]) : null;
+
+                // Extract current balance
+                let currMatch = REGEX.currentBalance.exec(text);
+                if (!currMatch) currMatch = REGEX.currentBalanceSimple.exec(text);
+                const currBalance = currMatch ? parseNumber(currMatch[1]) : null;
+
+                // Extract transaction amount
+                let amount = null;
+                let amountMatch = REGEX.receivedAmount.exec(text);
+                if (amountMatch) {
+                    amount = parseNumber(amountMatch[1]);
+                } else {
+                    amountMatch = REGEX.sentAmount.exec(text);
+                    if (amountMatch) amount = parseNumber(amountMatch[1]);
+                }
+                if (amount === null) {
+                    amountMatch = REGEX.amountAfterKeyword.exec(text);
+                    if (amountMatch) amount = parseNumber(amountMatch[1]);
                 }
 
-                const responseData = await response.json();
-                let responseText = '';
-                if (responseData.candidates && responseData.candidates.length > 0 &&
-                    responseData.candidates[0].content && responseData.candidates[0].content.parts &&
-                    responseData.candidates[0].content.parts.length > 0) {
-                    responseText = responseData.candidates[0].content.parts[0].text || '';
-                }
+                results.amount = amount;
+                results.currentBalance = currBalance;
+                results.previousBalance = prevBalance;
+                results.isCredit = isCredit;
 
-                let parsedResult = null;
-                try {
-                    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-                    if (jsonMatch) {
-                        parsedResult = JSON.parse(jsonMatch[0]);
-                    } else {
-                        parsedResult = JSON.parse(responseText);
+                // If amount not found via keyword, try to infer from all amounts
+                if (amount === null) {
+                    const allAmounts = extractAllAmounts(text);
+                    if (allAmounts.length >= 2) {
+                        // If we have prev and curr, the amount is the difference
+                        if (prevBalance !== null && currBalance !== null) {
+                            const diff = Math.abs(currBalance - prevBalance);
+                            if (diff > 0) {
+                                amount = diff;
+                                results.amount = amount;
+                                results.details =
+                                    `Amount inferred from balance difference: |${currBalance} - ${prevBalance}| = ${diff}.`;
+                            }
+                        }
                     }
-                } catch (parseError) {
-                    console.error('Failed to parse Gemini response:', parseError);
-                    throw new Error('Invalid response format from AI');
                 }
 
-                if (!parsedResult || !parsedResult.status) {
-                    throw new Error('Missing status in AI response');
+                // Math check
+                if (prevBalance !== null && currBalance !== null && amount !== null) {
+                    const epsilon = 0.01;
+                    let expected;
+                    if (isCredit) {
+                        expected = prevBalance + amount;
+                        const diff = Math.abs(expected - currBalance);
+                        if (diff <= epsilon) {
+                            results.valid = true;
+                            results.mathCheck = 'pass';
+                            results.details =
+                                `Math verified: Previous (${prevBalance}) + Amount (${amount}) = ${expected} ≈ Current (${currBalance}). ✓`;
+                        } else {
+                            results.valid = false;
+                            results.mathCheck = 'fail';
+                            results.details =
+                                `🚨 Mathematical inconsistency: Previous (${prevBalance}) + Amount (${amount}) = ${expected}, but Current balance is ${currBalance}. Difference: ${diff.toFixed(2)} ETB.`;
+                        }
+                    } else if (isDebit) {
+                        expected = prevBalance - amount;
+                        const diff = Math.abs(expected - currBalance);
+                        if (diff <= epsilon) {
+                            results.valid = true;
+                            results.mathCheck = 'pass';
+                            results.details =
+                                `Math verified: Previous (${prevBalance}) - Amount (${amount}) = ${expected} ≈ Current (${currBalance}). ✓`;
+                        } else {
+                            results.valid = false;
+                            results.mathCheck = 'fail';
+                            results.details =
+                                `🚨 Mathematical inconsistency: Previous (${prevBalance}) - Amount (${amount}) = ${expected}, but Current balance is ${currBalance}. Difference: ${diff.toFixed(2)} ETB.`;
+                        }
+                    } else {
+                        // Can't determine credit/debit, but check if numbers are close either way
+                        const creditDiff = Math.abs(prevBalance + amount - currBalance);
+                        const debitDiff = Math.abs(prevBalance - amount - currBalance);
+                        if (creditDiff <= epsilon || debitDiff <= epsilon) {
+                            results.valid = true;
+                            results.mathCheck = 'pass';
+                            results.details = `Math verified: Numbers are mathematically consistent. ✓`;
+                        } else {
+                            results.valid = false;
+                            results.mathCheck = 'fail';
+                            results.details =
+                                `🚨 Mathematical inconsistency: No consistent relationship found between Previous (${prevBalance}), Amount (${amount}), and Current (${currBalance}).`;
+                        }
+                    }
+                } else if (currBalance !== null && amount !== null && prevBalance === null) {
+                    // Only have current balance and amount — check plausibility
+                    if (isCredit && currBalance < amount) {
+                        results.valid = false;
+                        results.details =
+                            `🚨 Suspicious: Credit of ${amount} ETB but current balance (${currBalance}) is less than the credit amount.`;
+                    } else if (isDebit && currBalance < 0) {
+                        results.valid = false;
+                        results.details = `🚨 Suspicious: Debit of ${amount} ETB leads to negative balance (${currBalance}).`;
+                    } else if (amount !== null && currBalance !== null && amount > 0 && currBalance >= 0) {
+                        results.valid = true;
+                        results.details = `No previous balance found — cannot verify full math. Basic plausibility check passed (amount: ${amount}, balance: ${currBalance}).`;
+                    } else {
+                        results.valid = false;
+                        results.details = 'Insufficient data for math verification. Previous balance not found.';
+                    }
+                } else if (prevBalance !== null && currBalance !== null && amount === null) {
+                    // Have prev and curr but no explicit amount
+                    const diff = Math.abs(currBalance - prevBalance);
+                    if (diff > 0) {
+                        results.valid = true;
+                        results.details = `No explicit amount found, but balance changed from ${prevBalance} to ${currBalance} (Δ=${diff}). Math structurally consistent.`;
+                    } else {
+                        results.valid = false;
+                        results.details = 'No explicit amount found and no balance change detected — suspicious.';
+                    }
+                } else {
+                    results.valid = false;
+                    results.details = 'Insufficient numeric data to perform math audit. Transaction amount and current balance required.';
                 }
-
-                clearInterval(progressInterval);
-                progressFill.style.width = '100%';
-                progressPercent.textContent = '100%';
-                progressLabel.textContent = 'Analysis complete';
-                progressContainer.classList.add('hidden');
-                analysisInProgress = false;
-                analyzeBtn.disabled = false;
-                analyzeBtn.style.opacity = '1';
-
-                showAnalysisResult(parsedResult);
-
-            } catch (error) {
-                clearInterval(progressInterval);
-                console.error('Analysis error:', error);
-                progressContainer.classList.add('hidden');
-                analysisInProgress = false;
-                analyzeBtn.disabled = false;
-                analyzeBtn.style.opacity = '1';
-                showErrorResult(error.message || 'Analysis failed');
+                return results;
             }
-        }
 
-        function showAnalysisResult(parsedResult) {
-            const resultContainer = document.getElementById('analysisResultContainer');
-            resultContainer.classList.remove('hidden');
-            resultContainer.innerHTML = '';
+            // ─── Main Scan Function ───────────────────────────────────────
+            function runScan() {
+                const text = smsInput.value.trim();
 
-            const status = parsedResult.status.toUpperCase();
-            const score = parsedResult.score || 0;
-            const reason = parsedResult.reason || 'No explanation provided';
+                if (!text) {
+                    showError('⚠️ Please paste SMS or Telegram text first.');
+                    return;
+                }
 
-            if (status === 'AUTHENTIC') {
-                resultContainer.innerHTML = `
-                    <div class="result-card result-legit">
-                        <div class="flex items-start gap-3">
-                            <span class="text-2xl mt-0.5">✅</span>
-                            <div class="flex-1">
-                                <h3 class="font-bold text-green-400 text-sm tracking-wide">AI VERIFIED: AUTHENTIC SCREENSHOT</h3>
-                                <p class="text-green-300/70 text-[0.72rem] mt-1 leading-relaxed">${reason}</p>
-                                <div class="grid grid-cols-2 gap-1.5 mt-3 text-[0.6rem]">
-                                    <div class="flex items-center gap-1.5 text-green-400"><span class="w-1 h-1 rounded-full bg-green-400"></span> Confidence: ${score}%</div>
-                                    <div class="flex items-center gap-1.5 text-green-400"><span class="w-1 h-1 rounded-full bg-green-400"></span> Status: AUTHENTIC</div>
-                                    <div class="flex items-center gap-1.5 text-green-400"><span class="w-1 h-1 rounded-full bg-green-400"></span> Engine: Gemini Vision</div>
-                                    <div class="flex items-center gap-1.5 text-green-400"><span class="w-1 h-1 rounded-full bg-green-400"></span> Tampering: None Detected</div>
-                                </div>
+                if (text.length < 20) {
+                    showError('⚠️ Text is too short to be a valid transaction message. Please paste the full SMS/Telegram text.');
+                    return;
+                }
+
+                // Brief loading state
+                scanBtn.innerHTML = '<span class="spinner"></span> SCANNING...';
+                scanBtn.disabled = true;
+
+                setTimeout(() => {
+                    try {
+                        const platform = identifyPlatform(text);
+                        const idResult = checkTransactionID(text, platform);
+                        const kwResult = checkKeywords(text, platform);
+                        const mathResult = checkMathBalance(text, platform);
+                        const ts = findTimestamp(text);
+                        const tsResult = validateTimestamp(ts);
+
+                        const allPassed = idResult.valid && kwResult.valid && mathResult.valid && tsResult.valid;
+
+                        renderResults({
+                            platform,
+                            idResult,
+                            kwResult,
+                            mathResult,
+                            tsResult,
+                            ts,
+                            allPassed,
+                            rawText: text
+                        });
+
+                    } catch (err) {
+                        showError('⚠️ Error during scan: ' + err.message);
+                    } finally {
+                        scanBtn.innerHTML = '🔒 RUN FORENSIC SCAN';
+                        scanBtn.disabled = false;
+                    }
+                }, 350);
+            }
+
+            function showError(msg) {
+                resultsSection.classList.add('visible');
+                resultCard.className = 'result-card fail';
+                resultCard.innerHTML = `
+                    <span class="result-icon">⚠️</span>
+                    <div class="result-title">SCAN ERROR</div>
+                    <div class="result-detail">${msg}</div>
+                `;
+            }
+
+            function renderResults(data) {
+                const { platform, idResult, kwResult, mathResult, tsResult, ts, allPassed, rawText } = data;
+                const platformNames = { telebirr: '📱 Telebirr', cbe: '🏦 CBE', unknown: '❓ Unknown', ambiguous: '⚠️ Ambiguous' };
+                const platformName = platformNames[platform] || platform;
+
+                let html = '';
+
+                if (allPassed) {
+                    html += `
+                        <div class="result-card pass">
+                            <span class="result-icon">✅</span>
+                            <div class="result-title">AUDIT PASSED: AUTHENTIC TEXT TRANSACTION</div>
+                            <div class="result-detail">All structural, mathematical, and timestamp checks passed. This text appears to be a genuine ${platformName} transaction message.</div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="result-card fail">
+                            <span class="result-icon">🚨</span>
+                            <div class="result-title">FRAUD DETECTED: RULE VIOLATION</div>
+                            <div class="result-detail">One or more forensic checks failed. Detailed breakdown below.</div>
+                        </div>
+                    `;
+                }
+
+                // Platform
+                html += `
+                    <div class="test-results">
+                        <div class="test-item ${platform !== 'unknown' && platform !== 'ambiguous' ? 'pass-item' : 'fail-item'}">
+                            <span class="test-icon">${platform !== 'unknown' && platform !== 'ambiguous' ? '✅' : '❌'}</span>
+                            <div class="test-content">
+                                <div class="test-name">Platform Identification</div>
+                                <div class="test-description">${platformName} detected.</div>
+                            </div>
+                        </div>
+                        <div class="test-item ${idResult.valid ? 'pass-item' : 'fail-item'}">
+                            <span class="test-icon">${idResult.valid ? '✅' : '❌'}</span>
+                            <div class="test-content">
+                                <div class="test-name">Transaction ID Verification</div>
+                                <div class="test-description">${idResult.details}</div>
+                                ${idResult.rawID ? `<div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;font-family:monospace;">ID: ${idResult.rawID}</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="test-item ${kwResult.valid ? 'pass-item' : 'fail-item'}">
+                            <span class="test-icon">${kwResult.valid ? '✅' : '❌'}</span>
+                            <div class="test-content">
+                                <div class="test-name">Keyword & Mandatory Marker Check</div>
+                                <div class="test-description">${kwResult.details}${kwResult.foundKeywords.length ? ` Found: ${kwResult.foundKeywords.join(', ')}.` : ''}</div>
+                            </div>
+                        </div>
+                        <div class="test-item ${mathResult.valid ? 'pass-item' : 'fail-item'}">
+                            <span class="test-icon">${mathResult.valid ? '✅' : '❌'}</span>
+                            <div class="test-content">
+                                <div class="test-name">Math Balance Auditor</div>
+                                <div class="test-description">${mathResult.details}</div>
+                            </div>
+                        </div>
+                        <div class="test-item ${tsResult.valid ? 'pass-item' : 'fail-item'}">
+                            <span class="test-icon">${tsResult.valid ? '✅' : '❌'}</span>
+                            <div class="test-content">
+                                <div class="test-name">Timestamp Validity Check</div>
+                                <div class="test-description">${tsResult.details}${ts ? ` Extracted: ${ts.raw}` : ''}</div>
                             </div>
                         </div>
                     </div>
                 `;
-            } else {
-                resultContainer.innerHTML = `
-                    <div class="result-card result-critical">
-                        <div class="flex items-start gap-3">
-                            <span class="text-2xl mt-0.5">🚨</span>
-                            <div class="flex-1">
-                                <h3 class="font-bold text-red-400 text-sm tracking-wide">CRITICAL WARNING: TAMPERED SCREENSHOT DETECTED</h3>
-                                <p class="text-red-300/70 text-[0.72rem] mt-1 leading-relaxed">${reason}</p>
-                                <div class="grid grid-cols-2 gap-1.5 mt-3 text-[0.6rem]">
-                                    <div class="flex items-center gap-1.5 text-red-400"><span class="w-1 h-1 rounded-full bg-red-400"></span> Confidence: ${score}%</div>
-                                    <div class="flex items-center gap-1.5 text-red-400"><span class="w-1 h-1 rounded-full bg-red-400"></span> Status: FORGED</div>
-                                    <div class="flex items-center gap-1.5 text-red-400"><span class="w-1 h-1 rounded-full bg-red-400"></span> Engine: Gemini Vision</div>
-                                    <div class="flex items-center gap-1.5 text-red-400"><span class="w-1 h-1 rounded-full bg-red-400"></span> Tampering: Likely</div>
-                                </div>
+
+                // Extracted data section
+                html += `
+                    <div class="extracted-data">
+                        <div class="extracted-title">📊 Extracted Transaction Metrics</div>
+                        <div class="data-grid">
+                            <div class="data-item">
+                                <div class="data-label">Platform</div>
+                                <div class="data-value">${platformName}</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">Transaction Amount</div>
+                                <div class="data-value amount">${mathResult.amount !== null ? 'ETB ' + mathResult.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : 'N/A'}</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">Current Balance</div>
+                                <div class="data-value balance">${mathResult.currentBalance !== null ? 'ETB ' + mathResult.currentBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : 'N/A'}</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">Previous Balance</div>
+                                <div class="data-value">${mathResult.previousBalance !== null ? 'ETB ' + mathResult.previousBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : 'N/A'}</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">Transaction Type</div>
+                                <div class="data-value">${mathResult.isCredit === true ? 'Credit' : mathResult.isCredit === false ? 'Debit' : 'Unknown'}</div>
+                            </div>
+                            <div class="data-item">
+                                <div class="data-label">Reference ID</div>
+                                <div class="data-value ref">${idResult.rawID || 'N/A'}</div>
                             </div>
                         </div>
                     </div>
                 `;
+
+                resultCard.innerHTML = html;
+                resultsSection.classList.add('visible');
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
-        }
 
-        function showErrorResult(errorMessage) {
-            const resultContainer = document.getElementById('analysisResultContainer');
-            resultContainer.classList.remove('hidden');
-            resultContainer.innerHTML = `
-                <div class="result-card result-critical">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl mt-0.5">⚠️</span>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-red-400 text-sm tracking-wide">ANALYSIS ERROR</h3>
-                            <p class="text-red-300/70 text-[0.72rem] mt-1 leading-relaxed">${errorMessage}</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
+            // ─── Event Listeners ──────────────────────────────────────────
+            scanBtn.addEventListener('click', runScan);
 
-        // ===== INITIALIZATION =====
-        document.addEventListener('DOMContentLoaded', function() {
-            switchTab('sms');
-            updateNetworkStatus();
-            const analyzeBtn = document.getElementById('btnAnalyze');
-            analyzeBtn.disabled = true;
-            analyzeBtn.style.opacity = '0.6';
-            document.getElementById('smsInput').addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault(); verifySms(); }
+            clearBtn.addEventListener('click', () => {
+                smsInput.value = '';
+                resultsSection.classList.remove('visible');
+                smsInput.focus();
             });
-            console.log('[Telecore AI-Mesh] Dashboard initialized — Gemini Vision Integration Ready');
-            console.log('[Telecore AI-Mesh] Network status:', isOnline ? 'ONLINE' : 'OFFLINE');
-        });
+
+            // Sample chips
+            sampleRow.addEventListener('click', (e) => {
+                const chip = e.target.closest('.sample-chip');
+                if (!chip) return;
+                const key = chip.dataset.sample;
+                if (SAMPLE_TEXTS[key]) {
+                    smsInput.value = SAMPLE_TEXTS[key];
+                    smsInput.focus();
+                    resultsSection.classList.remove('visible');
+                }
+            });
+
+            // Ctrl+Enter shortcut
+            smsInput.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'Enter') {
+                    e.preventDefault();
+                    runScan();
+                }
+            });
+
+            // Auto-resize textarea
+            smsInput.addEventListener('input', () => {
+                smsInput.style.height = 'auto';
+                smsInput.style.height = Math.min(smsInput.scrollHeight, 400) + 'px';
+            });
+
+            // Initial height
+            smsInput.style.height = 'auto';
+            smsInput.style.height = Math.min(smsInput.scrollHeight, 400) + 'px';
+
+            console.log('%c🛡️ Tele-Safe AI — Forensic Engine Loaded', 'color:#10b981;font-weight:bold;font-size:14px;');
+            console.log('%c100% Client-Side | No External APIs | GitHub Pages Ready', 'color:#94a3b8;font-size:11px;');
+            console.log('%cEthiopian Digital Wallet Screener: Telebirr & CBE', 'color:#f59e0b;font-size:11px;');
+        })();
     </script>
 </body>
-    </html>
+</html>
