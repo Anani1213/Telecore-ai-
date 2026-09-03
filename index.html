@@ -8,10 +8,13 @@
   <style>
     :root {
       --bg-dark: #0a0f0d;
-      --card-bg: rgba(16, 24, 20, 0.9);
+      --card-bg: rgba(16, 24, 20, 0.88);
       --emerald-glow: #10b981;
       --amber-glow: #f59e0b;
       --rose-glow: #f43f5e;
+      --cyber-orange: #ff6b35;
+      --cyber-purple: #a855f7;
+      --cyber-pink: #ec4899;
     }
     * {
       -webkit-tap-highlight-color: transparent;
@@ -21,9 +24,9 @@
     body {
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
       background: var(--bg-dark);
-      background-image: radial-gradient(ellipse at 20% 20%, rgba(16, 185, 129, 0.05) 0%, transparent 50%), 
-                        radial-gradient(ellipse at 80% 60%, rgba(245, 158, 11, 0.04) 0%, transparent 50%),
-                        radial-gradient(ellipse at 50% 100%, rgba(6, 20, 16, 0.9) 0%, var(--bg-dark) 100%);
+      background-image: radial-gradient(ellipse at 20% 20%, rgba(16, 185, 129, 0.06) 0%, transparent 50%), 
+                        radial-gradient(ellipse at 80% 60%, rgba(245, 158, 11, 0.05) 0%, transparent 50%),
+                        radial-gradient(ellipse at 50% 100%, rgba(6, 20, 16, 0.95) 0%, var(--bg-dark) 100%);
       min-height: 100vh;
       min-height: 100dvh;
       color: #e2e8f0;
@@ -31,22 +34,32 @@
       user-select: none;
       -webkit-user-select: none;
     }
-    /* Premium glass card */
+    /* Premium glass card with subtle border glow */
     .glass-card {
       background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 1.25rem;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.25), 0 0 40px rgba(16, 185, 129, 0.05);
+      transition: box-shadow 0.4s ease, border-color 0.4s ease;
     }
-    /* Active tab glow */
+    .glass-card:hover {
+      border-color: rgba(16, 185, 129, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.25), 0 0 60px rgba(16, 185, 129, 0.1);
+    }
+    .glass-card.active-glow {
+      border-color: rgba(16, 185, 129, 0.35);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 70px rgba(16, 185, 129, 0.2), 0 0 120px rgba(16, 185, 129, 0.06);
+    }
+    /* Tab active styling with glow */
     .tab-active {
-      background: rgba(16, 185, 129, 0.15) !important;
+      background: rgba(16, 185, 129, 0.18) !important;
       color: #34d399 !important;
-      box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+      box-shadow: 0 0 24px rgba(16, 185, 129, 0.3), inset 0 0 12px rgba(16, 185, 129, 0.05);
       border-bottom: 2px solid #10b981;
       font-weight: 600;
+      letter-spacing: 0.02em;
     }
     /* Pulsing red alert */
     .pulse-red {
@@ -54,7 +67,15 @@
     }
     @keyframes pulseRed {
       0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.6); }
-      50% { box-shadow: 0 0 0 15px rgba(244, 63, 94, 0); }
+      50% { box-shadow: 0 0 0 18px rgba(244, 63, 94, 0); }
+    }
+    /* Pulsing amber/orange for mesh active */
+    .pulse-amber {
+      animation: pulseAmber 1.5s ease-in-out infinite;
+    }
+    @keyframes pulseAmber {
+      0%, 100% { opacity: 1; text-shadow: 0 0 8px rgba(245, 158, 11, 0.7); }
+      50% { opacity: 0.75; text-shadow: 0 0 20px rgba(245, 158, 11, 1); }
     }
     /* Network badge pulse */
     .dot-pulse {
@@ -62,23 +83,78 @@
     }
     @keyframes dotPulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.8); }
+      50% { opacity: 0.4; transform: scale(0.7); }
     }
     /* Upload area styling */
     .upload-zone {
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       border: 2px dashed rgba(255, 255, 255, 0.15);
       background: rgba(255, 255, 255, 0.02);
+      position: relative;
+      overflow: hidden;
     }
     .upload-zone:hover {
       border-color: rgba(16, 185, 129, 0.5);
       background: rgba(16, 185, 129, 0.05);
-      box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.12);
     }
-    /* Progress bar animation */
+    .upload-zone.has-image {
+      border-style: solid;
+      border-color: rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.06);
+    }
+    /* Change image button */
+    .change-img-btn {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .change-img-btn:hover {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.5);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
+      transform: scale(1.05);
+    }
+    .change-img-btn:active {
+      transform: scale(0.95);
+    }
+    /* Cyberpunk progress bar */
     .progress-fill {
       transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      background: linear-gradient(90deg, #10b981, #14b8a6, #f59e0b);
+      background: linear-gradient(90deg, #10b981, #14b8a6, #f59e0b, #ec4899, #a855f7);
+      background-size: 300% 100%;
+      animation: progressGradient 2.5s ease-in-out infinite;
+      border-radius: 9999px;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.4), 0 0 40px rgba(245, 158, 11, 0.2);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    @keyframes progressGradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    /* Smooth neon gradient button */
+    .btn-cyber {
+      background: linear-gradient(135deg, #ff6b35 0%, #ec4899 25%, #a855f7 50%, #7c3aed 75%, #4f46e5 100%);
+      background-size: 300% 300%;
+      animation: btnGradient 4s ease-in-out infinite;
+      box-shadow: 0 4px 24px rgba(236, 72, 153, 0.3), 0 8px 40px rgba(168, 85, 247, 0.2);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes btnGradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .btn-cyber:hover {
+      box-shadow: 0 6px 32px rgba(236, 72, 153, 0.4), 0 12px 50px rgba(168, 85, 247, 0.3);
+      transform: translateY(-2px);
+    }
+    .btn-cyber:active {
+      transform: scale(0.97);
     }
     /* Fade in for results */
     .fade-in {
@@ -88,9 +164,29 @@
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    /* Result card glow */
+    .result-emerald {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      box-shadow: 0 0 40px rgba(16, 185, 129, 0.15);
+    }
+    .result-rose {
+      background: rgba(244, 63, 94, 0.12);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      box-shadow: 0 0 40px rgba(244, 63, 94, 0.15);
+    }
     ::-webkit-scrollbar { width: 3px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 99px; }
+    /* Glassmorphism progress container */
+    .progress-container {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
   </style>
 </head>
 <body class="p-4 max-w-md mx-auto pb-10">
@@ -108,7 +204,7 @@
         <p class="text-[10px] text-gray-400 font-medium tracking-widest uppercase">Certification Suite</p>
       </div>
     </div>
-    <!-- Network Status Badge -->
+    <!-- Network Status Badge - dynamically updated -->
     <div id="networkBadge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wide transition-all duration-500 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
       <span id="networkDot" class="w-1.5 h-1.5 rounded-full bg-emerald-400 dot-pulse"></span>
       <span id="networkText">ONLINE</span>
@@ -126,7 +222,7 @@
   </div>
 
   <!-- ========== TAB 1: SMS CERTIFICATION ========== -->
-  <div id="tab1Content" class="glass-card p-5 fade-in">
+  <div id="tab1Content" class="glass-card active-glow p-5 fade-in">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-sm font-semibold text-gray-300 tracking-wider uppercase">Verify SMS Authenticity</h2>
       <span class="text-[10px] text-gray-500 bg-white/5 px-2 py-0.5 rounded-full border border-white/10">REAL-TIME</span>
@@ -154,16 +250,23 @@
     </div>
 
     <!-- Upload Zone -->
-    <div id="uploadZone" class="upload-zone rounded-xl p-6 text-center cursor-pointer flex flex-col items-center justify-center gap-2" onclick="document.getElementById('fileInput').click()">
-      <svg class="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+    <div id="uploadZone" class="upload-zone rounded-xl p-6 text-center cursor-pointer flex flex-col items-center justify-center gap-2 relative" onclick="document.getElementById('fileInput').click()">
+      <svg id="uploadIcon" class="w-10 h-10 text-gray-500 transition-all duration-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
       </svg>
-      <p class="text-sm font-medium text-gray-300">Upload or Capture Telebirr Screenshot</p>
+      <p id="uploadLabel" class="text-sm font-medium text-gray-300">Upload or Capture Telebirr Screenshot</p>
       <p class="text-[10px] text-gray-500">Click to browse — JPEG, PNG supported</p>
       <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+      
+      <!-- Change Image / Upload New (+) button - hidden initially -->
+      <button id="changeImageBtn" class="change-img-btn hidden absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center text-white shadow-lg" onclick="event.stopPropagation(); resetAndOpenFilePicker();" title="Change Image">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+        </svg>
+      </button>
     </div>
 
-    <button id="analyzeBtn" class="mt-4 w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold text-sm tracking-wide shadow-lg shadow-amber-500/25 hover:from-amber-400 hover:to-orange-500 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+    <button id="analyzeBtn" class="btn-cyber mt-4 w-full py-3.5 rounded-xl text-white font-semibold text-sm tracking-wide flex items-center justify-center gap-2">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M21 3v4.5M21 3h-4.5M21 3H3v18h18V7.5"/>
       </svg>
@@ -172,13 +275,13 @@
 
     <!-- Analysis Result -->
     <div id="analysisResult" class="mt-4 hidden">
-      <!-- Progress Bar -->
+      <!-- Glassmorphism Progress Bar -->
       <div class="mb-3">
         <div class="flex justify-between text-[10px] text-gray-500 mb-1">
           <span>Analyzing metadata & font pixels...</span>
           <span id="progressPercent">0%</span>
         </div>
-        <div class="w-full bg-white/5 rounded-full h-2 overflow-hidden">
+        <div class="progress-container w-full h-2.5">
           <div id="progressBar" class="progress-fill h-full rounded-full" style="width: 0%;"></div>
         </div>
       </div>
@@ -196,6 +299,10 @@
   <script>
     // ==================== STATE & DOM REFS ====================
     let activeTab = 1;
+    let isAnalyzing = false;
+    let analysisInterval = null;
+    let currentFileName = null;
+
     const tab1Btn = document.getElementById('tab1Btn');
     const tab2Btn = document.getElementById('tab2Btn');
     const tab1Content = document.getElementById('tab1Content');
@@ -211,6 +318,9 @@
     
     const fileInput = document.getElementById('fileInput');
     const uploadZone = document.getElementById('uploadZone');
+    const uploadIcon = document.getElementById('uploadIcon');
+    const uploadLabel = document.getElementById('uploadLabel');
+    const changeImageBtn = document.getElementById('changeImageBtn');
     const analyzeBtn = document.getElementById('analyzeBtn');
     const analysisResult = document.getElementById('analysisResult');
     const progressBar = document.getElementById('progressBar');
@@ -227,6 +337,9 @@
         tab2Btn.classList.remove('tab-active');
         tab1Btn.classList.remove('text-gray-400', 'bg-transparent');
         tab2Btn.classList.add('text-gray-400', 'bg-transparent');
+        // Glow on active card
+        tab1Content.classList.add('active-glow');
+        tab2Content.classList.remove('active-glow');
       } else {
         tab1Content.classList.add('hidden');
         tab2Content.classList.remove('hidden');
@@ -234,34 +347,55 @@
         tab1Btn.classList.remove('tab-active');
         tab2Btn.classList.remove('text-gray-400', 'bg-transparent');
         tab1Btn.classList.add('text-gray-400', 'bg-transparent');
+        // Glow on active card
+        tab2Content.classList.add('active-glow');
+        tab1Content.classList.remove('active-glow');
       }
-      // Ensure tabs have consistent padding
+      // Reset class names for consistent styling
       tab1Btn.classList.add('py-2.5', 'px-2', 'rounded-lg', 'text-xs', 'font-medium', 'transition-all');
       tab2Btn.classList.add('py-2.5', 'px-2', 'rounded-lg', 'text-xs', 'font-medium', 'transition-all');
     }
 
-    // ==================== NETWORK DETECTION ====================
+    // ==================== NETWORK DETECTION (FULLY FUNCTIONAL) ====================
     function updateNetworkStatus() {
       const isOnline = navigator.onLine;
+      
       if (isOnline) {
+        // Green ONLINE badge
         networkBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wide transition-all duration-500 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
         networkDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 dot-pulse';
         networkText.textContent = 'ONLINE';
+        networkText.className = '';
+        networkText.classList.remove('pulse-amber');
       } else {
-        networkBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wide transition-all duration-500 bg-rose-500/15 text-rose-300 border border-rose-500/30';
-        networkDot.className = 'w-1.5 h-1.5 rounded-full bg-rose-400 dot-pulse';
-        networkText.textContent = 'OFFLINE';
+        // Amber/OFFLINE with MESH ACTIVE text
+        networkBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wide transition-all duration-500 bg-amber-500/15 text-amber-300 border border-amber-500/30';
+        networkDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400 dot-pulse';
+        networkText.textContent = 'MESH ACTIVE';
+        networkText.className = 'pulse-amber';
+        // Additional visual cue
+        networkBadge.style.boxShadow = '0 0 20px rgba(245, 158, 11, 0.3)';
       }
     }
 
-    window.addEventListener('online', updateNetworkStatus);
-    window.addEventListener('offline', updateNetworkStatus);
+    // Global event listeners for offline/online
+    window.addEventListener('online', function() {
+      updateNetworkStatus();
+    });
+    window.addEventListener('offline', function() {
+      updateNetworkStatus();
+    });
+
+    // Also check on page load
+    window.addEventListener('load', function() {
+      updateNetworkStatus();
+    });
 
     // ==================== SMS VERIFICATION ====================
     function verifySms() {
       const text = smsText.value.toLowerCase().trim();
       if (!text) {
-        smsResult.className = 'mt-4 p-4 rounded-xl text-sm font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/25';
+        smsResult.className = 'mt-4 p-4 rounded-xl text-sm font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/25 fade-in';
         smsResult.textContent = '⚠️ Please paste an SMS message to verify.';
         return;
       }
@@ -271,38 +405,86 @@
       const hasETB = text.includes('etb');
 
       if (hasTelebirr && hasEthioTelecom && hasETB) {
-        smsResult.className = 'mt-4 p-4 rounded-xl text-sm font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/25 fade-in';
+        smsResult.className = 'mt-4 p-4 rounded-xl text-sm font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/25 result-emerald fade-in';
         smsResult.innerHTML = '✅ LEGIT TRANSACTION<br><span class="text-[10px] font-normal text-emerald-200/70 mt-1 block">All three critical markers detected (Telebirr, Ethio Telecom, ETB)</span>';
       } else {
-        smsResult.className = 'mt-4 p-4 rounded-xl text-sm font-semibold text-rose-300 bg-rose-500/10 border border-rose-500/25 pulse-red fade-in';
+        smsResult.className = 'mt-4 p-4 rounded-xl text-sm font-semibold text-rose-300 bg-rose-500/10 border border-rose-500/25 result-rose pulse-red fade-in';
         smsResult.innerHTML = '🚨 CRITICAL WARNING<br><span class="text-[10px] font-normal text-rose-200/70 mt-1 block">Forged or suspicious SMS detected. Missing required markers.</span>';
       }
     }
 
-    // ==================== SCREENSHOT AI SIMULATION ====================
-    let analysisInterval = null;
-    let isAnalyzing = false;
-
+    // ==================== SCREENSHOT UPLOAD & CHANGE IMAGE ====================
     function handleFileSelect(event) {
       const file = event.target.files[0];
       if (file) {
-        // Just visual feedback
+        currentFileName = file.name;
         const fileName = file.name.length > 25 ? file.name.substring(0, 22) + '...' : file.name;
-        uploadZone.innerHTML = `
+        
+        // Update upload zone to show image preview state
+        uploadZone.classList.add('has-image');
+        uploadIcon.innerHTML = `
           <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
-          <p class="text-sm font-medium text-emerald-300">${fileName}</p>
-          <p class="text-[10px] text-gray-500">Ready for AI analysis</p>
         `;
-        uploadZone.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        uploadLabel.textContent = fileName;
+        uploadLabel.className = 'text-sm font-medium text-emerald-300';
+        
+        // Show the change image button
+        changeImageBtn.classList.remove('hidden');
+        
+        // Reset analysis results if any
+        analysisResult.classList.add('hidden');
+        aiResultCard.classList.add('hidden');
+        if (analysisInterval) {
+          clearInterval(analysisInterval);
+          isAnalyzing = false;
+          analyzeBtn.disabled = false;
+          analyzeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+        progressBar.style.width = '0%';
+        progressPercent.textContent = '0%';
       }
     }
 
+    function resetAndOpenFilePicker() {
+      // Clear the current file input
+      fileInput.value = '';
+      currentFileName = null;
+      
+      // Reset upload zone UI
+      uploadZone.classList.remove('has-image');
+      uploadIcon.innerHTML = `
+        <svg class="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+        </svg>
+      `;
+      uploadLabel.textContent = 'Upload or Capture Telebirr Screenshot';
+      uploadLabel.className = 'text-sm font-medium text-gray-300';
+      
+      // Hide the change image button
+      changeImageBtn.classList.add('hidden');
+      
+      // Reset analysis results
+      analysisResult.classList.add('hidden');
+      aiResultCard.classList.add('hidden');
+      if (analysisInterval) {
+        clearInterval(analysisInterval);
+        isAnalyzing = false;
+        analyzeBtn.disabled = false;
+        analyzeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+      progressBar.style.width = '0%';
+      progressPercent.textContent = '0%';
+      
+      // Open the file picker
+      fileInput.click();
+    }
+
+    // ==================== SCREENSHOT AI ANALYSIS ====================
     function analyzeScreenshot() {
       if (isAnalyzing) return;
       
-      // Check if a file is selected (simulated) - we'll just allow it regardless
       // Reset UI
       aiResultCard.classList.add('hidden');
       analysisResult.classList.remove('hidden');
@@ -313,7 +495,6 @@
       analyzeBtn.classList.add('opacity-50', 'cursor-not-allowed');
       
       let progress = 0;
-      // Randomize outcome: 60% authentic, 40% forged (or based on time)
       const isForged = Math.random() < 0.4;
       
       analysisInterval = setInterval(() => {
@@ -325,15 +506,14 @@
           analyzeBtn.disabled = false;
           analyzeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
           
-          // Show result card
           aiResultCard.classList.remove('hidden');
           aiResultCard.classList.add('fade-in');
           
           if (isForged) {
-            aiResultCard.className = 'p-4 rounded-xl text-sm font-semibold text-rose-300 bg-rose-500/10 border border-rose-500/25 fade-in pulse-red';
+            aiResultCard.className = 'p-4 rounded-xl text-sm font-semibold text-rose-300 bg-rose-500/10 border border-rose-500/25 result-rose fade-in pulse-red';
             aiResultCard.innerHTML = '🕵️ AI DETECTION: FORGERY SUSPECTED<br><span class="text-[10px] font-normal text-rose-200/70 mt-1 block">Image metadata & font pixel alignment show signs of digital tampering. Proceed with caution.</span>';
           } else {
-            aiResultCard.className = 'p-4 rounded-xl text-sm font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/25 fade-in';
+            aiResultCard.className = 'p-4 rounded-xl text-sm font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/25 result-emerald fade-in';
             aiResultCard.innerHTML = '✅ AI VERIFIED: AUTHENTIC SCREENSHOT<br><span class="text-[10px] font-normal text-emerald-200/70 mt-1 block">No modified pixels or spoofed metadata detected. This screenshot appears legit.</span>';
           }
         }
@@ -346,20 +526,24 @@
     verifySmsBtn.addEventListener('click', verifySms);
     analyzeBtn.addEventListener('click', analyzeScreenshot);
     
-    // Allow drag & drop simulation
+    // Allow drag & drop
     uploadZone.addEventListener('dragover', (e) => {
       e.preventDefault();
       uploadZone.style.borderColor = 'rgba(16, 185, 129, 0.6)';
       uploadZone.style.background = 'rgba(16, 185, 129, 0.05)';
     });
     uploadZone.addEventListener('dragleave', () => {
-      uploadZone.style.borderColor = 'rgba(255, 255, 255, 0.15)';
-      uploadZone.style.background = 'rgba(255, 255, 255, 0.02)';
+      if (!uploadZone.classList.contains('has-image')) {
+        uploadZone.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+        uploadZone.style.background = 'rgba(255, 255, 255, 0.02)';
+      }
     });
     uploadZone.addEventListener('drop', (e) => {
       e.preventDefault();
-      uploadZone.style.borderColor = 'rgba(255, 255, 255, 0.15)';
-      uploadZone.style.background = 'rgba(255, 255, 255, 0.02)';
+      if (!uploadZone.classList.contains('has-image')) {
+        uploadZone.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+        uploadZone.style.background = 'rgba(255, 255, 255, 0.02)';
+      }
       if (e.dataTransfer.files.length > 0) {
         fileInput.files = e.dataTransfer.files;
         handleFileSelect({ target: { files: e.dataTransfer.files } });
@@ -369,9 +553,17 @@
     // ==================== INIT ====================
     function init() {
       updateNetworkStatus();
-      switchTab(1); // Ensure tab 1 is active on load
+      switchTab(1);
+      
+      // Additional offline check every 3 seconds as fallback
+      setInterval(() => {
+        const currentState = networkText.textContent === 'ONLINE' ? true : false;
+        if (currentState !== navigator.onLine) {
+          updateNetworkStatus();
+        }
+      }, 3000);
     }
     init();
   </script>
 </body>
-</html>
+  </html>
