@@ -181,7 +181,7 @@
                         <span class="text-xl">🖼️</span>
                         <h2 class="text-sm font-bold tracking-wide text-white/90 uppercase">AI Screenshot Forensic Scan</h2>
                     </div>
-                    <p class="text-[0.72rem] text-gray-400 leading-relaxed">Upload a Telebirr transaction screenshot. Our neural engine analyzes pixel-level font metrics, EXIF metadata, and tamper signatures.</p>
+                    <p class="text-[0.72rem] text-gray-400 leading-relaxed">Upload a Telebirr transaction screenshot. Our AI engine uses Google Gemini Vision to analyze authenticity and detect tampering.</p>
 
                     <!-- Upload / Preview Zone -->
                     <div id="uploadZoneContainer" class="relative">
@@ -217,7 +217,7 @@
                     <!-- Progress Bar -->
                     <div id="progressContainer" class="hidden flex flex-col gap-2">
                         <div class="flex items-center justify-between text-[0.6rem] text-gray-400">
-                            <span id="progressLabel">Initializing neural scan...</span>
+                            <span id="progressLabel">Sending to Gemini Vision API...</span>
                             <span id="progressPercent" class="font-bold text-orange-400">0%</span>
                         </div>
                         <div class="progress-glass">
@@ -229,23 +229,26 @@
                 </div>
                 <div class="glass-card p-3.5 flex items-center gap-3 text-[0.65rem] text-gray-400 border-white/[0.06]">
                     <span class="text-base">🧠</span>
-                    <span>Real client-side pixel analysis using Canvas API — calibrated to reduce false positives. Only massive localized anomalies trigger alerts.</span>
+                    <span>Powered by Google Gemini Vision AI — real-time authenticity detection with no backend required.</span>
                 </div>
             </div>
         </main>
 
         <footer class="mt-5 pt-3 pb-1 text-center text-[0.6rem] text-gray-500 border-t border-white/[0.05]">
-            <p>Telecore AI-Mesh v2.4 • Offline Mesh-Ready • Smart Pixel Forensics</p>
+            <p>Telecore AI-Mesh v2.4 • Offline Mesh-Ready • Gemini Vision API</p>
         </footer>
     </div>
 
     <script>
         // ===== GLOBAL STATE =====
+        const GEMINI_API_KEY = 'AQ.Ab8RN6KRmVT095VVnr4xUzncUJj7VAUiRb0xUdoVpA3eJwl4ng'; // Your API key
+        const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
         let currentTab = 'sms';
         let screenshotLoaded = false;
         let analysisInProgress = false;
         let isOnline = navigator.onLine;
-        let currentImageDataURL = null;
+        let currentImageDataURL = null; // base64
 
         // ===== TAB SWITCHING =====
         function switchTab(tab) {
@@ -394,7 +397,7 @@
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                currentImageDataURL = e.target.result;
+                currentImageDataURL = e.target.result; // base64 with data:image prefix
                 const previewImg = document.getElementById('previewImage');
                 const previewContainer = document.getElementById('imagePreviewContainer');
                 const uploadPrompt = document.getElementById('uploadPrompt');
@@ -439,136 +442,7 @@
             setTimeout(() => { fileInput.click(); }, 50);
         }
 
-        // ===== IMPROVED REAL PIXEL ANALYSIS ENGINE =====
-        function performPixelAnalysis(imageDataURL) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.onload = function() {
-                    const maxWidth = 400; // slightly higher for better block stats
-                    const scale = Math.min(1, maxWidth / img.width);
-                    const canvas = document.createElement('canvas');
-                    canvas.width = Math.floor(img.width * scale);
-                    canvas.height = Math.floor(img.height * scale);
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    const data = imageData.data;
-                    const width = canvas.width;
-                    const height = canvas.height;
-
-                    // Grayscale conversion
-                    const gray = new Float32Array(width * height);
-                    for (let i = 0; i < data.length; i += 4) {
-                        const r = data[i], g = data[i+1], b = data[i+2];
-                        gray[i/4] = 0.299 * r + 0.587 * g + 0.114 * b;
-                    }
-
-                    // Gradient magnitude (edge strength)
-                    const gradientMag = new Float32Array(width * height);
-                    for (let y = 1; y < height - 1; y++) {
-                        for (let x = 1; x < width - 1; x++) {
-                            const idx = y * width + x;
-                            const gx = gray[idx + 1] - gray[idx - 1];
-                            const gy = gray[idx + width] - gray[idx - width];
-                            gradientMag[idx] = Math.sqrt(gx*gx + gy*gy);
-                        }
-                    }
-
-                    // Block-based variance analysis (8x8 blocks, similar to JPEG)
-                    const blockSize = 8;
-                    const blocksX = Math.floor(width / blockSize);
-                    const blocksY = Math.floor(height / blockSize);
-                    const blockVariances = [];
-                    let sumVariance = 0;
-                    for (let by = 0; by < blocksY; by++) {
-                        for (let bx = 0; bx < blocksX; bx++) {
-                            const startX = bx * blockSize;
-                            const startY = by * blockSize;
-                            let sum = 0, sqSum = 0, count = 0;
-                            for (let yy = 0; yy < blockSize; yy++) {
-                                for (let xx = 0; xx < blockSize; xx++) {
-                                    const px = startX + xx;
-                                    const py = startY + yy;
-                                    if (px < width && py < height) {
-                                        const val = gradientMag[py * width + px];
-                                        sum += val;
-                                        sqSum += val * val;
-                                        count++;
-                                    }
-                                }
-                            }
-                            if (count > 0) {
-                                const mean = sum / count;
-                                const variance = (sqSum / count) - (mean * mean);
-                                blockVariances.push(variance);
-                                sumVariance += variance;
-                            }
-                        }
-                    }
-
-                    if (blockVariances.length < 4) {
-                        resolve({ isTampered: false, tamperScore: 5, confidence: 90 });
-                        return;
-                    }
-
-                    // Sort variances to compute median and IQR
-                    const sorted = [...blockVariances].sort((a, b) => a - b);
-                    const median = sorted[Math.floor(sorted.length / 2)];
-                    const q1 = sorted[Math.floor(sorted.length * 0.25)];
-                    const q3 = sorted[Math.floor(sorted.length * 0.75)];
-                    const iqr = q3 - q1;
-                    const outlierThreshold = q3 + 1.5 * iqr; // Tukey's fence
-                    const extremeOutlierThreshold = q3 + 3 * iqr;
-
-                    // Count outlier blocks
-                    let outlierCount = 0;
-                    let extremeOutlierCount = 0;
-                    let maxOutlierRatio = 0;
-                    for (const v of blockVariances) {
-                        if (v > outlierThreshold) {
-                            outlierCount++;
-                            maxOutlierRatio = Math.max(maxOutlierRatio, v / (median + 0.001));
-                        }
-                        if (v > extremeOutlierThreshold) {
-                            extremeOutlierCount++;
-                        }
-                    }
-
-                    const totalBlocks = blockVariances.length;
-                    const outlierPercentage = (outlierCount / totalBlocks) * 100;
-                    const extremeOutlierPercentage = (extremeOutlierCount / totalBlocks) * 100;
-
-                    // Heuristic: tampered if extreme outliers > 8% AND maxOutlierRatio > 8 (very localized huge spikes)
-                    const isTampered = (extremeOutlierPercentage > 8) && (maxOutlierRatio > 8);
-
-                    // Compute tamperScore (0-100) for display
-                    let tamperScore = Math.min(100, Math.round((extremeOutlierPercentage * 2) + (maxOutlierRatio * 5)));
-                    if (!isTampered) tamperScore = Math.min(20, tamperScore); // keep low for authentic
-
-                    // Fallback check for uniform blocks (metadata): if outlierPercentage < 2 and maxOutlierRatio < 3 -> very authentic
-                    let confidence = 90;
-                    if (!isTampered) {
-                        if (outlierPercentage < 2 && maxOutlierRatio < 3) {
-                            confidence = 98;
-                        } else if (outlierPercentage < 5) {
-                            confidence = 95;
-                        } else {
-                            confidence = 90;
-                        }
-                    } else {
-                        confidence = 85; // tampered but still detected
-                    }
-
-                    resolve({ isTampered, tamperScore, confidence });
-                };
-                img.onerror = function() {
-                    resolve({ isTampered: false, tamperScore: 5, confidence: 90 });
-                };
-                img.src = imageDataURL;
-            });
-        }
-
-        // ===== SCREENSHOT AI ANALYSIS =====
+        // ===== GEMINI VISION API ANALYSIS =====
         async function analyzeScreenshot() {
             if (!screenshotLoaded || analysisInProgress || !currentImageDataURL) return;
 
@@ -586,52 +460,131 @@
             analyzeBtn.disabled = true;
             analyzeBtn.style.opacity = '0.6';
 
-            const analysisResult = await performPixelAnalysis(currentImageDataURL);
+            // Reset progress
+            progressFill.style.width = '0%';
+            progressPercent.textContent = '0%';
+            progressLabel.textContent = 'Sending to Gemini Vision API...';
 
+            // Simulate progress while awaiting API response
             let progress = 0;
-            const targetProgress = 100;
-            const interval = setInterval(() => {
-                progress += 4 + Math.random() * 6;
-                if (progress >= targetProgress) {
-                    progress = targetProgress;
-                    clearInterval(interval);
-                    progressFill.style.width = '100%';
-                    progressPercent.textContent = '100%';
-                    progressLabel.textContent = 'Analysis complete';
-                    setTimeout(() => {
-                        progressContainer.classList.add('hidden');
-                        analysisInProgress = false;
-                        analyzeBtn.disabled = false;
-                        analyzeBtn.style.opacity = '1';
-                        showAnalysisResult(analysisResult);
-                    }, 300);
-                } else {
+            const progressInterval = setInterval(() => {
+                if (progress < 90) {
+                    progress += Math.random() * 5;
+                    if (progress > 90) progress = 90;
                     progressFill.style.width = progress + '%';
                     progressPercent.textContent = Math.round(progress) + '%';
-                    if (progress < 40) progressLabel.textContent = 'Scanning pixel edges...';
-                    else if (progress < 70) progressLabel.textContent = 'Analyzing compression artifacts...';
-                    else progressLabel.textContent = 'Comparing block variance...';
+                    if (progress < 40) progressLabel.textContent = 'Uploading image...';
+                    else if (progress < 70) progressLabel.textContent = 'Waiting for Gemini analysis...';
+                    else progressLabel.textContent = 'Processing AI response...';
                 }
-            }, 60);
+            }, 200);
+
+            try {
+                // Prepare base64 data (strip the data:image prefix)
+                const base64Data = currentImageDataURL.split(',')[1];
+                const mimeType = currentImageDataURL.split(';')[0].split(':')[1] || 'image/png';
+
+                const promptText = 'Analyze this image. Is it a genuine, unedited Telebirr or Ethio Telecom transaction screenshot, or does it look modified, edited, or fake? Reply in a strict JSON format only: {"status": "AUTHENTIC" or "FORGED", "score": percentage_confidence, "reason": "short explanation in English"}';
+
+                const requestBody = {
+                    contents: [
+                        {
+                            parts: [
+                                { text: promptText },
+                                { inline_data: { mime_type: mimeType, data: base64Data } }
+                            ]
+                        }
+                    ]
+                };
+
+                const response = await fetch(GEMINI_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+
+                const responseData = await response.json();
+
+                // Extract text from Gemini response
+                let responseText = '';
+                if (responseData.candidates && responseData.candidates.length > 0 &&
+                    responseData.candidates[0].content && responseData.candidates[0].content.parts &&
+                    responseData.candidates[0].content.parts.length > 0) {
+                    responseText = responseData.candidates[0].content.parts[0].text || '';
+                }
+
+                // Attempt to parse JSON from response
+                let parsedResult = null;
+                try {
+                    // Remove potential markdown code block formatting
+                    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+                    if (jsonMatch) {
+                        parsedResult = JSON.parse(jsonMatch[0]);
+                    } else {
+                        parsedResult = JSON.parse(responseText);
+                    }
+                } catch (parseError) {
+                    console.error('Failed to parse Gemini response:', parseError);
+                    throw new Error('Invalid response format from AI');
+                }
+
+                if (!parsedResult || !parsedResult.status) {
+                    throw new Error('Missing status in AI response');
+                }
+
+                // Stop progress interval and set to 100%
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+                progressPercent.textContent = '100%';
+                progressLabel.textContent = 'Analysis complete';
+                progressContainer.classList.add('hidden');
+                analysisInProgress = false;
+                analyzeBtn.disabled = false;
+                analyzeBtn.style.opacity = '1';
+
+                showAnalysisResult(parsedResult);
+
+            } catch (error) {
+                clearInterval(progressInterval);
+                console.error('Analysis error:', error);
+                progressContainer.classList.add('hidden');
+                analysisInProgress = false;
+                analyzeBtn.disabled = false;
+                analyzeBtn.style.opacity = '1';
+
+                // Show error card
+                showErrorResult(error.message || 'Analysis failed');
+            }
         }
 
-        function showAnalysisResult(analysisResult) {
+        function showAnalysisResult(parsedResult) {
             const resultContainer = document.getElementById('analysisResultContainer');
             resultContainer.classList.remove('hidden');
+            resultContainer.innerHTML = '';
 
-            if (!analysisResult.isTampered) {
+            const status = parsedResult.status.toUpperCase();
+            const score = parsedResult.score || 0;
+            const reason = parsedResult.reason || 'No explanation provided';
+
+            if (status === 'AUTHENTIC') {
                 resultContainer.innerHTML = `
                     <div class="result-card result-legit">
                         <div class="flex items-start gap-3">
                             <span class="text-2xl mt-0.5">✅</span>
                             <div class="flex-1">
                                 <h3 class="font-bold text-green-400 text-sm tracking-wide">AI VERIFIED: AUTHENTIC SCREENSHOT</h3>
-                                <p class="text-green-300/70 text-[0.72rem] mt-1 leading-relaxed">Pixel analysis detected uniform compression and natural font rendering. No localized tampering found.</p>
+                                <p class="text-green-300/70 text-[0.72rem] mt-1 leading-relaxed">${reason}</p>
                                 <div class="grid grid-cols-2 gap-1.5 mt-3 text-[0.6rem]">
-                                    <div class="flex items-center gap-1.5 text-green-400"><span class="w-1 h-1 rounded-full bg-green-400"></span> Block variance: UNIFORM</div>
-                                    <div class="flex items-center gap-1.5 text-green-400"><span class="w-1 h-1 rounded-full bg-green-400"></span> Edge consistency: NATURAL</div>
-                                    <div class="flex items-center gap-1.5 text-green-400"><span class="w-1 h-1 rounded-full bg-green-400"></span> Tamper score: ${analysisResult.tamperScore}%</div>
-                                    <div class="flex items-center gap-1.5 text-green-400"><span class="w-1 h-1 rounded-full bg-green-400"></span> Confidence: ${analysisResult.confidence}%</div>
+                                    <div class="flex items-center gap-1.5 text-green-400"><span class="w-1 h-1 rounded-full bg-green-400"></span> Confidence: ${score}%</div>
+                                    <div class="flex items-center gap-1.5 text-green-400"><span class="w-1 h-1 rounded-full bg-green-400"></span> Status: AUTHENTIC</div>
+                                    <div class="flex items-center gap-1.5 text-green-400"><span class="w-1 h-1 rounded-full bg-green-400"></span> Engine: Gemini Vision</div>
+                                    <div class="flex items-center gap-1.5 text-green-400"><span class="w-1 h-1 rounded-full bg-green-400"></span> Tampering: None Detected</div>
                                 </div>
                             </div>
                         </div>
@@ -643,19 +596,35 @@
                         <div class="flex items-start gap-3">
                             <span class="text-2xl mt-0.5">🚨</span>
                             <div class="flex-1">
-                                <h3 class="font-bold text-red-400 text-sm tracking-wide">CRITICAL WARNING: TAMPERED PIXELS CAUGHT!</h3>
-                                <p class="text-red-300/70 text-[0.72rem] mt-1 leading-relaxed">Localized anomalies detected in font-edge pixels and compression artifacts — strong indication of manual editing.</p>
+                                <h3 class="font-bold text-red-400 text-sm tracking-wide">CRITICAL WARNING: TAMPERED SCREENSHOT DETECTED</h3>
+                                <p class="text-red-300/70 text-[0.72rem] mt-1 leading-relaxed">${reason}</p>
                                 <div class="grid grid-cols-2 gap-1.5 mt-3 text-[0.6rem]">
-                                    <div class="flex items-center gap-1.5 text-red-400"><span class="w-1 h-1 rounded-full bg-red-400"></span> Block variance: IRREGULAR</div>
-                                    <div class="flex items-center gap-1.5 text-red-400"><span class="w-1 h-1 rounded-full bg-red-400"></span> Edge consistency: ALTERED</div>
-                                    <div class="flex items-center gap-1.5 text-red-400"><span class="w-1 h-1 rounded-full bg-red-400"></span> Tamper score: ${analysisResult.tamperScore}%</div>
-                                    <div class="flex items-center gap-1.5 text-red-400"><span class="w-1 h-1 rounded-full bg-red-400"></span> Confidence: ${analysisResult.confidence}%</div>
+                                    <div class="flex items-center gap-1.5 text-red-400"><span class="w-1 h-1 rounded-full bg-red-400"></span> Confidence: ${score}%</div>
+                                    <div class="flex items-center gap-1.5 text-red-400"><span class="w-1 h-1 rounded-full bg-red-400"></span> Status: FORGED</div>
+                                    <div class="flex items-center gap-1.5 text-red-400"><span class="w-1 h-1 rounded-full bg-red-400"></span> Engine: Gemini Vision</div>
+                                    <div class="flex items-center gap-1.5 text-red-400"><span class="w-1 h-1 rounded-full bg-red-400"></span> Tampering: Likely</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
             }
+        }
+
+        function showErrorResult(errorMessage) {
+            const resultContainer = document.getElementById('analysisResultContainer');
+            resultContainer.classList.remove('hidden');
+            resultContainer.innerHTML = `
+                <div class="result-card result-critical">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl mt-0.5">⚠️</span>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-red-400 text-sm tracking-wide">ANALYSIS ERROR</h3>
+                            <p class="text-red-300/70 text-[0.72rem] mt-1 leading-relaxed">${errorMessage}. Please check your API key or internet connection.</p>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         // ===== INITIALIZATION =====
@@ -668,7 +637,7 @@
             document.getElementById('smsInput').addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault(); verifySms(); }
             });
-            console.log('[Telecore AI-Mesh] Dashboard initialized — Smart Pixel Forensics Engine Ready');
+            console.log('[Telecore AI-Mesh] Dashboard initialized — Gemini Vision Integration Ready');
             console.log('[Telecore AI-Mesh] Network status:', isOnline ? 'ONLINE' : 'OFFLINE');
         });
     </script>
