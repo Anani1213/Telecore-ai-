@@ -108,6 +108,33 @@
         .content-wrapper { position: relative; z-index: 1; }
         .tab-content-panel { transition: opacity 0.35s ease, transform 0.35s ease; opacity: 0; transform: translateY(8px); pointer-events: none; }
         .tab-content-panel.active-panel { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .api-input {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.85rem;
+            padding: 0.8rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            outline: none;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            letter-spacing: 0.02em;
+        }
+        .api-input:focus {
+            border-color: rgba(255, 107, 53, 0.45);
+            box-shadow: 0 0 18px rgba(255, 107, 53, 0.1), 0 0 30px rgba(155, 48, 255, 0.06);
+            background: rgba(0, 0, 0, 0.45);
+        }
+        .api-input::placeholder { color: rgba(160, 160, 184, 0.5); }
+        .api-link {
+            color: var(--neon-orange);
+            text-decoration: none;
+            font-size: 0.65rem;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .api-link:hover { color: var(--neon-purple); text-decoration: underline; }
         @media (max-width: 380px) {
             .tab-btn { font-size: 0.7rem; padding: 0.55rem 0.7rem; }
             .btn-neon-analyze { font-size: 0.78rem; padding: 0.75rem 1.2rem; }
@@ -183,6 +210,16 @@
                     </div>
                     <p class="text-[0.72rem] text-gray-400 leading-relaxed">Upload a Telebirr transaction screenshot. Our AI engine uses Google Gemini Vision to analyze authenticity and detect tampering.</p>
 
+                    <!-- API KEY INPUT -->
+                    <div class="flex flex-col gap-1.5">
+                        <label for="apiKeyInput" class="text-[0.7rem] text-gray-300 font-semibold tracking-wide uppercase">Enter Gemini API Key for Authentication</label>
+                        <input type="password" id="apiKeyInput" class="api-input" placeholder="AIzaSy... (paste your key here)" autocomplete="off" />
+                        <div class="flex items-center justify-between">
+                            <a href="https://ai.google.dev/" target="_blank" rel="noopener noreferrer" class="api-link">🔑 Get Free Key from Google AI Studio</a>
+                            <button onclick="toggleApiKeyVisibility()" class="text-gray-400 hover:text-white text-[0.6rem] font-medium transition-colors">👁️ Show</button>
+                        </div>
+                    </div>
+
                     <!-- Upload / Preview Zone -->
                     <div id="uploadZoneContainer" class="relative">
                         <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleFileUpload(event)" />
@@ -229,7 +266,7 @@
                 </div>
                 <div class="glass-card p-3.5 flex items-center gap-3 text-[0.65rem] text-gray-400 border-white/[0.06]">
                     <span class="text-base">🧠</span>
-                    <span>Powered by Google Gemini Vision AI — real-time authenticity detection with no backend required.</span>
+                    <span>Powered by Google Gemini Vision API — key is never stored, only used for this session.</span>
                 </div>
             </div>
         </main>
@@ -241,14 +278,11 @@
 
     <script>
         // ===== GLOBAL STATE =====
-        const GEMINI_API_KEY = 'AQ.Ab8RN6KRmVT095VVnr4xUzncUJj7VAUiRb0xUdoVpA3eJwl4ng'; // Your API key
-        const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-
         let currentTab = 'sms';
         let screenshotLoaded = false;
         let analysisInProgress = false;
         let isOnline = navigator.onLine;
-        let currentImageDataURL = null; // base64
+        let currentImageDataURL = null;
 
         // ===== TAB SWITCHING =====
         function switchTab(tab) {
@@ -397,7 +431,7 @@
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                currentImageDataURL = e.target.result; // base64 with data:image prefix
+                currentImageDataURL = e.target.result;
                 const previewImg = document.getElementById('previewImage');
                 const previewContainer = document.getElementById('imagePreviewContainer');
                 const uploadPrompt = document.getElementById('uploadPrompt');
@@ -442,9 +476,23 @@
             setTimeout(() => { fileInput.click(); }, 50);
         }
 
+        // Toggle API key visibility
+        function toggleApiKeyVisibility() {
+            const apiInput = document.getElementById('apiKeyInput');
+            const type = apiInput.type === 'password' ? 'text' : 'password';
+            apiInput.type = type;
+        }
+
         // ===== GEMINI VISION API ANALYSIS =====
         async function analyzeScreenshot() {
             if (!screenshotLoaded || analysisInProgress || !currentImageDataURL) return;
+
+            // Get API key from user input
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            if (!apiKey) {
+                showErrorResult('Please enter a valid API Key to connect with Google AI');
+                return;
+            }
 
             analysisInProgress = true;
             const progressContainer = document.getElementById('progressContainer');
@@ -465,7 +513,6 @@
             progressPercent.textContent = '0%';
             progressLabel.textContent = 'Sending to Gemini Vision API...';
 
-            // Simulate progress while awaiting API response
             let progress = 0;
             const progressInterval = setInterval(() => {
                 if (progress < 90) {
@@ -480,11 +527,12 @@
             }, 200);
 
             try {
-                // Prepare base64 data (strip the data:image prefix)
                 const base64Data = currentImageDataURL.split(',')[1];
                 const mimeType = currentImageDataURL.split(';')[0].split(':')[1] || 'image/png';
 
                 const promptText = 'Analyze this image. Is it a genuine, unedited Telebirr or Ethio Telecom transaction screenshot, or does it look modified, edited, or fake? Reply in a strict JSON format only: {"status": "AUTHENTIC" or "FORGED", "score": percentage_confidence, "reason": "short explanation in English"}';
+
+                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
 
                 const requestBody = {
                     contents: [
@@ -497,7 +545,7 @@
                     ]
                 };
 
-                const response = await fetch(GEMINI_ENDPOINT, {
+                const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -506,12 +554,12 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`API request failed with status ${response.status}`);
+                    const errorData = await response.json().catch(() => ({}));
+                    const errorMessage = errorData.error?.message || `API request failed with status ${response.status}`;
+                    throw new Error(errorMessage);
                 }
 
                 const responseData = await response.json();
-
-                // Extract text from Gemini response
                 let responseText = '';
                 if (responseData.candidates && responseData.candidates.length > 0 &&
                     responseData.candidates[0].content && responseData.candidates[0].content.parts &&
@@ -519,10 +567,8 @@
                     responseText = responseData.candidates[0].content.parts[0].text || '';
                 }
 
-                // Attempt to parse JSON from response
                 let parsedResult = null;
                 try {
-                    // Remove potential markdown code block formatting
                     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
                     if (jsonMatch) {
                         parsedResult = JSON.parse(jsonMatch[0]);
@@ -538,7 +584,6 @@
                     throw new Error('Missing status in AI response');
                 }
 
-                // Stop progress interval and set to 100%
                 clearInterval(progressInterval);
                 progressFill.style.width = '100%';
                 progressPercent.textContent = '100%';
@@ -557,8 +602,6 @@
                 analysisInProgress = false;
                 analyzeBtn.disabled = false;
                 analyzeBtn.style.opacity = '1';
-
-                // Show error card
                 showErrorResult(error.message || 'Analysis failed');
             }
         }
@@ -620,7 +663,7 @@
                         <span class="text-2xl mt-0.5">⚠️</span>
                         <div class="flex-1">
                             <h3 class="font-bold text-red-400 text-sm tracking-wide">ANALYSIS ERROR</h3>
-                            <p class="text-red-300/70 text-[0.72rem] mt-1 leading-relaxed">${errorMessage}. Please check your API key or internet connection.</p>
+                            <p class="text-red-300/70 text-[0.72rem] mt-1 leading-relaxed">${errorMessage}</p>
                         </div>
                     </div>
                 </div>
@@ -642,4 +685,4 @@
         });
     </script>
 </body>
-</html>
+    </html>
