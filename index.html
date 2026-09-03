@@ -1,994 +1,377 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Telecore AI-Mesh — Telebirr Merchant Dashboard</title>
-    <script src="https://cdn.tailwindcss.com">
-    </script>
-    <style>
-        :root {
-            --emerald-glow: #10b981;
-            --amber-glow: #f59e0b;
-            --rose-glow: #f43f5e;
-            --bg-dark: #0a0f0d;
-            --card-bg: rgba(16, 24, 20, 0.92);
-        }
-
-        * {
-            -webkit-tap-highlight-color: transparent;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        body {
-            font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg-dark);
-            background-image:
-                radial-gradient(ellipse at 30% 20%, rgba(16, 185, 129, 0.06) 0%, transparent 55%),
-                radial-gradient(ellipse at 70% 80%, rgba(245, 158, 11, 0.04) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 50%, rgba(6, 20, 16, 0.9) 0%, var(--bg-dark) 100%);
-            min-height: 100vh;
-            min-height: 100dvh;
-            color: #e2e8f0;
-            overflow-x: hidden;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        .glass-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 1.25rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .glass-card-inner {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 0.9rem;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .glass-card-inner:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .status-ring {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .status-ring.online {
-            background: radial-gradient(circle at center, rgba(16, 185, 129, 0.25) 0%, rgba(16, 185, 129, 0.05) 60%, transparent 70%);
-            box-shadow: 0 0 60px rgba(16, 185, 129, 0.25), 0 0 120px rgba(16, 185, 129, 0.08);
-        }
-
-        .status-ring.offline {
-            background: radial-gradient(circle at center, rgba(245, 158, 11, 0.25) 0%, rgba(245, 158, 11, 0.05) 60%, transparent 70%);
-            box-shadow: 0 0 60px rgba(245, 158, 11, 0.25), 0 0 120px rgba(245, 158, 11, 0.08);
-        }
-
-        .status-ring::before {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            animation: ringPulse 2.5s ease-out infinite;
-        }
-
-        .status-ring.online::before {
-            border-color: rgba(16, 185, 129, 0.5);
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3), inset 0 0 20px rgba(16, 185, 129, 0.1);
-        }
-
-        .status-ring.offline::before {
-            border-color: rgba(245, 158, 11, 0.5);
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3), inset 0 0 20px rgba(245, 158, 11, 0.1);
-            animation-duration: 1.8s;
-        }
-
-        @keyframes ringPulse {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            70% {
-                transform: scale(1.08);
-                opacity: 0.5;
-            }
-            100% {
-                transform: scale(1.1);
-                opacity: 0;
-            }
-        }
-
-        .dot-pulse {
-            animation: dotPulse 1.6s ease-in-out infinite;
-        }
-        @keyframes dotPulse {
-            0%,
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% {
-                opacity: 0.4;
-                transform: scale(0.8);
-            }
-        }
-
-        /* Pulsing text for MESH ACTIVE */
-        .pulse-text {
-            animation: pulseText 1.5s ease-in-out infinite;
-        }
-        @keyframes pulseText {
-            0%,
-            100% {
-                opacity: 1;
-                text-shadow: 0 0 10px rgba(245, 158, 11, 0.8);
-            }
-            50% {
-                opacity: 0.7;
-                text-shadow: 0 0 20px rgba(245, 158, 11, 1);
-            }
-        }
-
-        .toggle-track {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .toggle-track.active {
-            background: rgba(16, 185, 129, 0.25);
-            border-color: rgba(16, 185, 129, 0.4);
-        }
-        .toggle-knob {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .btn-scan {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .btn-scan::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .btn-scan:hover::after {
-            opacity: 1;
-        }
-        .btn-scan:active {
-            transform: scale(0.97);
-        }
-
-        .risk-bar {
-            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s;
-            border-radius: 9999px;
-            height: 8px;
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .mesh-canvas-container {
-            border-radius: 1rem;
-            overflow: hidden;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            position: relative;
-        }
-        .mesh-canvas-container canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-
-        ::-webkit-scrollbar {
-            width: 3px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 99px;
-        }
-
-        .badge-shimmer {
-            background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.12) 50%, rgba(255, 255, 255, 0.05) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 2.5s ease-in-out infinite;
-        }
-        @keyframes shimmer {
-            0% {
-                background-position: 200% 0;
-            }
-            100% {
-                background-position: -200% 0;
-            }
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-            font-family: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
-            font-size: 0.85rem;
-            line-height: 1.5;
-            letter-spacing: 0.01em;
-        }
-        textarea:focus {
-            outline: none;
-            border-color: rgba(16, 185, 129, 0.5);
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-        }
-        textarea::placeholder {
-            color: rgba(255, 255, 255, 0.25);
-        }
-
-        .safe-pb {
-            padding-bottom: env(safe-area-inset-bottom, 0px);
-        }
-        .safe-pt {
-            padding-top: env(safe-area-inset-top, 0px);
-        }
-
-        /* Pulsing red alert for verify section */
-        .pulse-red {
-            animation: pulseRed 1.2s ease-in-out infinite;
-        }
-        @keyframes pulseRed {
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7);
-            }
-            50% {
-                box-shadow: 0 0 0 12px rgba(244, 63, 94, 0);
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Telecore AI-Mesh · Certification Suite</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg-dark: #0a0f0d;
+      --card-bg: rgba(16, 24, 20, 0.9);
+      --emerald-glow: #10b981;
+      --amber-glow: #f59e0b;
+      --rose-glow: #f43f5e;
+    }
+    * {
+      -webkit-tap-highlight-color: transparent;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg-dark);
+      background-image: radial-gradient(ellipse at 20% 20%, rgba(16, 185, 129, 0.05) 0%, transparent 50%), 
+                        radial-gradient(ellipse at 80% 60%, rgba(245, 158, 11, 0.04) 0%, transparent 50%),
+                        radial-gradient(ellipse at 50% 100%, rgba(6, 20, 16, 0.9) 0%, var(--bg-dark) 100%);
+      min-height: 100vh;
+      min-height: 100dvh;
+      color: #e2e8f0;
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    /* Premium glass card */
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 1.25rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    /* Active tab glow */
+    .tab-active {
+      background: rgba(16, 185, 129, 0.15) !important;
+      color: #34d399 !important;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+      border-bottom: 2px solid #10b981;
+      font-weight: 600;
+    }
+    /* Pulsing red alert */
+    .pulse-red {
+      animation: pulseRed 1.2s ease-in-out infinite;
+    }
+    @keyframes pulseRed {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.6); }
+      50% { box-shadow: 0 0 0 15px rgba(244, 63, 94, 0); }
+    }
+    /* Network badge pulse */
+    .dot-pulse {
+      animation: dotPulse 1.6s ease-in-out infinite;
+    }
+    @keyframes dotPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+    /* Upload area styling */
+    .upload-zone {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 2px dashed rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .upload-zone:hover {
+      border-color: rgba(16, 185, 129, 0.5);
+      background: rgba(16, 185, 129, 0.05);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+    }
+    /* Progress bar animation */
+    .progress-fill {
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      background: linear-gradient(90deg, #10b981, #14b8a6, #f59e0b);
+    }
+    /* Fade in for results */
+    .fade-in {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 99px; }
+  </style>
 </head>
-<body>
+<body class="p-4 max-w-md mx-auto pb-10">
 
-    <!-- ===================== HEADER ===================== -->
-    <header class="sticky top-0 z-50 px-4 safe-pt pb-3 bg-[#0a0f0d]/90 backdrop-blur-xl border-b border-white/5">
-        <div class="max-w-md mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>
-                    </svg>
-                </div>
-                <div>
-                    <h1 class="text-lg font-bold tracking-tight leading-tight bg-gradient-to-r from-emerald-300 to-teal-200 bg-clip-text text-transparent">Telecore AI-Mesh</h1>
-                    <p class="text-[10px] text-gray-400 font-medium tracking-widest uppercase">Telebirr Merchant Suite</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-2">
-                <span id="headerStatusBadge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wide transition-all duration-500 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 dot-pulse"></span>
-                    ONLINE
-                </span>
-            </div>
+  <!-- ========== HEADER & NETWORK STATUS ========== -->
+  <div class="flex items-center justify-between mb-6 pt-2">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-base font-bold leading-tight bg-gradient-to-r from-emerald-300 to-teal-200 bg-clip-text text-transparent">Telecore AI-Mesh</h1>
+        <p class="text-[10px] text-gray-400 font-medium tracking-widest uppercase">Certification Suite</p>
+      </div>
+    </div>
+    <!-- Network Status Badge -->
+    <div id="networkBadge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wide transition-all duration-500 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+      <span id="networkDot" class="w-1.5 h-1.5 rounded-full bg-emerald-400 dot-pulse"></span>
+      <span id="networkText">ONLINE</span>
+    </div>
+  </div>
+
+  <!-- ========== TABS SYSTEM ========== -->
+  <div class="flex bg-black/20 backdrop-blur-md p-1 rounded-xl mb-5 border border-white/5">
+    <button id="tab1Btn" onclick="switchTab(1)" class="flex-1 py-2.5 px-2 rounded-lg text-xs font-medium text-gray-400 transition-all duration-300 tab-active">
+      📱 SMS Certification
+    </button>
+    <button id="tab2Btn" onclick="switchTab(2)" class="flex-1 py-2.5 px-2 rounded-lg text-xs font-medium text-gray-400 transition-all duration-300">
+      🖼️ Screenshot Certification
+    </button>
+  </div>
+
+  <!-- ========== TAB 1: SMS CERTIFICATION ========== -->
+  <div id="tab1Content" class="glass-card p-5 fade-in">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-sm font-semibold text-gray-300 tracking-wider uppercase">Verify SMS Authenticity</h2>
+      <span class="text-[10px] text-gray-500 bg-white/5 px-2 py-0.5 rounded-full border border-white/10">REAL-TIME</span>
+    </div>
+    
+    <label for="smsText" class="block text-xs font-medium text-gray-400 mb-1.5">Paste Telebirr SMS Here</label>
+    <textarea id="smsText" rows="5" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-gray-200 placeholder:text-gray-500 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-300 resize-none" placeholder="e.g. Telebirr: You have received 1,500.00 ETB from Ethio Telecom..."></textarea>
+    
+    <button id="verifySmsBtn" class="mt-3 w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold text-sm tracking-wide shadow-lg shadow-emerald-500/25 hover:from-emerald-500 hover:to-teal-500 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      Verify SMS
+    </button>
+
+    <!-- Result Container -->
+    <div id="smsResult" class="mt-4 hidden p-4 rounded-xl text-sm font-semibold transition-all duration-500"></div>
+  </div>
+
+  <!-- ========== TAB 2: SCREENSHOT CERTIFICATION ========== -->
+  <div id="tab2Content" class="glass-card p-5 fade-in hidden">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-sm font-semibold text-gray-300 tracking-wider uppercase">Screenshot Forensics</h2>
+      <span class="text-[10px] text-gray-500 bg-white/5 px-2 py-0.5 rounded-full border border-white/10">AI VISION</span>
+    </div>
+
+    <!-- Upload Zone -->
+    <div id="uploadZone" class="upload-zone rounded-xl p-6 text-center cursor-pointer flex flex-col items-center justify-center gap-2" onclick="document.getElementById('fileInput').click()">
+      <svg class="w-10 h-10 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+      </svg>
+      <p class="text-sm font-medium text-gray-300">Upload or Capture Telebirr Screenshot</p>
+      <p class="text-[10px] text-gray-500">Click to browse — JPEG, PNG supported</p>
+      <input type="file" id="fileInput" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+    </div>
+
+    <button id="analyzeBtn" class="mt-4 w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold text-sm tracking-wide shadow-lg shadow-amber-500/25 hover:from-amber-400 hover:to-orange-500 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M21 3v4.5M21 3h-4.5M21 3H3v18h18V7.5"/>
+      </svg>
+      Analyze Screenshot with AI
+    </button>
+
+    <!-- Analysis Result -->
+    <div id="analysisResult" class="mt-4 hidden">
+      <!-- Progress Bar -->
+      <div class="mb-3">
+        <div class="flex justify-between text-[10px] text-gray-500 mb-1">
+          <span>Analyzing metadata & font pixels...</span>
+          <span id="progressPercent">0%</span>
         </div>
-    </header>
-
-    <!-- ===================== MAIN CONTENT ===================== -->
-    <main class="max-w-md mx-auto px-4 pb-8 safe-pb space-y-5">
-
-        <!-- ===== SECTION 1: MESH STATUS INDICATOR ===== -->
-        <section class="glass-card p-5 fade-in" style="animation-delay:0.05s">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-sm font-semibold text-gray-300 tracking-wider uppercase">Network Status</h2>
-                <span id="meshModeLabel" class="text-[10px] font-medium text-gray-400 bg-white/5 px-2.5 py-1 rounded-full border border-white/10">LIVE</span>
-            </div>
-
-            <!-- Status ring + Mesh canvas -->
-            <div class="flex items-center gap-5">
-                <div class="flex-shrink-0">
-                    <div id="statusRing" class="status-ring online">
-                        <div class="text-center">
-                            <svg id="statusIcon" class="w-8 h-8 mx-auto text-emerald-400 transition-colors duration-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.749.749 0 011.06 0z"/>
-                            </svg>
-                            <p id="statusLabel" class="mt-1 text-[11px] font-bold text-emerald-400 tracking-wider transition-colors duration-500">ONLINE</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Mesh network canvas -->
-                <div class="flex-1 mesh-canvas-container h-[110px]">
-                    <canvas id="meshCanvas" class="w-full h-full"></canvas>
-                </div>
-            </div>
-
-            <!-- Toggle switch -->
-            <div class="mt-4 flex items-center justify-between">
-                <div>
-                    <p id="modeDetail" class="text-xs font-medium text-gray-300">Cellular Data Active</p>
-                    <p id="modeSubDetail" class="text-[10px] text-gray-500">Full connectivity via Telebirr network</p>
-                </div>
-                <button id="toggleBtn" class="toggle-track active relative w-14 h-8 rounded-full flex items-center px-1 cursor-pointer transition-all duration-400" aria-label="Toggle network status">
-                    <span id="toggleKnob" class="toggle-knob w-6 h-6 rounded-full bg-white flex items-center justify-center transform translate-x-0 transition-all duration-400">
-                        <svg id="toggleIcon" class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                        </svg>
-                    </span>
-                </button>
-            </div>
-        </section>
-
-        <!-- ===== VERIFY TRANSACTION (NEW SECTION) ===== -->
-        <section class="glass-card p-5 fade-in" style="animation-delay:0.08s">
-            <div class="flex items-center justify-between mb-3">
-                <h2 class="text-sm font-semibold text-gray-300 tracking-wider uppercase">Verify SMS Authenticity</h2>
-                <span class="text-[10px] text-gray-500 bg-white/5 px-2 py-0.5 rounded-full border border-white/10">REAL-TIME CHECK</span>
-            </div>
-            <div>
-                <label for="verifySmsInput" class="block text-xs font-medium text-gray-400 mb-1.5">Paste Telebirr SMS Here for Verification</label>
-                <textarea id="verifySmsInput" rows="4" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-gray-200 placeholder:text-gray-500 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-300" placeholder="Paste full Telebirr SMS alert here..."></textarea>
-            </div>
-            <button id="verifyBtn" class="btn-scan mt-3 w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-sm tracking-wide shadow-lg shadow-blue-500/25 hover:from-blue-500 hover:to-indigo-500 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                Verify Transaction
-            </button>
-            <div id="verifyAlert" class="mt-4 hidden p-4 rounded-xl text-sm font-semibold transition-all duration-500"></div>
-        </section>
-
-        <!-- ===== QUICK STATS ===== -->
-        <section class="grid grid-cols-3 gap-3 fade-in" style="animation-delay:0.1s">
-            <div class="glass-card-inner p-3 text-center">
-                <p id="statScanned" class="text-2xl font-bold text-emerald-300">0</p>
-                <p class="text-[9px] text-gray-500 font-medium tracking-wider uppercase mt-0.5">Scanned</p>
-            </div>
-            <div class="glass-card-inner p-3 text-center">
-                <p id="statFraud" class="text-2xl font-bold text-rose-400">0</p>
-                <p class="text-[9px] text-gray-500 font-medium tracking-wider uppercase mt-0.5">Blocked</p>
-            </div>
-            <div class="glass-card-inner p-3 text-center">
-                <p id="statNodes" class="text-2xl font-bold text-amber-300">12</p>
-                <p class="text-[9px] text-gray-500 font-medium tracking-wider uppercase mt-0.5">Mesh Nodes</p>
-            </div>
-        </section>
-
-        <!-- ===== SECTION 2: TRANSACTION SCANNER ===== -->
-        <section class="glass-card p-5 fade-in" style="animation-delay:0.15s">
-            <div class="flex items-center justify-between mb-3">
-                <h2 class="text-sm font-semibold text-gray-300 tracking-wider uppercase">Transaction Scanner</h2>
-                <span class="text-[10px] text-gray-500 bg-white/5 px-2 py-0.5 rounded-full border border-white/10">AI Fraud Detection</span>
-            </div>
-
-            <div class="relative">
-                <textarea id="smsInput" rows="4" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-gray-200 placeholder:text-gray-500 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-300" placeholder="Paste Telebirr SMS alert here...&#10;e.g. Telebirr: You have received 1,500.00 ETB from Abebe K. (0911xxxxxx) Ref: TB123456789"></textarea>
-                <button id="clearBtn" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-gray-200 transition-colors" title="Clear">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
-            </div>
-
-            <div class="flex gap-2 mt-2 overflow-x-auto pb-1 -mx-1 px-1">
-                <button onclick="loadSample('legit')" class="flex-shrink-0 text-[10px] font-medium px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/25 hover:bg-emerald-500/20 transition-all">✓ Legit Sample</button>
-                <button onclick="loadSample('fraud')" class="flex-shrink-0 text-[10px] font-medium px-3 py-1.5 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/25 hover:bg-rose-500/20 transition-all">⚠ Fraud Sample</button>
-                <button onclick="loadSample('suspicious')" class="flex-shrink-0 text-[10px] font-medium px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/25 hover:bg-amber-500/20 transition-all">? Suspicious</button>
-            </div>
-
-            <button id="scanBtn" class="btn-scan mt-3 w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold text-sm tracking-wide shadow-lg shadow-emerald-500/25 hover:from-emerald-500 hover:to-teal-500 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
-                </svg>
-                Scan for Fraud
-            </button>
-        </section>
-
-        <!-- ===== RESULTS SECTION ===== -->
-        <section id="resultsSection" class="glass-card p-5 fade-in hidden" style="animation-delay:0.05s">
-            <div class="flex items-center justify-between mb-3">
-                <h2 class="text-sm font-semibold text-gray-300 tracking-wider uppercase">Scan Results</h2>
-                <span id="resultTimestamp" class="text-[10px] text-gray-500"></span>
-            </div>
-
-            <div class="mb-4">
-                <div class="flex items-center justify-between mb-1.5">
-                    <span class="text-xs text-gray-400 font-medium">Risk Score</span>
-                    <span id="riskScoreText" class="text-sm font-bold text-emerald-400">0 / 100</span>
-                </div>
-                <div class="w-full bg-white/5 rounded-full h-2 overflow-hidden">
-                    <div id="riskBar" class="risk-bar" style="width:0%; background:#10b981;"></div>
-                </div>
-            </div>
-
-            <div id="riskClassification" class="mb-4 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center gap-3">
-                <div id="riskIcon" class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-emerald-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
-                <div>
-                    <p id="riskTitle" class="text-sm font-bold text-emerald-300">Transaction Verified</p>
-                    <p id="riskDetail" class="text-[11px] text-emerald-200/70">No suspicious patterns detected</p>
-                </div>
-            </div>
-
-            <div id="txDetails" class="space-y-2 mb-4">
-                <div class="flex justify-between text-[11px] py-1.5 border-b border-white/5">
-                    <span class="text-gray-500">Amount</span>
-                    <span id="txAmount" class="text-gray-200 font-medium">—</span>
-                </div>
-                <div class="flex justify-between text-[11px] py-1.5 border-b border-white/5">
-                    <span class="text-gray-500">Transaction Ref</span>
-                    <span id="txRef" class="text-gray-200 font-medium">—</span>
-                </div>
-                <div class="flex justify-between text-[11px] py-1.5 border-b border-white/5">
-                    <span class="text-gray-500">Counterparty</span>
-                    <span id="txParty" class="text-gray-200 font-medium">—</span>
-                </div>
-                <div class="flex justify-between text-[11px] py-1.5">
-                    <span class="text-gray-500">Anomalies Found</span>
-                    <span id="txAnomalies" class="text-gray-200 font-medium">0</span>
-                </div>
-            </div>
-
-            <div id="txRecommendation" class="p-3 rounded-lg bg-white/5 border border-white/10 text-[11px] text-gray-400 leading-relaxed">
-                No action required.
-            </div>
-        </section>
-
-        <!-- ===== RECENT ACTIVITY ===== -->
-        <section class="glass-card p-5 fade-in" style="animation-delay:0.2s">
-            <h2 class="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-3">Recent Scans</h2>
-            <div id="activityList" class="space-y-2">
-                <p class="text-[11px] text-gray-500 text-center py-4">No transactions scanned yet</p>
-            </div>
-        </section>
-
-        <!-- ===== FOOTER ===== -->
-        <footer class="text-center pb-4 pt-2 fade-in" style="animation-delay:0.25s">
-            <p class="text-[10px] text-gray-600 tracking-wide">Telecore AI-Mesh • Telebirr Merchant Suite v2.1</p>
-            <p class="text-[9px] text-gray-700 mt-0.5">Built for Tech Innovation Demo 2025</p>
-        </footer>
-    </main>
-
-    <script>
-        (function() {
-            // ==================== STATE ====================
-            const state = {
-                isOnline: true,
-                scannedCount: 0,
-                fraudCount: 0,
-                meshNodes: 12,
-                activity: [],
-                scanHistoryRefs: new Set(),
-            };
-
-            // ==================== DOM REFS ====================
-            const $ = (id) => document.getElementById(id);
-            const statusRing = $('statusRing');
-            const statusIcon = $('statusIcon');
-            const statusLabel = $('statusLabel');
-            const modeDetail = $('modeDetail');
-            const modeSubDetail = $('modeSubDetail');
-            const headerBadge = $('headerStatusBadge');
-            const meshModeLabel = $('meshModeLabel');
-            const toggleBtn = $('toggleBtn');
-            const toggleKnob = $('toggleKnob');
-            const toggleIcon = $('toggleIcon');
-            const toggleTrack = $('toggleBtn');
-            const meshCanvas = $('meshCanvas');
-            const smsInput = $('smsInput');
-            const scanBtn = $('scanBtn');
-            const clearBtn = $('clearBtn');
-            const resultsSection = $('resultsSection');
-            const resultTimestamp = $('resultTimestamp');
-            const riskScoreText = $('riskScoreText');
-            const riskBar = $('riskBar');
-            const riskClassification = $('riskClassification');
-            const riskIcon = $('riskIcon');
-            const riskTitle = $('riskTitle');
-            const riskDetail = $('riskDetail');
-            const txAmount = $('txAmount');
-            const txRef = $('txRef');
-            const txParty = $('txParty');
-            const txAnomalies = $('txAnomalies');
-            const txRecommendation = $('txRecommendation');
-            const txDetails = $('txDetails');
-            const activityList = $('activityList');
-            const statScanned = $('statScanned');
-            const statFraud = $('statFraud');
-            const statNodes = $('statNodes');
-            const verifySmsInput = $('verifySmsInput');
-            const verifyBtn = $('verifyBtn');
-            const verifyAlert = $('verifyAlert');
-
-            // ==================== MESH CANVAS ANIMATION ====================
-            const ctx = meshCanvas.getContext('2d');
-            let meshFrameId = null;
-            let particles = [];
-
-            function initParticles() {
-                particles = [];
-                const nodeCount = 10;
-                const w = meshCanvas.width;
-                const h = meshCanvas.height;
-                for (let i = 0; i < nodeCount; i++) {
-                    particles.push({
-                        x: Math.random() * w,
-                        y: Math.random() * h,
-                        vx: (Math.random() - 0.5) * 0.4,
-                        vy: (Math.random() - 0.5) * 0.4,
-                        r: 2 + Math.random() * 3,
-                        phase: Math.random() * Math.PI * 2,
-                        pulseSpeed: 0.02 + Math.random() * 0.04,
-                    });
-                }
-            }
-
-            function resizeMeshCanvas() {
-                const rect = meshCanvas.parentElement.getBoundingClientRect();
-                const dpr = window.devicePixelRatio || 1;
-                meshCanvas.width = rect.width * dpr;
-                meshCanvas.height = rect.height * dpr;
-                meshCanvas.style.width = rect.width + 'px';
-                meshCanvas.style.height = rect.height + 'px';
-                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-                initParticles();
-            }
-
-            function drawMeshNetwork(timestamp) {
-                const w = meshCanvas.width / (window.devicePixelRatio || 1);
-                const h = meshCanvas.height / (window.devicePixelRatio || 1);
-                ctx.clearRect(0, 0, w, h);
-
-                const baseColor = state.isOnline ? '16,185,129' : '245,158,11';
-                const centerX = w / 2;
-                const centerY = h / 2;
-
-                particles.forEach(p => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    if (p.x < 0 || p.x > w) p.vx *= -1;
-                    if (p.y < 0 || p.y > h) p.vy *= -1;
-                    p.phase += p.pulseSpeed;
-                });
-
-                particles.forEach(p => {
-                    const dist = Math.hypot(p.x - centerX, p.y - centerY);
-                    const alpha = Math.max(0.08, 0.45 - dist / 300);
-                    ctx.beginPath();
-                    ctx.moveTo(centerX, centerY);
-                    ctx.lineTo(p.x, p.y);
-                    ctx.strokeStyle = `rgba(${baseColor},${alpha})`;
-                    ctx.lineWidth = 0.8;
-                    ctx.stroke();
-                });
-
-                for (let i = 0; i < particles.length; i++) {
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const d = Math.hypot(particles[i].x - particles[j].x, particles[i].y - particles[j].y);
-                        if (d < 65) {
-                            const alpha = 0.18 * (1 - d / 65);
-                            ctx.beginPath();
-                            ctx.moveTo(particles[i].x, particles[i].y);
-                            ctx.lineTo(particles[j].x, particles[j].y);
-                            ctx.strokeStyle = `rgba(${baseColor},${alpha})`;
-                            ctx.lineWidth = 0.5;
-                            ctx.stroke();
-                        }
-                    }
-                }
-
-                const hubGlow = 20 + Math.sin(timestamp * 0.004) * 6;
-                const hubGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, hubGlow + 15);
-                hubGrad.addColorStop(0, `rgba(${baseColor},0.6)`);
-                hubGrad.addColorStop(0.5, `rgba(${baseColor},0.2)`);
-                hubGrad.addColorStop(1, `rgba(${baseColor},0)`);
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, hubGlow + 15, 0, Math.PI * 2);
-                ctx.fillStyle = hubGrad;
-                ctx.fill();
-
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, 4.5, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(${baseColor},0.9)`;
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, 8, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(${baseColor},0.2)`;
-                ctx.fill();
-
-                particles.forEach(p => {
-                    const pulse = 0.5 + Math.sin(p.phase) * 0.5;
-                    const r = p.r * (0.8 + pulse * 0.5);
-                    const glowR = r * 3.5;
-                    const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowR);
-                    grad.addColorStop(0, `rgba(${baseColor},${0.65 * pulse})`);
-                    grad.addColorStop(1, `rgba(${baseColor},0)`);
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, glowR, 0, Math.PI * 2);
-                    ctx.fillStyle = grad;
-                    ctx.fill();
-
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(${baseColor},${0.7 + pulse * 0.3})`;
-                    ctx.fill();
-                });
-
-                const travelTime = timestamp * 0.002;
-                particles.forEach((p, idx) => {
-                    const pulseT = (travelTime + idx * 0.37) % 1;
-                    const px = centerX + (p.x - centerX) * pulseT;
-                    const py = centerY + (p.y - centerY) * pulseT;
-                    const pulseR = 2.5 + Math.sin(pulseT * Math.PI) * 1.5;
-                    ctx.beginPath();
-                    ctx.arc(px, py, pulseR, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(${baseColor},${0.85 * Math.sin(pulseT * Math.PI)})`;
-                    ctx.fill();
-                });
-            }
-
-            function animateMesh(timestamp) {
-                drawMeshNetwork(timestamp);
-                meshFrameId = requestAnimationFrame(animateMesh);
-            }
-
-            // ==================== STATUS UPDATE ====================
-            function updateStatusUI() {
-                const isOnline = state.isOnline;
-
-                statusRing.classList.toggle('online', isOnline);
-                statusRing.classList.toggle('offline', !isOnline);
-
-                if (isOnline) {
-                    statusIcon.innerHTML =
-                        '<path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.749.749 0 011.06 0z"/>';
-                    statusIcon.className = 'w-8 h-8 mx-auto text-emerald-400 transition-colors duration-500';
-                    statusLabel.textContent = 'ONLINE';
-                    statusLabel.className = 'mt-1 text-[11px] font-bold text-emerald-400 tracking-wider transition-colors duration-500';
-                    modeDetail.textContent = 'Cellular Data Active';
-                    modeSubDetail.textContent = 'Full connectivity via Telebirr network';
-                    headerBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wide transition-all duration-500 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
-                    headerBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 dot-pulse"></span> ONLINE';
-                    meshModeLabel.textContent = 'LIVE';
-                    toggleTrack.className = 'toggle-track active relative w-14 h-8 rounded-full flex items-center px-1 cursor-pointer transition-all duration-400';
-                    toggleKnob.style.transform = 'translateX(0)';
-                    toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>';
-                    toggleIcon.className = 'w-3.5 h-3.5 text-emerald-500';
-                    statNodes.textContent = state.meshNodes;
-                } else {
-                    statusIcon.innerHTML =
-                        '<path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636a9 9 0 010 12.728m-2.828-9.9a5 5 0 010 7.07m-9.9-7.07a5 5 0 010 7.07m-2.828-9.9a9 9 0 010 12.728"/>';
-                    statusIcon.className = 'w-8 h-8 mx-auto text-amber-400 transition-colors duration-500';
-                    statusLabel.textContent = 'MESH ACTIVE';
-                    statusLabel.className = 'mt-1 text-[11px] font-bold text-amber-400 tracking-wider transition-colors duration-500 pulse-text';
-                    modeDetail.textContent = 'Mesh Fallback Enabled';
-                    modeSubDetail.textContent = 'Routing via 12 nearby mesh nodes';
-                    headerBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wide transition-all duration-500 bg-amber-500/15 text-amber-300 border border-amber-500/30';
-                    headerBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 dot-pulse"></span> OFFLINE';
-                    meshModeLabel.textContent = 'MESH MODE';
-                    toggleTrack.className = 'toggle-track relative w-14 h-8 rounded-full flex items-center px-1 cursor-pointer transition-all duration-400';
-                    toggleKnob.style.transform = 'translateX(24px)';
-                    toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>';
-                    toggleIcon.className = 'w-3.5 h-3.5 text-amber-500';
-                    statNodes.textContent = state.meshNodes + 4;
-                }
-            }
-
-            function toggleStatus() {
-                state.isOnline = !state.isOnline;
-                updateStatusUI();
-            }
-
-            toggleBtn.addEventListener('click', toggleStatus);
-
-            // ==================== SAMPLE SMS DATA ====================
-            const samples = {
-                legit: 'Telebirr: You have received 1,500.00 ETB from Abebe Kebede (0911xxxxxx) on 12/03/2025 14:30. Ref: TB202503121430889',
-                fraud: 'URGENT Telebirr: Your account needs verification! Send your PIN and OTP to 0911xxxxxx immediately. Ref: XX9999. Amount: 50,000 ETB. Click http://fake-telebirr.et/verify',
-                suspicious: 'Telebirr: You received 25,000 ETB from unknown sender. Ref: TB999999999. Please verify your identity by sending OTP.',
-            };
-
-            window.loadSample = function(type) {
-                smsInput.value = samples[type] || '';
-                smsInput.focus();
-                setTimeout(() => performScan(), 350);
-            };
-
-            // ==================== FRAUD DETECTION ENGINE ====================
-            function detectFraud(smsText) {
-                const anomalies = [];
-                let riskScore = 0;
-                const text = smsText.toLowerCase();
-                const textUpper = smsText.toUpperCase();
-
-                const amountMatch = smsText.match(/([\d,]+(?:\.\d{1,2})?)\s*(?:ETB|birr|Br)/i);
-                let amount = amountMatch ? amountMatch[1] : 'Unknown';
-                const amountNum = amountMatch ? parseFloat(amountMatch[1].replace(/,/g, '')) : null;
-
-                const refMatch = smsText.match(/ref[:\s]*([A-Za-z0-9]+)/i) || smsText.match(/TB[\d]+/i);
-                let ref = refMatch ? refMatch[1] || refMatch[0] : 'Not found';
-                if (ref !== 'Not found' && ref.length > 3 && !ref.toUpperCase().startsWith('TB')) {
-                    ref = ref.toUpperCase();
-                }
-
-                const partyMatch = smsText.match(/(?:from|to|by)\s+([A-Za-z\s.]+?)(?:\s*\(|\s+on\s+|\s+Ref|$)/i);
-                let party = partyMatch ? partyMatch[1].trim() : 'Unknown party';
-
-                const fraudKeywords = ['urgent', 'verify', 'password', 'pin', 'otp', 'click', 'link',
-                    'suspend', 'blocked', 'confirm your', 'identity', 'update your', 'warning',
-                    'immediately', 'send your', 'account will', 'deactivated'
-                ];
-                const foundKeywords = fraudKeywords.filter(k => text.includes(k));
-                if (foundKeywords.length > 0) {
-                    anomalies.push(`Suspicious keywords: ${foundKeywords.slice(0, 3).join(', ')}`);
-                    riskScore += 22 * Math.min(foundKeywords.length, 3);
-                }
-
-                if (/http[s]?:\/\//i.test(smsText) && !/telebirr\.et|ethiotelecom\.et/i.test(smsText)) {
-                    anomalies.push('Phishing URL detected');
-                    riskScore += 25;
-                }
-
-                if (amountNum !== null && amountNum > 20000) {
-                    anomalies.push(`High-value transaction (${amountNum.toLocaleString()} ETB)`);
-                    riskScore += 15;
-                }
-
-                if (amountNum !== null && amountNum >= 10000 && amountNum % 5000 === 0) {
-                    anomalies.push('Suspicious round amount pattern');
-                    riskScore += 8;
-                }
-
-                if (ref === 'Not found' || ref === 'XX9999') {
-                    anomalies.push('Missing or invalid transaction reference');
-                    riskScore += 18;
-                }
-
-                if (party === 'unknown sender' || party === 'Unknown party') {
-                    anomalies.push('Counterparty identity not verified');
-                    riskScore += 12;
-                }
-
-                if (ref !== 'Not found' && state.scanHistoryRefs.has(ref.toUpperCase())) {
-                    anomalies.push('Duplicate transaction reference detected');
-                    riskScore += 30;
-                } else if (ref !== 'Not found' && ref !== 'XX9999') {
-                    state.scanHistoryRefs.add(ref.toUpperCase());
-                }
-
-                if (!/telebirr/i.test(smsText)) {
-                    anomalies.push('Not a standard Telebirr SMS format');
-                    riskScore += 10;
-                }
-
-                const phoneMatches = smsText.match(/09\d{8}/g);
-                if (phoneMatches) {
-                    const hasInvalidPhone = phoneMatches.some(p => !/^09\d{8}$/.test(p));
-                    if (hasInvalidPhone) {
-                        anomalies.push('Invalid phone number format');
-                        riskScore += 8;
-                    }
-                }
-
-                riskScore = Math.min(riskScore, 100);
-                riskScore = Math.round(riskScore);
-
-                return { amount, ref, party, riskScore, anomalies };
-            }
-
-            // ==================== PERFORM SCAN (existing) ====================
-            function performScan() {
-                const smsText = smsInput.value.trim();
-                if (!smsText) {
-                    smsInput.classList.add('animate-pulse');
-                    setTimeout(() => smsInput.classList.remove('animate-pulse'), 800);
-                    return;
-                }
-
-                const result = detectFraud(smsText);
-
-                state.scannedCount++;
-                state.activity.unshift({
-                    time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-                    ref: result.ref,
-                    amount: result.amount,
-                    risk: result.riskScore,
-                    classification: result.riskScore >= 60 ? 'HIGH RISK' : result.riskScore >= 30 ? 'SUSPICIOUS' :
-                        'VERIFIED',
-                    riskClass: result.riskScore >= 60 ? 'rose' : result.riskScore >= 30 ? 'amber' : 'emerald',
-                });
-                if (result.riskScore >= 30) {
-                    state.fraudCount++;
-                }
-                if (state.activity.length > 8) state.activity.length = 8;
-
-                statScanned.textContent = state.scannedCount;
-                statFraud.textContent = state.fraudCount;
-
-                resultsSection.classList.remove('hidden');
-                resultTimestamp.textContent = new Date().toLocaleString('en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: true,
-                });
-
-                riskScoreText.textContent = `${result.riskScore} / 100`;
-                const rClass = result.riskScore >= 60 ? 'rose' : result.riskScore >= 30 ? 'amber' : 'emerald';
-                riskScoreText.className = `text-sm font-bold text-${rClass}-400`;
-                riskBar.style.width = '0%';
-                setTimeout(() => {
-                    riskBar.style.width = `${result.riskScore}%`;
-                    riskBar.style.backgroundColor = rClass === 'rose' ? '#f43f5e' : rClass === 'amber' ? '#f59e0b' :
-                        '#10b981';
-                }, 50);
-
-                riskClassification.className =
-                    `mb-4 p-3.5 rounded-xl bg-${rClass}-500/10 border border-${rClass}-500/25 flex items-center gap-3 transition-all duration-500`;
-                riskIcon.innerHTML = rClass === 'rose' ?
-                    '<svg class="w-5 h-5 text-rose-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>' :
-                    rClass === 'amber' ?
-                    '<svg class="w-5 h-5 text-amber-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 3.75h.008v.008H12v-.008zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' :
-                    '<svg class="w-5 h-5 text-emerald-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
-                riskIcon.className =
-                    `w-10 h-10 rounded-full bg-${rClass}-500/20 flex items-center justify-center flex-shrink-0 transition-all duration-500`;
-                riskTitle.textContent = rClass === 'rose' ? 'Fraud Alert — Block Transaction' : rClass === 'amber' ?
-                    'Suspicious — Manual Review Needed' : 'Transaction Verified';
-                riskTitle.className = `text-sm font-bold text-${rClass}-300`;
-                riskDetail.textContent = rClass === 'rose' ? 'Multiple critical anomalies detected. Do not proceed.' :
-                    rClass === 'amber' ? 'Some patterns require human verification.' :
-                    'No suspicious patterns detected';
-                riskDetail.className = `text-[11px] text-${rClass}-200/70`;
-
-                txAmount.textContent = result.amount !== 'Unknown' ? `${result.amount} ETB` : 'Unknown';
-                txRef.textContent = result.ref;
-                txParty.textContent = result.party;
-                txAnomalies.textContent = result.anomalies.length;
-                txAnomalies.className = `text-gray-200 font-medium ${result.anomalies.length > 0 ? 'text-rose-300' : ''}`;
-                txRecommendation.textContent = buildRecommendations(result.riskScore, result.anomalies);
-
-                renderActivity();
-            }
-
-            function buildRecommendations(riskScore, anomalies) {
-                if (riskScore >= 60) {
-                    return '⚠ CRITICAL: Do NOT process this transaction. Contact Telebirr fraud hotline at 994 immediately. Preserve the SMS message as evidence.';
-                } else if (riskScore >= 30) {
-                    return '⚡ Caution advised. Verify the sender\'s identity through the official Telebirr merchant portal before processing.';
-                } else {
-                    return '✓ All clear. This transaction appears legitimate. You may proceed with confidence.';
-                }
-            }
-
-            // ==================== RENDER ACTIVITY ====================
-            function renderActivity() {
-                if (state.activity.length === 0) {
-                    activityList.innerHTML =
-                        '<p class="text-[11px] text-gray-500 text-center py-4">No transactions scanned yet</p>';
-                    return;
-                }
-                activityList.innerHTML = state.activity.map(item => {
-                    const dotColor = item.riskClass === 'rose' ? 'bg-rose-400' :
-                        item.riskClass === 'amber' ? 'bg-amber-400' : 'bg-emerald-400';
-                    const textColor = item.riskClass === 'rose' ? 'text-rose-300' :
-                        item.riskClass === 'amber' ? 'text-amber-300' : 'text-emerald-300';
-                    return `
-                    <div class="glass-card-inner px-3.5 py-2.5 flex items-center justify-between fade-in">
-                        <div class="flex items-center gap-2.5 min-w-0">
-                            <span class="w-1.5 h-1.5 rounded-full ${dotColor} flex-shrink-0"></span>
-                            <div class="min-w-0">
-                                <p class="text-[11px] font-medium text-gray-200 truncate">${item.ref}</p>
-                                <p class="text-[9px] text-gray-500">${item.time} • ${item.amount} ETB</p>
-                            </div>
-                        </div>
-                        <span class="text-[10px] font-bold ${textColor} flex-shrink-0 ml-2">${item.classification}</span>
-                    </div>`;
-                }).join('');
-            }
-
-            // ==================== NEW VERIFY FUNCTION ====================
-            function verifyTransaction() {
-                const smsText = verifySmsInput.value.trim();
-                if (!smsText) {
-                    verifyAlert.classList.remove('hidden');
-                    verifyAlert.textContent = 'Please paste an SMS message to verify.';
-                    verifyAlert.className = 'mt-4 p-4 rounded-xl text-sm font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/25';
-                    return;
-                }
-
-                const lower = smsText.toLowerCase();
-                const hasTelebirr = /telebirr/i.test(smsText) && smsText.trim().toLowerCase().startsWith('telebirr');
-                const hasAmount = /[\d,]+(?:\.\d{1,2})?\s*(?:ETB|birr|Br)/i.test(smsText);
-                const hasRef = /ref[:\s]*[A-Za-z0-9]+/i.test(smsText) || /TB[\d]+/i.test(smsText);
-                const hasFraudSignals = /urgent|verify|password|pin|otp|click|link|suspend|blocked|immediately|send your|deactivated/i
-                    .test(smsText);
-                const hasPhishingLink = /http[s]?:\/\//i.test(smsText) && !/telebirr\.et|ethiotelecom\.et/i.test(smsText);
-
-                const isAuthentic = hasTelebirr && hasAmount && hasRef && !hasFraudSignals && !hasPhishingLink;
-
-                verifyAlert.classList.remove('hidden');
-                if (isAuthentic) {
-                    verifyAlert.textContent = 'SUCCESS: Transaction is 100% Authentic';
-                    verifyAlert.className = 'mt-4 p-4 rounded-xl text-sm font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/25';
-                } else {
-                    verifyAlert.textContent = 'CRITICAL WARNING: Forged or Suspicious Transaction Alert!';
-                    verifyAlert.className = 'mt-4 p-4 rounded-xl text-sm font-semibold text-rose-300 bg-rose-500/10 border border-rose-500/25 pulse-red';
-                }
-            }
-
-            verifyBtn.addEventListener('click', verifyTransaction);
-            verifySmsInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && e.ctrlKey) verifyTransaction();
-            });
-
-            // ==================== EVENT LISTENERS ====================
-            scanBtn.addEventListener('click', performScan);
-            clearBtn.addEventListener('click', () => {
-                smsInput.value = '';
-                smsInput.focus();
-            });
-            smsInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && e.ctrlKey) performScan();
-            });
-
-            // ==================== AUTO ONLINE/OFFLINE DETECTION ====================
-            window.addEventListener('online', () => {
-                state.isOnline = true;
-                updateStatusUI();
-            });
-
-            window.addEventListener('offline', () => {
-                state.isOnline = false;
-                updateStatusUI();
-            });
-
-            // ==================== INIT ====================
-            function init() {
-                // Set initial state based on actual connectivity
-                state.isOnline = navigator.onLine;
-                updateStatusUI();
-
-                resizeMeshCanvas();
-                animateMesh(0);
-                renderActivity();
-
-                window.addEventListener('resize', () => {
-                    resizeMeshCanvas();
-                });
-
-                window.addEventListener('orientationchange', () => {
-                    setTimeout(resizeMeshCanvas, 300);
-                });
-            }
-
-            init();
-        })();
-    </script>
+        <div class="w-full bg-white/5 rounded-full h-2 overflow-hidden">
+          <div id="progressBar" class="progress-fill h-full rounded-full" style="width: 0%;"></div>
+        </div>
+      </div>
+      <!-- Result Card -->
+      <div id="aiResultCard" class="hidden p-4 rounded-xl text-sm font-semibold transition-all duration-500"></div>
+    </div>
+  </div>
+
+  <!-- ========== FOOTER ========== -->
+  <div class="text-center pt-6 pb-4">
+    <p class="text-[10px] text-gray-600 tracking-wide">Telecore AI-Mesh · Telebirr Merchant Suite v3.0</p>
+    <p class="text-[9px] text-gray-700 mt-0.5">Premium Tech Demo · 2025</p>
+  </div>
+
+  <script>
+    // ==================== STATE & DOM REFS ====================
+    let activeTab = 1;
+    const tab1Btn = document.getElementById('tab1Btn');
+    const tab2Btn = document.getElementById('tab2Btn');
+    const tab1Content = document.getElementById('tab1Content');
+    const tab2Content = document.getElementById('tab2Content');
+    
+    const networkBadge = document.getElementById('networkBadge');
+    const networkDot = document.getElementById('networkDot');
+    const networkText = document.getElementById('networkText');
+    
+    const smsText = document.getElementById('smsText');
+    const verifySmsBtn = document.getElementById('verifySmsBtn');
+    const smsResult = document.getElementById('smsResult');
+    
+    const fileInput = document.getElementById('fileInput');
+    const uploadZone = document.getElementById('uploadZone');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const analysisResult = document.getElementById('analysisResult');
+    const progressBar = document.getElementById('progressBar');
+    const progressPercent = document.getElementById('progressPercent');
+    const aiResultCard = document.getElementById('aiResultCard');
+
+    // ==================== TAB SWITCHING ====================
+    function switchTab(tab) {
+      activeTab = tab;
+      if (tab === 1) {
+        tab1Content.classList.remove('hidden');
+        tab2Content.classList.add('hidden');
+        tab1Btn.classList.add('tab-active');
+        tab2Btn.classList.remove('tab-active');
+        tab1Btn.classList.remove('text-gray-400', 'bg-transparent');
+        tab2Btn.classList.add('text-gray-400', 'bg-transparent');
+      } else {
+        tab1Content.classList.add('hidden');
+        tab2Content.classList.remove('hidden');
+        tab2Btn.classList.add('tab-active');
+        tab1Btn.classList.remove('tab-active');
+        tab2Btn.classList.remove('text-gray-400', 'bg-transparent');
+        tab1Btn.classList.add('text-gray-400', 'bg-transparent');
+      }
+      // Ensure tabs have consistent padding
+      tab1Btn.classList.add('py-2.5', 'px-2', 'rounded-lg', 'text-xs', 'font-medium', 'transition-all');
+      tab2Btn.classList.add('py-2.5', 'px-2', 'rounded-lg', 'text-xs', 'font-medium', 'transition-all');
+    }
+
+    // ==================== NETWORK DETECTION ====================
+    function updateNetworkStatus() {
+      const isOnline = navigator.onLine;
+      if (isOnline) {
+        networkBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wide transition-all duration-500 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+        networkDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400 dot-pulse';
+        networkText.textContent = 'ONLINE';
+      } else {
+        networkBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wide transition-all duration-500 bg-rose-500/15 text-rose-300 border border-rose-500/30';
+        networkDot.className = 'w-1.5 h-1.5 rounded-full bg-rose-400 dot-pulse';
+        networkText.textContent = 'OFFLINE';
+      }
+    }
+
+    window.addEventListener('online', updateNetworkStatus);
+    window.addEventListener('offline', updateNetworkStatus);
+
+    // ==================== SMS VERIFICATION ====================
+    function verifySms() {
+      const text = smsText.value.toLowerCase().trim();
+      if (!text) {
+        smsResult.className = 'mt-4 p-4 rounded-xl text-sm font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/25';
+        smsResult.textContent = '⚠️ Please paste an SMS message to verify.';
+        return;
+      }
+
+      const hasTelebirr = text.includes('telebirr');
+      const hasEthioTelecom = text.includes('ethio telecom') || text.includes('ethiotelecom');
+      const hasETB = text.includes('etb');
+
+      if (hasTelebirr && hasEthioTelecom && hasETB) {
+        smsResult.className = 'mt-4 p-4 rounded-xl text-sm font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/25 fade-in';
+        smsResult.innerHTML = '✅ LEGIT TRANSACTION<br><span class="text-[10px] font-normal text-emerald-200/70 mt-1 block">All three critical markers detected (Telebirr, Ethio Telecom, ETB)</span>';
+      } else {
+        smsResult.className = 'mt-4 p-4 rounded-xl text-sm font-semibold text-rose-300 bg-rose-500/10 border border-rose-500/25 pulse-red fade-in';
+        smsResult.innerHTML = '🚨 CRITICAL WARNING<br><span class="text-[10px] font-normal text-rose-200/70 mt-1 block">Forged or suspicious SMS detected. Missing required markers.</span>';
+      }
+    }
+
+    // ==================== SCREENSHOT AI SIMULATION ====================
+    let analysisInterval = null;
+    let isAnalyzing = false;
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (file) {
+        // Just visual feedback
+        const fileName = file.name.length > 25 ? file.name.substring(0, 22) + '...' : file.name;
+        uploadZone.innerHTML = `
+          <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <p class="text-sm font-medium text-emerald-300">${fileName}</p>
+          <p class="text-[10px] text-gray-500">Ready for AI analysis</p>
+        `;
+        uploadZone.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+      }
+    }
+
+    function analyzeScreenshot() {
+      if (isAnalyzing) return;
+      
+      // Check if a file is selected (simulated) - we'll just allow it regardless
+      // Reset UI
+      aiResultCard.classList.add('hidden');
+      analysisResult.classList.remove('hidden');
+      progressBar.style.width = '0%';
+      progressPercent.textContent = '0%';
+      isAnalyzing = true;
+      analyzeBtn.disabled = true;
+      analyzeBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      
+      let progress = 0;
+      // Randomize outcome: 60% authentic, 40% forged (or based on time)
+      const isForged = Math.random() < 0.4;
+      
+      analysisInterval = setInterval(() => {
+        progress += Math.random() * 15 + 5;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(analysisInterval);
+          isAnalyzing = false;
+          analyzeBtn.disabled = false;
+          analyzeBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+          
+          // Show result card
+          aiResultCard.classList.remove('hidden');
+          aiResultCard.classList.add('fade-in');
+          
+          if (isForged) {
+            aiResultCard.className = 'p-4 rounded-xl text-sm font-semibold text-rose-300 bg-rose-500/10 border border-rose-500/25 fade-in pulse-red';
+            aiResultCard.innerHTML = '🕵️ AI DETECTION: FORGERY SUSPECTED<br><span class="text-[10px] font-normal text-rose-200/70 mt-1 block">Image metadata & font pixel alignment show signs of digital tampering. Proceed with caution.</span>';
+          } else {
+            aiResultCard.className = 'p-4 rounded-xl text-sm font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/25 fade-in';
+            aiResultCard.innerHTML = '✅ AI VERIFIED: AUTHENTIC SCREENSHOT<br><span class="text-[10px] font-normal text-emerald-200/70 mt-1 block">No modified pixels or spoofed metadata detected. This screenshot appears legit.</span>';
+          }
+        }
+        progressBar.style.width = `${progress}%`;
+        progressPercent.textContent = `${Math.floor(progress)}%`;
+      }, 200);
+    }
+
+    // ==================== EVENT LISTENERS ====================
+    verifySmsBtn.addEventListener('click', verifySms);
+    analyzeBtn.addEventListener('click', analyzeScreenshot);
+    
+    // Allow drag & drop simulation
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.style.borderColor = 'rgba(16, 185, 129, 0.6)';
+      uploadZone.style.background = 'rgba(16, 185, 129, 0.05)';
+    });
+    uploadZone.addEventListener('dragleave', () => {
+      uploadZone.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+      uploadZone.style.background = 'rgba(255, 255, 255, 0.02)';
+    });
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+      uploadZone.style.background = 'rgba(255, 255, 255, 0.02)';
+      if (e.dataTransfer.files.length > 0) {
+        fileInput.files = e.dataTransfer.files;
+        handleFileSelect({ target: { files: e.dataTransfer.files } });
+      }
+    });
+
+    // ==================== INIT ====================
+    function init() {
+      updateNetworkStatus();
+      switchTab(1); // Ensure tab 1 is active on load
+    }
+    init();
+  </script>
 </body>
 </html>
