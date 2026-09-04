@@ -3,632 +3,880 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tele-Safe AI — Ethiopian Digital Wallet Forensics</title>
+    <title>Tele-Bill QR - Telebirr Merchant QR Generator</title>
+    <meta name="description" content="Generate secure Telebirr merchant QR codes for Ethiopian businesses. Free, fast, and works offline.">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js">
+    </script>
     <style>
         :root {
-            --bg-primary: #0a0e17;
-            --bg-secondary: #111827;
-            --bg-card: #1a1f2e;
-            --bg-card-hover: #1e2433;
-            --bg-input: #0d1220;
-            --border: #2a3040;
-            --border-accent: #3a4055;
-            --text-primary: #e2e8f0;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --green: #10b981;
-            --green-dark: #059669;
-            --green-glow: rgba(16, 185, 129, 0.2);
-            --red: #ef4444;
-            --red-dark: #dc2626;
-            --red-glow: rgba(239, 68, 68, 0.2);
-            --gold: #f59e0b;
-            --gold-dark: #d97706;
-            --gold-glow: rgba(245, 158, 11, 0.15);
-            --ethio-green: #078930;
-            --ethio-yellow: #fcdd09;
-            --ethio-red: #da121a;
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 20px;
-            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
-            --shadow-glow: 0 0 40px rgba(0, 0, 0, 0.6);
-            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --bg-primary: #06060f;
+            --bg-secondary: #0d0d1f;
+            --bg-card: rgba(18, 18, 40, 0.75);
+            --bg-card-solid: #12122a;
+            --text-primary: #f0f0f8;
+            --text-secondary: #9494b8;
+            --text-muted: #5a5a7e;
+            --accent-cyan: #00e5ff;
+            --accent-teal: #00f5d4;
+            --accent-purple: #7c3aed;
+            --accent-pink: #ec4899;
+            --accent-gold: #f59e0b;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(0, 229, 255, 0.35);
+            --shadow-neon: 0 0 30px rgba(0, 229, 255, 0.15), 0 0 60px rgba(0, 229, 255, 0.05);
+            --shadow-neon-strong: 0 0 40px rgba(0, 229, 255, 0.3), 0 0 80px rgba(0, 229, 255, 0.12), 0 0 120px rgba(124, 58, 237, 0.08);
+            --font-main: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 10px;
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            --transition-bounce: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        * {
+        *,
+        *::before,
+        *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            font-family: 'Segoe UI', 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', sans-serif;
+            font-family: var(--font-main);
             background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
-            line-height: 1.6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            overflow-x: hidden;
         }
 
+        /* Animated background mesh */
         body::before {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
             background:
-                radial-gradient(ellipse at 20% 20%, rgba(7, 137, 48, 0.06) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 80%, rgba(245, 158, 11, 0.04) 0%, transparent 60%),
-                radial-gradient(ellipse at 50% 50%, rgba(16, 185, 129, 0.02) 0%, transparent 70%);
+                radial-gradient(ellipse at 20% 50%, rgba(0, 229, 255, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(124, 58, 237, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(236, 72, 153, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 60%, rgba(0, 245, 212, 0.03) 0%, transparent 40%);
+            animation: bgDrift 20s ease-in-out infinite;
             pointer-events: none;
             z-index: 0;
         }
 
-        .app-container {
-            max-width: 820px;
-            margin: 0 auto;
-            padding: 24px 20px 60px;
-            position: relative;
-            z-index: 1;
+        @keyframes bgDrift {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(1%, -0.5%) scale(1.02);
+            }
+            50% {
+                transform: translate(-0.5%, 1%) scale(0.98);
+            }
+            75% {
+                transform: translate(0.5%, -1%) scale(1.01);
+            }
         }
 
-        /* Header */
-        .app-header {
-            text-align: center;
-            padding: 28px 0 20px;
-            position: relative;
-        }
-        .app-header::after {
+        /* Subtle grain overlay */
+        body::after {
             content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
-            height: 3px;
-            background: linear-gradient(90deg, var(--ethio-green), var(--gold), var(--ethio-red));
-            border-radius: 2px;
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.5;
         }
-        .logo-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 64px;
-            height: 64px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, rgba(7, 137, 48, 0.25), rgba(245, 158, 11, 0.15));
-            border: 2px solid rgba(7, 137, 48, 0.5);
-            margin-bottom: 14px;
-            font-size: 32px;
-            box-shadow: 0 0 30px rgba(7, 137, 48, 0.2);
-        }
-        .app-title {
-            font-size: 2rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #ffffff 0%, #a5f3fc 40%, #fbbf24 70%, #ffffff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 4px;
-        }
-        .app-subtitle {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-        .app-tagline {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 4px;
-            letter-spacing: 0.5px;
+
+        .app-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 520px;
         }
 
         /* Main Card */
         .main-card {
             background: var(--bg-card);
-            border-radius: var(--radius-xl);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-card);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 36px 32px 32px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: box-shadow var(--transition-smooth);
+            position: relative;
             overflow: hidden;
-            margin-top: 24px;
-            transition: var(--transition);
-        }
-        .main-card:hover {
-            border-color: var(--border-accent);
         }
 
-        .card-header {
-            padding: 20px 24px 16px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .card-header-title {
-            font-size: 0.9rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-secondary);
-        }
-        .card-header-badge {
-            font-size: 0.7rem;
-            padding: 4px 12px;
-            border-radius: 20px;
-            background: rgba(245, 158, 11, 0.12);
-            color: var(--gold);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            font-weight: 600;
-            letter-spacing: 0.5px;
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-teal), var(--accent-purple), transparent);
+            opacity: 0.7;
+            border-radius: 2px 2px 0 0;
         }
 
-        .card-body {
-            padding: 20px 24px;
+        .main-card.has-qr {
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 8px 20px rgba(0, 0, 0, 0.3), var(--shadow-neon), inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
 
-        /* Textarea */
-        .input-label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            letter-spacing: 0.3px;
-        }
-        .input-textarea {
-            width: 100%;
-            min-height: 180px;
-            padding: 16px 18px;
-            background: var(--bg-input);
-            border: 2px solid var(--border);
-            border-radius: var(--radius-md);
-            color: var(--text-primary);
-            font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
-            font-size: 0.85rem;
-            line-height: 1.7;
-            resize: vertical;
-            transition: var(--transition);
-            outline: none;
-            letter-spacing: 0.2px;
-        }
-        .input-textarea:focus {
-            border-color: rgba(245, 158, 11, 0.5);
-            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.08);
-        }
-        .input-textarea::placeholder {
-            color: var(--text-muted);
-            font-style: italic;
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
         }
 
-        /* Buttons */
-        .btn-row {
-            display: flex;
-            gap: 12px;
-            margin-top: 16px;
-            flex-wrap: wrap;
-        }
-        .btn {
-            padding: 12px 24px;
-            border-radius: var(--radius-md);
-            font-weight: 700;
-            font-size: 0.85rem;
-            letter-spacing: 0.3px;
-            cursor: pointer;
-            transition: var(--transition);
-            border: none;
-            outline: none;
+        .logo-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid rgba(0, 229, 255, 0.25);
+            border-radius: 50px;
+            padding: 6px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
             text-transform: uppercase;
-            font-family: inherit;
+            color: var(--accent-cyan);
+            margin-bottom: 14px;
+            transition: all var(--transition-fast);
         }
-        .btn-primary {
-            background: linear-gradient(135deg, #059669, #10b981);
-            color: #ffffff;
-            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
-            flex: 1;
-            min-width: 200px;
-            justify-content: center;
-            font-size: 0.9rem;
-            padding: 14px 28px;
+
+        .logo-badge .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-teal);
+            box-shadow: 0 0 8px var(--accent-teal);
+            animation: pulseDot 2s ease-in-out infinite;
         }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4);
-            background: linear-gradient(135deg, #10b981, #34d399);
+
+        @keyframes pulseDot {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(1.4);
+            }
         }
-        .btn-primary:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.2);
+
+        .logo-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+            display: block;
         }
-        .btn-secondary {
-            background: var(--bg-card-hover);
+
+        .title {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            line-height: 1.15;
+            background: linear-gradient(135deg, #ffffff 0%, #b8e6ff 40%, var(--accent-cyan) 60%, var(--accent-teal) 80%, var(--accent-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 18px rgba(0, 229, 255, 0.25));
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            font-size: 0.875rem;
             color: var(--text-secondary);
-            border: 1px solid var(--border-accent);
-            font-size: 0.75rem;
-            padding: 10px 16px;
-            letter-spacing: 0.5px;
-        }
-        .btn-secondary:hover {
-            border-color: var(--gold);
-            color: var(--gold);
-            background: rgba(245, 158, 11, 0.08);
-            transform: translateY(-1px);
-        }
-        .btn-danger {
-            background: rgba(239, 68, 68, 0.12);
-            color: var(--red);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            font-size: 0.75rem;
-            padding: 10px 16px;
-            letter-spacing: 0.5px;
-        }
-        .btn-danger:hover {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: rgba(239, 68, 68, 0.6);
+            font-weight: 400;
+            letter-spacing: 0.2px;
         }
 
-        /* Sample chips */
-        .sample-row {
+        .subtitle strong {
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        /* Form */
+        .form-section {
             display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 12px;
-        }
-        .sample-chip {
-            font-size: 0.7rem;
-            padding: 6px 14px;
-            border-radius: 16px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: var(--transition);
-            font-weight: 500;
-            letter-spacing: 0.3px;
-            font-family: inherit;
-        }
-        .sample-chip:hover {
-            border-color: var(--gold);
-            color: var(--gold);
-            background: rgba(245, 158, 11, 0.07);
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
         }
 
-        /* Results */
-        .results-section {
-            margin-top: 24px;
-            display: none;
-            animation: fadeInUp 0.5s ease-out;
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            position: relative;
         }
-        .results-section.visible {
+
+        .input-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color var(--transition-fast);
+        }
+
+        .input-label .label-icon {
+            font-size: 14px;
+        }
+
+        .input-label .required-dot {
+            color: var(--accent-pink);
+            font-weight: 700;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 13px 16px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1.5px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-weight: 500;
+            font-family: var(--font-main);
+            letter-spacing: 0.3px;
+            transition: all var(--transition-fast);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .input-field::placeholder {
+            color: var(--text-muted);
+            font-weight: 400;
+            font-size: 0.85rem;
+        }
+
+        .input-field:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .input-field:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.12), 0 0 20px rgba(0, 229, 255, 0.08);
+            background: rgba(0, 0, 0, 0.55);
+        }
+
+        .input-field:focus~.input-glow {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .input-field.input-error {
+            border-color: rgba(239, 68, 68, 0.6);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .input-field.input-error:focus {
+            border-color: rgba(239, 68, 68, 0.8);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+        }
+
+        .input-glow {
+            position: absolute;
+            bottom: -1px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-teal), transparent);
+            border-radius: 2px;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all var(--transition-smooth);
+            pointer-events: none;
+        }
+
+        .input-hint {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.2px;
+        }
+
+        .error-message {
+            font-size: 0.7rem;
+            color: #ef4444;
+            letter-spacing: 0.3px;
+            font-weight: 500;
+            display: none;
+            animation: fadeInUp 0.25s ease-out;
+        }
+
+        .error-message.visible {
             display: block;
         }
 
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(-4px);
             }
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        @keyframes pulse {
-            0%,
-            100% {
-                box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-            }
-            50% {
-                box-shadow: 0 0 40px rgba(16, 185, 129, 0.6);
-            }
-        }
-        @keyframes pulseRed {
-            0%,
-            100% {
-                box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
-            }
-            50% {
-                box-shadow: 0 0 40px rgba(239, 68, 68, 0.6);
-            }
-        }
 
-        .result-card {
-            border-radius: var(--radius-lg);
-            padding: 28px 24px;
-            border: 2px solid;
+        /* Generate Button */
+        .generate-btn {
+            width: 100%;
+            padding: 15px 24px;
+            background: linear-gradient(135deg, #00b8d4 0%, #0091ea 30%, var(--accent-cyan) 60%, var(--accent-teal) 100%);
+            border: none;
+            border-radius: var(--radius-sm);
+            color: #000;
+            font-size: 0.95rem;
+            font-weight: 700;
+            font-family: var(--font-main);
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            cursor: pointer;
             position: relative;
             overflow: hidden;
-            transition: var(--transition);
-        }
-        .result-card.pass {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(5, 150, 105, 0.06));
-            border-color: var(--green);
-            animation: pulse 2s ease-in-out infinite;
-        }
-        .result-card.fail {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(220, 38, 38, 0.06));
-            border-color: var(--red);
-            animation: pulseRed 2s ease-in-out infinite;
-        }
-
-        .result-icon {
-            font-size: 3rem;
-            margin-bottom: 8px;
-            display: block;
-        }
-        .result-title {
-            font-size: 1.4rem;
-            font-weight: 800;
-            letter-spacing: -0.3px;
-            margin-bottom: 4px;
-        }
-        .result-card.pass .result-title {
-            color: var(--green);
-        }
-        .result-card.fail .result-title {
-            color: var(--red);
-        }
-        .result-detail {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-top: 6px;
-            line-height: 1.5;
-        }
-        .result-card.pass .result-detail {
-            color: #a7f3d0;
-        }
-        .result-card.fail .result-detail {
-            color: #fca5a5;
-        }
-
-        /* Individual test results */
-        .test-results {
-            margin-top: 20px;
+            transition: all var(--transition-smooth);
+            box-shadow: 0 4px 20px rgba(0, 229, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.3);
             display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .test-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 14px 18px;
-            border-radius: var(--radius-sm);
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border);
-            transition: var(--transition);
-        }
-        .test-item.pass-item {
-            border-left: 3px solid var(--green);
-            background: rgba(16, 185, 129, 0.04);
-        }
-        .test-item.fail-item {
-            border-left: 3px solid var(--red);
-            background: rgba(239, 68, 68, 0.04);
-        }
-        .test-icon {
-            font-size: 1.2rem;
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-        .test-content {
-            flex: 1;
-        }
-        .test-name {
-            font-weight: 700;
-            font-size: 0.85rem;
-            color: var(--text-primary);
-            letter-spacing: 0.2px;
-        }
-        .test-description {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 2px;
-            line-height: 1.4;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
-        /* Extracted data */
-        .extracted-data {
-            margin-top: 20px;
-            padding: 18px;
-            background: rgba(0, 0, 0, 0.25);
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-        }
-        .extracted-title {
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-        }
-        .data-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-        }
-        .data-item {
-            padding: 10px 14px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-        }
-        .data-label {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            font-weight: 600;
-        }
-        .data-value {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-top: 2px;
-            font-family: 'SF Mono', 'Cascadia Code', monospace;
-        }
-        .data-value.amount {
-            color: var(--gold);
-        }
-        .data-value.balance {
-            color: var(--green);
-        }
-        .data-value.ref {
-            color: #60a5fa;
+        .generate-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: left 0.5s ease;
         }
 
-        /* Footer */
-        .app-footer {
-            text-align: center;
-            margin-top: 32px;
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            letter-spacing: 0.5px;
-        }
-        .app-footer a {
-            color: var(--gold);
-            text-decoration: none;
-        }
-        .app-footer a:hover {
-            text-decoration: underline;
+        .generate-btn:hover::before {
+            left: 100%;
         }
 
-        /* Responsive */
-        @media (max-width: 640px) {
-            .app-container {
-                padding: 16px 12px 40px;
-            }
-            .app-title {
-                font-size: 1.5rem;
-            }
-            .card-header {
-                padding: 16px 18px 12px;
-            }
-            .card-body {
-                padding: 16px 18px;
-            }
-            .result-card {
-                padding: 20px 16px;
-            }
-            .result-title {
-                font-size: 1.1rem;
-            }
-            .btn-primary {
-                font-size: 0.8rem;
-                padding: 12px 20px;
-            }
-            .data-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .input-textarea {
-                min-height: 140px;
-                font-size: 0.78rem;
-            }
-        }
-        @media (max-width: 400px) {
-            .data-grid {
-                grid-template-columns: 1fr;
-            }
-            .btn-row {
-                flex-direction: column;
-            }
-            .btn-primary {
-                width: 100%;
-            }
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 229, 255, 0.45), 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
-        /* Loading spinner */
-        .spinner {
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            border: 2.5px solid rgba(255, 255, 255, 0.3);
-            border-top-color: #ffffff;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
+        .generate-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 15px rgba(0, 229, 255, 0.3), 0 2px 6px rgba(0, 0, 0, 0.3);
         }
+
+        .generate-btn .btn-icon {
+            font-size: 18px;
+            transition: transform var(--transition-bounce);
+        }
+
+        .generate-btn:hover .btn-icon {
+            transform: rotate(15deg) scale(1.15);
+        }
+
+        .generate-btn.loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .generate-btn.loading .btn-icon {
+            animation: spin 0.8s linear infinite;
+        }
+
         @keyframes spin {
             to {
                 transform: rotate(360deg);
             }
         }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
+        /* QR Display Section */
+        .qr-section {
+            display: none;
+            margin-top: 24px;
+            animation: qrReveal 0.6s cubic-bezier(0.22, 1, 0.36, 1);
         }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-primary);
+
+        .qr-section.visible {
+            display: block;
         }
-        ::-webkit-scrollbar-thumb {
-            background: var(--border-accent);
-            border-radius: 3px;
+
+        @keyframes qrReveal {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.92);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-muted);
+
+        .qr-display-card {
+            background: rgba(0, 0, 0, 0.45);
+            border: 1.5px solid var(--border-glow);
+            border-radius: var(--radius-md);
+            padding: 24px 20px 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: var(--shadow-neon);
+            transition: all var(--transition-smooth);
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%,
+            100% {
+                box-shadow: var(--shadow-neon);
+            }
+            50% {
+                box-shadow: var(--shadow-neon-strong);
+            }
+        }
+
+        .qr-display-card::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.4), transparent 40%, transparent 60%, rgba(0, 245, 212, 0.3));
+            z-index: -1;
+            opacity: 0.5;
+            animation: borderGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes borderGlow {
+            0%,
+            100% {
+                opacity: 0.35;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .qr-code-wrapper {
+            display: inline-block;
+            padding: 12px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 229, 255, 0.1);
+            margin-bottom: 14px;
+            position: relative;
+        }
+
+        .qr-code-wrapper img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .qr-scan-hint {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .qr-scan-hint .scan-icon {
+            display: inline-block;
+            animation: scanMove 2s ease-in-out infinite;
+        }
+
+        @keyframes scanMove {
+            0%,
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-3px);
+                opacity: 0.5;
+            }
+        }
+
+        .qr-merchant-info {
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        .qr-merchant-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.3px;
+            margin-bottom: 2px;
+        }
+
+        .qr-merchant-detail {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.2px;
+        }
+
+        .qr-amount-badge {
+            display: inline-block;
+            background: rgba(0, 229, 255, 0.12);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 50px;
+            padding: 4px 14px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            letter-spacing: 0.4px;
+            margin-top: 8px;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: var(--font-main);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 1.5px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-download {
+            background: rgba(0, 229, 255, 0.1);
+            border-color: rgba(0, 229, 255, 0.35);
+            color: var(--accent-cyan);
+        }
+
+        .btn-download:hover {
+            background: rgba(0, 229, 255, 0.2);
+            border-color: rgba(0, 229, 255, 0.6);
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .btn-print {
+            background: rgba(124, 58, 237, 0.1);
+            border-color: rgba(124, 58, 237, 0.35);
+            color: #a78bfa;
+        }
+
+        .btn-print:hover {
+            background: rgba(124, 58, 237, 0.2);
+            border-color: rgba(124, 58, 237, 0.6);
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.25);
+            transform: translateY(-1px);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.3px;
+        }
+
+        .footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+
+        .footer a:hover {
+            color: var(--accent-cyan);
+        }
+
+        /* Responsive */
+        @media (max-width: 560px) {
+            .main-card {
+                padding: 24px 18px 20px;
+                border-radius: 18px;
+            }
+            .title {
+                font-size: 1.5rem;
+            }
+            .logo-badge {
+                font-size: 10px;
+                padding: 5px 12px;
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
+            .qr-display-card {
+                padding: 16px 12px 14px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .main-card {
+                padding: 18px 12px 16px;
+            }
+            .title {
+                font-size: 1.25rem;
+            }
+            .generate-btn {
+                font-size: 0.8rem;
+                padding: 13px 16px;
+            }
+            .input-field {
+                padding: 11px 12px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: #ffffff !important;
+                padding: 20px;
+                display: block;
+            }
+            body::before,
+            body::after {
+                display: none !important;
+            }
+            .main-card {
+                background: #ffffff;
+                border: 2px solid #000;
+                box-shadow: none;
+                border-radius: 0;
+                padding: 20px;
+                max-width: 100%;
+            }
+            .main-card::before {
+                display: none;
+            }
+            .header {
+                display: none;
+            }
+            .form-section {
+                display: none !important;
+            }
+            .generate-btn {
+                display: none !important;
+            }
+            .action-buttons {
+                display: none !important;
+            }
+            .footer {
+                display: none;
+            }
+            .qr-section {
+                display: block !important;
+                margin-top: 0;
+            }
+            .qr-display-card {
+                border: 2px solid #000;
+                box-shadow: none;
+                border-radius: 0;
+                background: #fff;
+                animation: none;
+            }
+            .qr-display-card::after {
+                display: none;
+            }
+            .qr-code-wrapper {
+                box-shadow: none;
+                border: 1px solid #ccc;
+                padding: 8px;
+            }
+            .qr-scan-hint {
+                color: #666;
+            }
+            .qr-merchant-name {
+                color: #000;
+            }
+            .qr-merchant-detail {
+                color: #444;
+            }
+            .qr-amount-badge {
+                background: #f0f0f0;
+                border: 1px solid #ccc;
+                color: #000;
+            }
+            .app-container {
+                max-width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-
     <div class="app-container">
-        <!-- Header -->
-        <header class="app-header">
-            <div class="logo-badge">🛡️</div>
-            <h1 class="app-title">Tele-Safe AI</h1>
-            <div class="app-subtitle">Ethiopian Digital Wallet Forensics</div>
-            <div class="app-tagline">Telebirr &amp; CBE Transaction Text Auditor — 100% Local</div>
-        </header>
-
-        <!-- Main Scanner Card -->
-        <div class="main-card">
-            <div class="card-header">
-                <span class="card-header-title">🔍 Text Forensic Scanner</span>
-                <span class="card-header-badge">⚡ Local Analysis Engine</span>
+        <div class="main-card" id="mainCard">
+            <!-- Header -->
+            <div class="header">
+                <span class="logo-badge">
+                    <span class="dot"></span> Telebirr Merchant
+                </span>
+                <span class="logo-icon">📱</span>
+                <h1 class="title">Tele-Bill QR</h1>
+                <p class="subtitle">Generate <strong>secure Telebirr QR codes</strong> for your business in Ethiopia 🇪🇹</p>
             </div>
-            <div class="card-body">
-                <label class="input-label" for="smsInput">📩 Paste SMS or Telegram transaction text</label>
-                <textarea id="smsInput" class="input-textarea" placeholder="Paste your Telebirr or CBE SMS/Telegram text here..." spellcheck="false"></textarea>
 
-                <div class="sample-row" id="sampleRow">
-                    <button class="sample-chip" data-sample="telebirr_credit">📲 Telebirr Credit</button>
-                    <button class="sample-chip" data-sample="cbe_credit">🏦 CBE Credit</button>
-                    <button class="sample-chip" data-sample="telebirr_debit">💸 Telebirr Debit</button>
-                    <button class="sample-chip" data-sample="fraud">🚨 Tampered (Fraud)</button>
-                    <button class="sample-chip" data-sample="fraud2">🚨 Math Inconsistency</button>
+            <!-- Form -->
+            <div class="form-section" id="formSection">
+                <!-- Merchant Name -->
+                <div class="input-group">
+                    <label class="input-label" for="merchantName">
+                        <span class="label-icon">🏪</span> Merchant / Shop Name
+                        <span class="required-dot">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input
+                        type="text"
+                        id="merchantName"
+                        class="input-field"
+                        placeholder="e.g., Addis Coffee House"
+                        autocomplete="off"
+                        maxlength="60"
+                        required
+                        >
+                        <span class="input-glow"></span>
+                    </div>
+                    <span class="error-message" id="merchantNameError">Please enter your shop or merchant name.</span>
                 </div>
 
-                <div class="btn-row">
-                    <button id="scanBtn" class="btn btn-primary">🔒 RUN FORENSIC SCAN</button>
-                    <button id="clearBtn" class="btn btn-secondary">✕ Clear</button>
+                <!-- Mobile Number -->
+                <div class="input-group">
+                    <label class="input-label" for="mobileNumber">
+                        <span class="label-icon">📞</span> Telebirr Mobile Number
+                        <span class="required-dot">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input
+                        type="tel"
+                        id="mobileNumber"
+                        class="input-field"
+                        placeholder="e.g., 0912345678"
+                        autocomplete="tel"
+                        maxlength="10"
+                        inputmode="numeric"
+                        pattern="[0-9]{10}"
+                        required
+                        >
+                        <span class="input-glow"></span>
+                    </div>
+                    <span class="input-hint">Format: 09XXXXXXXX (10 digits)</span>
+                    <span class="error-message" id="mobileNumberError">Enter a valid 10-digit Ethiopian mobile number (09XXXXXXXX).</span>
+                </div>
+
+                <!-- Amount -->
+                <div class="input-group">
+                    <label class="input-label" for="amount">
+                        <span class="label-icon">💵</span> Amount to Pay (ETB)
+                        <span style="color:var(--text-muted);font-weight:400;">(optional)</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input
+                        type="text"
+                        id="amount"
+                        class="input-field"
+                        placeholder="e.g., 250"
+                        autocomplete="off"
+                        maxlength="12"
+                        inputmode="decimal"
+                        >
+                        <span class="input-glow"></span>
+                    </div>
+                    <span class="input-hint">Leave blank for a reusable QR (no fixed amount)</span>
+                    <span class="error-message" id="amountError">Enter a valid amount (numbers only, e.g., 250 or 150.50).</span>
+                </div>
+            </div>
+
+            <!-- Generate Button -->
+            <button class="generate-btn" id="generateBtn" type="button">
+                <span class="btn-icon">⚡</span>
+                <span class="btn-text">Generate Secure QR Code</span>
+            </button>
+
+            <!-- QR Display -->
+            <div class="qr-section" id="qrSection">
+                <div class="qr-display-card" id="qrDisplayCard">
+                    <div class="qr-code-wrapper" id="qrCodeWrapper">
+                        <img id="qrImage" src="" alt="Telebirr QR Code" style="width:220px;height:220px;object-fit:contain;">
+                    </div>
+                    <div class="qr-scan-hint">
+                        <span class="scan-icon">📷</span> Scan with Telebirr App
+                    </div>
+                    <div class="qr-merchant-info">
+                        <div class="qr-merchant-name" id="displayMerchantName">—</div>
+                        <div class="qr-merchant-detail" id="displayMerchantDetail">—</div>
+                        <div class="qr-amount-badge" id="displayAmountBadge" style="display:none;"></div>
+                    </div>
+                </div>
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="action-btn btn-download" id="downloadBtn" type="button">
+                        ⬇️ Download PNG
+                    </button>
+                    <button class="action-btn btn-print" id="printBtn" type="button">
+                        🖨️ Print / Save PDF
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Results Section -->
-        <div id="resultsSection" class="results-section">
-            <div id="resultCard" class="result-card">
-                <!-- Dynamically populated -->
-            </div>
+        <div class="footer">
+            Built for Ethiopian Merchants · EMVCo® MPQR Standard · <span id="yearSpan"></span> Tele-Bill QR
         </div>
-
-        <!-- Footer -->
-        <footer class="app-footer">
-            Tele-Safe AI &bull; Client-Side Forensic Engine &bull; Runs 100% Locally &bull; No External APIs
-        </footer>
     </div>
 
     <script>
@@ -636,663 +884,404 @@
             'use strict';
 
             // ─── DOM References ───────────────────────────────────────────
-            const smsInput = document.getElementById('smsInput');
-            const scanBtn = document.getElementById('scanBtn');
-            const clearBtn = document.getElementById('clearBtn');
-            const resultsSection = document.getElementById('resultsSection');
-            const resultCard = document.getElementById('resultCard');
-            const sampleRow = document.getElementById('sampleRow');
+            const merchantNameInput = document.getElementById('merchantName');
+            const mobileNumberInput = document.getElementById('mobileNumber');
+            const amountInput = document.getElementById('amount');
+            const generateBtn = document.getElementById('generateBtn');
+            const btnText = generateBtn.querySelector('.btn-text');
+            const btnIcon = generateBtn.querySelector('.btn-icon');
+            const qrSection = document.getElementById('qrSection');
+            const qrImage = document.getElementById('qrImage');
+            const qrDisplayCard = document.getElementById('qrDisplayCard');
+            const qrCodeWrapper = document.getElementById('qrCodeWrapper');
+            const displayMerchantName = document.getElementById('displayMerchantName');
+            const displayMerchantDetail = document.getElementById('displayMerchantDetail');
+            const displayAmountBadge = document.getElementById('displayAmountBadge');
+            const mainCard = document.getElementById('mainCard');
+            const merchantNameError = document.getElementById('merchantNameError');
+            const mobileNumberError = document.getElementById('mobileNumberError');
+            const amountError = document.getElementById('amountError');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const printBtn = document.getElementById('printBtn');
 
-            // ─── Sample Texts ─────────────────────────────────────────────
-            const SAMPLE_TEXTS = {
-                telebirr_credit: 'Ethio telecom: Your telebirr account has received ETB 2,500.00 from ABEBE KEBEDE (Phone: 0912345678). Your previous balance was ETB 3,200.00. Your current balance is ETB 5,700.00. Reference: TB4829130456. Date: 2025-07-21 14:35:00',
-                cbe_credit: 'Commercial Bank of Ethiopia: Your account has been credited with ETB 10,000.00 from CHALA TRADING PLC. Your previous balance was ETB 45,500.00. Your current balance is ETB 55,500.00. Ref: FT2025072109B6X2. Date: 2025-07-21 09:12:45',
-                telebirr_debit: 'Ethio telecom: Your telebirr account has transferred ETB 800.00 to MESERET ALEMU (Phone: 0923456789). Your previous balance was ETB 4,000.00. Your current balance is ETB 3,200.00. Reference: TB7728193451. Date: 2025-07-20 18:22:10',
-                fraud: 'Ethio telecom: Your telebirr account has received ETB 25,000.00 from ABEBE KEBEDE (Phone: 0912345678). Your previous balance was ETB 3,200.00. Your current balance is ETB 5,700.00. Reference: TB123. Date: 2025-07-21 14:35:00',
-                fraud2: 'Commercial Bank of Ethiopia: Your account has been credited with ETB 50,000.00 from CHALA TRADING PLC. Your previous balance was ETB 45,500.00. Your current balance is ETB 55,500.00. Ref: FT2025072109B6X2. Date: 2025-02-30 09:12:45'
-            };
+            // ─── State ────────────────────────────────────────────────────
+            let currentDataUrl = null;
+            let currentPayload = '';
 
-            // ─── Regex Patterns ───────────────────────────────────────────
-            const REGEX = {
-                // Platform detection
-                telebirrKeyword: /(ethio\s*telecom|telebirr|ethiotelecom)/i,
-                cbeKeyword: /(commercial\s*bank\s*of\s*ethiopia|\bCBE\b|commercial\s*bank)/i,
-
-                // Transaction ID patterns
-                telebirrID: /(?:TB|TBR|TBF)\s*\d{8,15}/i,
-                telebirrIDAlt: /\b(?:TB|TBR|TBF)\d{8,15}\b/i,
-                cbeID: /\bFT\d{10,16}\b/i,
-                cbeIDAlt: /(?:CBE|Ref)\s*[:#]?\s*([A-Z0-9]{8,20})/i,
-                genericRef: /\b(?:reference|ref|trx|txn)\s*[:#]?\s*([A-Z0-9]{8,20})\b/i,
-
-                // Amount extraction — with currency
-                amountETB: /ETB\s*([\d,]+(?:\.\d{1,2})?)/gi,
-                amountBirr: /\bbirr\s*([\d,]+(?:\.\d{1,2})?)/gi,
-                amountBr: /\bBr\.?\s*([\d,]+(?:\.\d{1,2})?)/gi,
-
-                // Previous balance
-                prevBalance: /previous\s*balance\s*(?:was|is|:)?\s*(?:ETB\s*)?([\d,]+(?:\.\d{1,2})?)/i,
-                prevBalanceAlt: /balance\s*before\s*(?:was|is|:)?\s*(?:ETB\s*)?([\d,]+(?:\.\d{1,2})?)/i,
-                prevBalanceAlt2: /old\s*balance\s*(?:was|is|:)?\s*(?:ETB\s*)?([\d,]+(?:\.\d{1,2})?)/i,
-
-                // Current balance
-                currentBalance: /(?:current|new|available|remaining)\s*balance\s*(?:is|:|was)?\s*(?:ETB\s*)?([\d,]+(?:\.\d{1,2})?)/i,
-                currentBalanceSimple: /balance\s*(?:is|:|was)?\s*(?:ETB\s*)?([\d,]+(?:\.\d{1,2})?)/i,
-
-                // Transaction amount (received/credited/sent/transferred/paid)
-                receivedAmount: /(?:received|credited|deposited)\s+(?:ETB\s*)?([\d,]+(?:\.\d{1,2})?)/i,
-                sentAmount: /(?:transferred|sent|paid|debited|withdrawn)\s+(?:ETB\s*)?([\d,]+(?:\.\d{1,2})?)/i,
-                amountAfterKeyword: /(?:amount\s*of)\s*(?:ETB\s*)?([\d,]+(?:\.\d{1,2})?)/i,
-
-                // Timestamp
-                dateTimeFull: /(\d{4})[-/](\d{1,2})[-/](\d{1,2})[T\s]+(\d{1,2}):(\d{2})(?::(\d{2}))?/,
-                dateTimeSlash: /(\d{1,2})[/](\d{1,2})[/](\d{4})[T\s]+(\d{1,2}):(\d{2})(?::(\d{2}))?/,
-                dateOnly: /(\d{4})[-/](\d{1,2})[-/](\d{1,2})/,
-                timeOnly: /(\d{1,2}):(\d{2})(?::(\d{2}))?/,
-
-                // Credit/debit detection
-                creditKeyword: /(received|credited|deposited|incoming|added)/i,
-                debitKeyword: /(transferred|sent|paid|debited|withdrawn|outgoing|deducted)/i,
-            };
+            // ─── Constants ────────────────────────────────────────────────
+            const TELEBIRR_GUID = 'com.telebirr';
+            const ETB_CURRENCY_CODE = '230'; // ISO 4217 numeric for Ethiopian Birr
+            const ETHIOPIA_COUNTRY_CODE = 'ET';
+            const DEFAULT_MCC = '0000'; // General merchandise
+            const DEFAULT_CITY = 'Ethiopia';
 
             // ─── Utility Functions ────────────────────────────────────────
-            function parseNumber(str) {
-                if (!str) return null;
-                const cleaned = str.replace(/,/g, '').trim();
-                const num = parseFloat(cleaned);
-                return isNaN(num) ? null : num;
+            function sanitizeInput(str) {
+                return str.trim().replace(/\s+/g, ' ');
             }
 
-            function extractAllAmounts(text) {
-                const amounts = [];
-                const patterns = [REGEX.amountETB, REGEX.amountBirr, REGEX.amountBr];
-                patterns.forEach(pattern => {
-                    pattern.lastIndex = 0;
-                    let match;
-                    while ((match = pattern.exec(text)) !== null) {
-                        const val = parseNumber(match[1]);
-                        if (val !== null) amounts.push(val);
+            function validateEthiopianMobile(number) {
+                const cleaned = number.trim();
+                return /^09\d{8}$/.test(cleaned);
+            }
+
+            function validateAmount(amountStr) {
+                if (!amountStr || amountStr.trim() === '') return { valid: true, value: null };
+                const cleaned = amountStr.trim().replace(/,/g, '');
+                if (!/^\d+(\.\d{1,2})?$/.test(cleaned)) {
+                    return { valid: false, value: null };
+                }
+                const num = parseFloat(cleaned);
+                if (isNaN(num) || num <= 0) {
+                    return { valid: false, value: null };
+                }
+                // Convert to EMVCo format (smallest currency unit = cents for ETB)
+                // But if no decimal, treat as whole Birr
+                if (cleaned.includes('.')) {
+                    const parts = cleaned.split('.');
+                    const birr = parseInt(parts[0], 10);
+                    const cents = (parts[1] || '00').padEnd(2, '0').slice(0, 2);
+                    return { valid: true, value: String(birr * 100 + parseInt(cents, 10)) };
+                } else {
+                    // Whole Birr - use as is (Telebirr typically uses whole Birr)
+                    return { valid: true, value: String(parseInt(cleaned, 10)) };
+                }
+            }
+
+            function formatAmountForDisplay(amountStr) {
+                if (!amountStr) return null;
+                const parsed = validateAmount(amountStr);
+                if (!parsed.valid || parsed.value === null) return amountStr;
+                // If the value looks like cents (ends with 00 and came from whole number), show as whole
+                if (amountStr.includes('.')) {
+                    return amountStr + ' ETB';
+                }
+                return parseInt(parsed.value, 10) + ' ETB';
+            }
+
+            // ─── EMVCo CRC16-CCITT Calculation ──────────────────────────
+            function crc16CCITT(data) {
+                let crc = 0xFFFF;
+                for (let i = 0; i < data.length; i++) {
+                    crc ^= (data.charCodeAt(i) << 8);
+                    for (let j = 0; j < 8; j++) {
+                        if (crc & 0x8000) {
+                            crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+                        } else {
+                            crc = (crc << 1) & 0xFFFF;
+                        }
+                    }
+                }
+                return crc & 0xFFFF;
+            }
+
+            // ─── TLV Builder ──────────────────────────────────────────────
+            function buildTLV(tag, value) {
+                const length = String(value.length).padStart(2, '0');
+                return tag + length + value;
+            }
+
+            // ─── EMVCo MPQR Payload Builder for Telebirr ────────────────
+            function buildTelebirrPayload(shopName, mobileNumber, amountCents) {
+                let payload = '';
+
+                // Tag 00: Payload Format Indicator
+                payload += buildTLV('00', '01');
+
+                // Tag 01: Point of Initiation Method
+                // "11" = Static (no amount), "12" = Dynamic (with amount)
+                const poiMethod = (amountCents !== null && amountCents !== undefined) ? '12' : '11';
+                payload += buildTLV('01', poiMethod);
+
+                // Tag 26: Merchant Account Information (nested TLV)
+                //   Tag 00: Globally Unique Identifier (GUID)
+                //   Tag 01: Merchant Identifier (mobile number)
+                const guidTLV = buildTLV('00', TELEBIRR_GUID);
+                const merchantIdTLV = buildTLV('01', mobileNumber);
+                const merchantInfoValue = guidTLV + merchantIdTLV;
+                payload += buildTLV('26', merchantInfoValue);
+
+                // Tag 52: Merchant Category Code (MCC)
+                payload += buildTLV('52', DEFAULT_MCC);
+
+                // Tag 53: Transaction Currency (ETB = 230)
+                payload += buildTLV('53', ETB_CURRENCY_CODE);
+
+                // Tag 54: Transaction Amount (optional - only if provided)
+                if (amountCents !== null && amountCents !== undefined) {
+                    payload += buildTLV('54', amountCents);
+                }
+
+                // Tag 58: Country Code
+                payload += buildTLV('58', ETHIOPIA_COUNTRY_CODE);
+
+                // Tag 59: Merchant Name
+                payload += buildTLV('59', shopName);
+
+                // Tag 60: Merchant City
+                payload += buildTLV('60', DEFAULT_CITY);
+
+                // Tag 63: CRC (calculated over all previous data)
+                const crcValue = crc16CCITT(payload);
+                const crcHex = crcValue.toString(16).toUpperCase().padStart(4, '0');
+                payload += buildTLV('63', crcHex);
+
+                return payload;
+            }
+
+            // ─── QR Code Generation ─────────────────────────────────────
+            function generateQRCode(payload) {
+                try {
+                    // Use qrcode-generator: type 0 (auto-detect), error correction 'M'
+                    const qr = qrcode(0, 'M');
+                    qr.addData(payload);
+                    qr.make();
+                    // Cell size 8, margin 4 for good scanning
+                    const dataUrl = qr.createDataURL(8, 4);
+                    return dataUrl;
+                } catch (e) {
+                    console.error('QR generation error:', e);
+                    // Fallback: try with lower error correction
+                    try {
+                        const qrFallback = qrcode(0, 'L');
+                        qrFallback.addData(payload);
+                        qrFallback.make();
+                        return qrFallback.createDataURL(8, 4);
+                    } catch (e2) {
+                        console.error('QR fallback error:', e2);
+                        return null;
+                    }
+                }
+            }
+
+            // ─── Display QR Code ─────────────────────────────────────────
+            function displayQR(dataUrl, shopName, mobileNumber, amountDisplay) {
+                qrImage.src = dataUrl;
+                qrImage.style.width = '220px';
+                qrImage.style.height = '220px';
+                qrImage.style.objectFit = 'contain';
+                qrImage.alt = 'Telebirr QR Code - ' + shopName;
+
+                displayMerchantName.textContent = shopName;
+                displayMerchantDetail.textContent = '📞 ' + mobileNumber;
+
+                if (amountDisplay) {
+                    displayAmountBadge.textContent = '💰 ' + amountDisplay;
+                    displayAmountBadge.style.display = 'inline-block';
+                } else {
+                    displayAmountBadge.style.display = 'none';
+                }
+
+                // Show the QR section with animation
+                qrSection.classList.add('visible');
+                mainCard.classList.add('has-qr');
+
+                // Smooth scroll to QR code
+                setTimeout(function() {
+                    qrDisplayCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+
+                currentDataUrl = dataUrl;
+            }
+
+            // ─── Clear Errors ─────────────────────────────────────────────
+            function clearAllErrors() {
+                merchantNameInput.classList.remove('input-error');
+                mobileNumberInput.classList.remove('input-error');
+                amountInput.classList.remove('input-error');
+                merchantNameError.classList.remove('visible');
+                mobileNumberError.classList.remove('visible');
+                amountError.classList.remove('visible');
+            }
+
+            // ─── Handle Generate ─────────────────────────────────────────
+            function handleGenerate() {
+                clearAllErrors();
+
+                const shopName = sanitizeInput(merchantNameInput.value);
+                const mobileNumber = sanitizeInput(mobileNumberInput.value);
+                const amountRaw = amountInput.value.trim();
+
+                let hasError = false;
+
+                // Validate merchant name
+                if (!shopName || shopName.length < 2) {
+                    merchantNameInput.classList.add('input-error');
+                    merchantNameError.classList.add('visible');
+                    hasError = true;
+                }
+
+                // Validate mobile number
+                if (!validateEthiopianMobile(mobileNumber)) {
+                    mobileNumberInput.classList.add('input-error');
+                    mobileNumberError.classList.add('visible');
+                    hasError = true;
+                }
+
+                // Validate amount (optional)
+                const amountValidation = validateAmount(amountRaw);
+                if (!amountValidation.valid) {
+                    amountInput.classList.add('input-error');
+                    amountError.classList.add('visible');
+                    hasError = true;
+                }
+
+                if (hasError) return;
+
+                // Build the payload
+                const amountValue = amountValidation.value;
+                const payload = buildTelebirrPayload(shopName, mobileNumber, amountValue);
+                currentPayload = payload;
+
+                // Set loading state
+                generateBtn.classList.add('loading');
+                btnText.textContent = 'Generating...';
+                btnIcon.textContent = '⏳';
+
+                // Use setTimeout to allow the UI to update before heavy processing
+                setTimeout(function() {
+                    const dataUrl = generateQRCode(payload);
+
+                    generateBtn.classList.remove('loading');
+                    btnText.textContent = 'Generate Secure QR Code';
+                    btnIcon.textContent = '⚡';
+
+                    if (dataUrl) {
+                        const amountDisplay = amountRaw ? formatAmountForDisplay(amountRaw) : null;
+                        displayQR(dataUrl, shopName, mobileNumber, amountDisplay);
+                    } else {
+                        alert('Failed to generate QR code. Please try again.');
+                    }
+                }, 50);
+            }
+
+            // ─── Download Handler ────────────────────────────────────────
+            function handleDownload() {
+                if (!currentDataUrl) return;
+
+                const shopName = sanitizeInput(merchantNameInput.value) || 'telebirr-merchant';
+                const safeShopName = shopName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+                const fileName = 'telebirr-qr-' + (safeShopName || 'merchant') + '.png';
+
+                const link = document.createElement('a');
+                link.href = currentDataUrl;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            // ─── Print Handler ────────────────────────────────────────────
+            function handlePrint() {
+                if (!currentDataUrl) return;
+                window.print();
+            }
+
+            // ─── Real-time Input Validation Feedback ────────────────────
+            function setupLiveValidation() {
+                merchantNameInput.addEventListener('blur', function() {
+                    const val = sanitizeInput(merchantNameInput.value);
+                    if (val && val.length >= 2) {
+                        merchantNameInput.classList.remove('input-error');
+                        merchantNameError.classList.remove('visible');
                     }
                 });
-                // Also try generic number extraction after currency keywords
-                const genericPattern = /(?:ETB|Birr|Br\.?)\s*([\d,]+(?:\.\d{1,2})?)/gi;
-                genericPattern.lastIndex = 0;
-                let gm;
-                while ((gm = genericPattern.exec(text)) !== null) {
-                    const val = parseNumber(gm[1]);
-                    if (val !== null && !amounts.includes(val)) amounts.push(val);
-                }
-                return amounts;
-            }
 
-            function isLeapYear(year) {
-                return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
-            }
-
-            function daysInMonth(month, year) {
-                const days = [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-                return days[month - 1] || 0;
-            }
-
-            function identifyPlatform(text) {
-                const isTelebirr = REGEX.telebirrKeyword.test(text);
-                const isCBE = REGEX.cbeKeyword.test(text);
-                if (isTelebirr && isCBE) return 'ambiguous';
-                if (isTelebirr) return 'telebirr';
-                if (isCBE) return 'cbe';
-                return 'unknown';
-            }
-
-            function findTimestamp(text) {
-                // Try full datetime formats
-                let match = REGEX.dateTimeFull.exec(text);
-                if (match) {
-                    return {
-                        year: parseInt(match[1]),
-                        month: parseInt(match[2]),
-                        day: parseInt(match[3]),
-                        hour: parseInt(match[4]),
-                        minute: parseInt(match[5]),
-                        second: match[6] ? parseInt(match[6]) : 0,
-                        raw: match[0]
-                    };
-                }
-                match = REGEX.dateTimeSlash.exec(text);
-                if (match) {
-                    return {
-                        year: parseInt(match[3]),
-                        month: parseInt(match[2]),
-                        day: parseInt(match[1]),
-                        hour: parseInt(match[4]),
-                        minute: parseInt(match[5]),
-                        second: match[6] ? parseInt(match[6]) : 0,
-                        raw: match[0]
-                    };
-                }
-                // Date only
-                match = REGEX.dateOnly.exec(text);
-                if (match) {
-                    return {
-                        year: parseInt(match[1]),
-                        month: parseInt(match[2]),
-                        day: parseInt(match[3]),
-                        hour: null,
-                        minute: null,
-                        second: null,
-                        raw: match[0]
-                    };
-                }
-                return null;
-            }
-
-            function validateTimestamp(ts) {
-                if (!ts) return { valid: false, reason: 'No date/time string found in text.' };
-                if (ts.year < 2000 || ts.year > 2035) {
-                    return { valid: false, reason: `Year ${ts.year} is outside plausible range (2000-2035).` };
-                }
-                if (ts.month < 1 || ts.month > 12) {
-                    return { valid: false, reason: `Month ${ts.month} is invalid (must be 1-12).` };
-                }
-                const maxDay = daysInMonth(ts.month, ts.year);
-                if (ts.day < 1 || ts.day > maxDay) {
-                    return { valid: false, reason: `Day ${ts.day} is invalid for month ${ts.month}, year ${ts.year} (max: ${maxDay}).` };
-                }
-                if (ts.hour !== null) {
-                    if (ts.hour < 0 || ts.hour > 23) {
-                        return { valid: false, reason: `Hour ${ts.hour} is invalid (must be 0-23).` };
+                mobileNumberInput.addEventListener('input', function() {
+                    // Only allow digits
+                    this.value = this.value.replace(/\D/g, '');
+                    if (this.value.length > 10) {
+                        this.value = this.value.slice(0, 10);
                     }
-                    if (ts.minute < 0 || ts.minute > 59) {
-                        return { valid: false, reason: `Minute ${ts.minute} is invalid (must be 0-59).` };
-                    }
-                    if (ts.second !== null && (ts.second < 0 || ts.second > 59)) {
-                        return { valid: false, reason: `Second ${ts.second} is invalid (must be 0-59).` };
-                    }
-                }
-                return { valid: true, reason: 'Timestamp is mathematically valid.' };
-            }
+                });
 
-            function checkTransactionID(text, platform) {
-                const results = { valid: false, details: '', rawID: null };
+                mobileNumberInput.addEventListener('blur', function() {
+                    if (validateEthiopianMobile(this.value)) {
+                        this.classList.remove('input-error');
+                        mobileNumberError.classList.remove('visible');
+                    } else if (this.value.length > 0 && this.value.length < 10) {
+                        this.classList.add('input-error');
+                        mobileNumberError.classList.add('visible');
+                    }
+                });
 
-                if (platform === 'telebirr') {
-                    // Check Telebirr ID format
-                    const tbMatch = REGEX.telebirrID.exec(text) || REGEX.telebirrIDAlt.exec(text);
-                    if (tbMatch) {
-                        const id = tbMatch[0].replace(/\s+/g, '');
-                        results.rawID = id;
-                        const digits = id.replace(/[^0-9]/g, '');
-                        if (digits.length >= 8 && digits.length <= 15) {
-                            results.valid = true;
-                            results.details = `Telebirr ID "${id}" matches official structure (${digits.length} digits).`;
+                amountInput.addEventListener('input', function() {
+                    this.value = this.value.replace(/[^\d.]/g, '');
+                    // Prevent multiple dots
+                    var dots = (this.value.match(/\./g) || []).length;
+                    if (dots > 1) {
+                        this.value = this.value.slice(0, this.value.lastIndexOf('.'));
+                    }
+                    // Limit decimal places
+                    var dotIndex = this.value.indexOf('.');
+                    if (dotIndex !== -1 && this.value.length - dotIndex > 3) {
+                        this.value = this.value.slice(0, dotIndex + 3);
+                    }
+                    if (this.value.length > 12) {
+                        this.value = this.value.slice(0, 12);
+                    }
+                });
+
+                amountInput.addEventListener('blur', function() {
+                    if (this.value.trim() !== '') {
+                        const check = validateAmount(this.value);
+                        if (!check.valid) {
+                            this.classList.add('input-error');
+                            amountError.classList.add('visible');
                         } else {
-                            results.valid = false;
-                            results.details =
-                                `Telebirr ID "${id}" has ${digits.length} digits — expected 8-15 digits in official format.`;
+                            this.classList.remove('input-error');
+                            amountError.classList.remove('visible');
                         }
                     } else {
-                        // Check generic reference
-                        const genMatch = REGEX.genericRef.exec(text);
-                        if (genMatch) {
-                            const id = genMatch[1];
-                            results.rawID = id;
-                            results.valid = false;
-                            results.details = `Reference "${id}" does not match Telebirr official ID pattern (TB + 8-15 digits).`;
-                        } else {
-                            results.valid = false;
-                            results.details = 'No transaction reference ID found in the text.';
-                        }
+                        this.classList.remove('input-error');
+                        amountError.classList.remove('visible');
                     }
-                } else if (platform === 'cbe') {
-                    const ftMatch = REGEX.cbeID.exec(text);
-                    const cbeAltMatch = REGEX.cbeIDAlt.exec(text);
-                    if (ftMatch) {
-                        const id = ftMatch[0];
-                        results.rawID = id;
-                        const digits = id.replace(/[^0-9]/g, '');
-                        if (digits.length >= 10 && digits.length <= 16) {
-                            results.valid = true;
-                            results.details = `CBE ID "${id}" matches official structure (FT + 10-16 alphanumeric).`;
-                        } else {
-                            results.valid = false;
-                            results.details =
-                                `CBE ID "${id}" has ${digits.length} digits — expected 10-16 in official FT format.`;
+                });
+
+                // Enter key triggers generate
+                [merchantNameInput, mobileNumberInput, amountInput].forEach(function(input) {
+                    input.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleGenerate();
                         }
-                    } else if (cbeAltMatch) {
-                        const id = cbeAltMatch[1] || cbeAltMatch[0];
-                        results.rawID = id;
-                        results.valid = false;
-                        results.details = `Reference "${id}" does not match CBE official FT pattern.`;
-                    } else {
-                        const genMatch = REGEX.genericRef.exec(text);
-                        if (genMatch) {
-                            results.rawID = genMatch[1];
-                            results.valid = false;
-                            results.details = `Reference "${genMatch[1]}" does not match CBE official FT ID format.`;
-                        } else {
-                            results.valid = false;
-                            results.details = 'No transaction reference ID found in the text.';
-                        }
-                    }
-                } else if (platform === 'unknown') {
-                    // Try both patterns
-                    const tbMatch = REGEX.telebirrID.exec(text) || REGEX.telebirrIDAlt.exec(text);
-                    const ftMatch = REGEX.cbeID.exec(text);
-                    if (tbMatch) {
-                        const id = tbMatch[0].replace(/\s+/g, '');
-                        results.rawID = id;
-                        const digits = id.replace(/[^0-9]/g, '');
-                        results.valid = digits.length >= 8 && digits.length <= 15;
-                        results.details = results.valid ?
-                            `Telebirr-style ID "${id}" found (platform not explicitly stated).` :
-                            `ID "${id}" found but platform not identified and format may not be official.`;
-                    } else if (ftMatch) {
-                        const id = ftMatch[0];
-                        results.rawID = id;
-                        const digits = id.replace(/[^0-9]/g, '');
-                        results.valid = digits.length >= 10 && digits.length <= 16;
-                        results.details = results.valid ?
-                            `CBE-style ID "${id}" found (platform not explicitly stated).` :
-                            `ID "${id}" found but platform not identified and format may not be official.`;
-                    } else {
-                        results.valid = false;
-                        results.details = 'No transaction ID found and platform not identified.';
-                    }
-                } else {
-                    results.valid = false;
-                    results.details = 'Ambiguous platform — both Telebirr and CBE keywords detected. Cannot verify ID against a single standard.';
-                }
-                return results;
+                    });
+                });
             }
 
-            function checkKeywords(text, platform) {
-                const results = { valid: false, details: '', foundKeywords: [] };
-                const hasTelebirr = REGEX.telebirrKeyword.test(text);
-                const hasCBE = REGEX.cbeKeyword.test(text);
+            // ─── Initialize ──────────────────────────────────────────────
+            function init() {
+                setupLiveValidation();
+                generateBtn.addEventListener('click', handleGenerate);
+                downloadBtn.addEventListener('click', handleDownload);
+                printBtn.addEventListener('click', handlePrint);
 
-                if (hasTelebirr) results.foundKeywords.push('Ethio telecom / Telebirr');
-                if (hasCBE) results.foundKeywords.push('Commercial Bank of Ethiopia / CBE');
+                // Set year in footer
+                document.getElementById('yearSpan').textContent = new Date().getFullYear();
 
-                if (platform === 'telebirr') {
-                    if (hasTelebirr && !hasCBE) {
-                        results.valid = true;
-                        results.details = 'Official Telebirr keyword detected: "Ethio telecom" or "telebirr".';
-                    } else if (hasTelebirr && hasCBE) {
-                        results.valid = false;
-                        results.details = 'Both Telebirr and CBE keywords found — ambiguous source.';
-                    } else {
-                        results.valid = false;
-                        results.details = 'No official Telebirr keyword ("Ethio telecom" / "telebirr") detected.';
-                    }
-                } else if (platform === 'cbe') {
-                    if (hasCBE && !hasTelebirr) {
-                        results.valid = true;
-                        results.details = 'Official CBE keyword detected: "Commercial Bank of Ethiopia" / "CBE".';
-                    } else if (hasCBE && hasTelebirr) {
-                        results.valid = false;
-                        results.details = 'Both CBE and Telebirr keywords found — ambiguous source.';
-                    } else {
-                        results.valid = false;
-                        results.details = 'No official CBE keyword ("Commercial Bank of Ethiopia" / "CBE") detected.';
-                    }
-                } else if (platform === 'unknown') {
-                    results.valid = false;
-                    results.details = 'No recognized platform keyword found. Text must contain "Ethio telecom", "telebirr", or "Commercial Bank of Ethiopia".';
-                } else {
-                    results.valid = false;
-                    results.details = 'Ambiguous platform identification.';
+                // Check if QR library loaded
+                if (typeof qrcode !== 'function') {
+                    console.warn('QR library not loaded yet. Will try on first use.');
                 }
-                return results;
             }
 
-            function checkMathBalance(text, platform) {
-                const results = {
-                    valid: false,
-                    details: '',
-                    amount: null,
-                    currentBalance: null,
-                    previousBalance: null,
-                    isCredit: null,
-                    mathCheck: null
-                };
-
-                // Determine credit or debit
-                const isCredit = REGEX.creditKeyword.test(text);
-                const isDebit = REGEX.debitKeyword.test(text);
-
-                // Extract previous balance
-                let prevMatch = REGEX.prevBalance.exec(text);
-                if (!prevMatch) prevMatch = REGEX.prevBalanceAlt.exec(text);
-                if (!prevMatch) prevMatch = REGEX.prevBalanceAlt2.exec(text);
-                const prevBalance = prevMatch ? parseNumber(prevMatch[1]) : null;
-
-                // Extract current balance
-                let currMatch = REGEX.currentBalance.exec(text);
-                if (!currMatch) currMatch = REGEX.currentBalanceSimple.exec(text);
-                const currBalance = currMatch ? parseNumber(currMatch[1]) : null;
-
-                // Extract transaction amount
-                let amount = null;
-                let amountMatch = REGEX.receivedAmount.exec(text);
-                if (amountMatch) {
-                    amount = parseNumber(amountMatch[1]);
-                } else {
-                    amountMatch = REGEX.sentAmount.exec(text);
-                    if (amountMatch) amount = parseNumber(amountMatch[1]);
-                }
-                if (amount === null) {
-                    amountMatch = REGEX.amountAfterKeyword.exec(text);
-                    if (amountMatch) amount = parseNumber(amountMatch[1]);
-                }
-
-                results.amount = amount;
-                results.currentBalance = currBalance;
-                results.previousBalance = prevBalance;
-                results.isCredit = isCredit;
-
-                // If amount not found via keyword, try to infer from all amounts
-                if (amount === null) {
-                    const allAmounts = extractAllAmounts(text);
-                    if (allAmounts.length >= 2) {
-                        // If we have prev and curr, the amount is the difference
-                        if (prevBalance !== null && currBalance !== null) {
-                            const diff = Math.abs(currBalance - prevBalance);
-                            if (diff > 0) {
-                                amount = diff;
-                                results.amount = amount;
-                                results.details =
-                                    `Amount inferred from balance difference: |${currBalance} - ${prevBalance}| = ${diff}.`;
-                            }
-                        }
-                    }
-                }
-
-                // Math check
-                if (prevBalance !== null && currBalance !== null && amount !== null) {
-                    const epsilon = 0.01;
-                    let expected;
-                    if (isCredit) {
-                        expected = prevBalance + amount;
-                        const diff = Math.abs(expected - currBalance);
-                        if (diff <= epsilon) {
-                            results.valid = true;
-                            results.mathCheck = 'pass';
-                            results.details =
-                                `Math verified: Previous (${prevBalance}) + Amount (${amount}) = ${expected} ≈ Current (${currBalance}). ✓`;
-                        } else {
-                            results.valid = false;
-                            results.mathCheck = 'fail';
-                            results.details =
-                                `🚨 Mathematical inconsistency: Previous (${prevBalance}) + Amount (${amount}) = ${expected}, but Current balance is ${currBalance}. Difference: ${diff.toFixed(2)} ETB.`;
-                        }
-                    } else if (isDebit) {
-                        expected = prevBalance - amount;
-                        const diff = Math.abs(expected - currBalance);
-                        if (diff <= epsilon) {
-                            results.valid = true;
-                            results.mathCheck = 'pass';
-                            results.details =
-                                `Math verified: Previous (${prevBalance}) - Amount (${amount}) = ${expected} ≈ Current (${currBalance}). ✓`;
-                        } else {
-                            results.valid = false;
-                            results.mathCheck = 'fail';
-                            results.details =
-                                `🚨 Mathematical inconsistency: Previous (${prevBalance}) - Amount (${amount}) = ${expected}, but Current balance is ${currBalance}. Difference: ${diff.toFixed(2)} ETB.`;
-                        }
-                    } else {
-                        // Can't determine credit/debit, but check if numbers are close either way
-                        const creditDiff = Math.abs(prevBalance + amount - currBalance);
-                        const debitDiff = Math.abs(prevBalance - amount - currBalance);
-                        if (creditDiff <= epsilon || debitDiff <= epsilon) {
-                            results.valid = true;
-                            results.mathCheck = 'pass';
-                            results.details = `Math verified: Numbers are mathematically consistent. ✓`;
-                        } else {
-                            results.valid = false;
-                            results.mathCheck = 'fail';
-                            results.details =
-                                `🚨 Mathematical inconsistency: No consistent relationship found between Previous (${prevBalance}), Amount (${amount}), and Current (${currBalance}).`;
-                        }
-                    }
-                } else if (currBalance !== null && amount !== null && prevBalance === null) {
-                    // Only have current balance and amount — check plausibility
-                    if (isCredit && currBalance < amount) {
-                        results.valid = false;
-                        results.details =
-                            `🚨 Suspicious: Credit of ${amount} ETB but current balance (${currBalance}) is less than the credit amount.`;
-                    } else if (isDebit && currBalance < 0) {
-                        results.valid = false;
-                        results.details = `🚨 Suspicious: Debit of ${amount} ETB leads to negative balance (${currBalance}).`;
-                    } else if (amount !== null && currBalance !== null && amount > 0 && currBalance >= 0) {
-                        results.valid = true;
-                        results.details = `No previous balance found — cannot verify full math. Basic plausibility check passed (amount: ${amount}, balance: ${currBalance}).`;
-                    } else {
-                        results.valid = false;
-                        results.details = 'Insufficient data for math verification. Previous balance not found.';
-                    }
-                } else if (prevBalance !== null && currBalance !== null && amount === null) {
-                    // Have prev and curr but no explicit amount
-                    const diff = Math.abs(currBalance - prevBalance);
-                    if (diff > 0) {
-                        results.valid = true;
-                        results.details = `No explicit amount found, but balance changed from ${prevBalance} to ${currBalance} (Δ=${diff}). Math structurally consistent.`;
-                    } else {
-                        results.valid = false;
-                        results.details = 'No explicit amount found and no balance change detected — suspicious.';
-                    }
-                } else {
-                    results.valid = false;
-                    results.details = 'Insufficient numeric data to perform math audit. Transaction amount and current balance required.';
-                }
-                return results;
+            // ─── Boot ────────────────────────────────────────────────────
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
             }
 
-            // ─── Main Scan Function ───────────────────────────────────────
-            function runScan() {
-                const text = smsInput.value.trim();
+            // ─── Expose for debugging ────────────────────────────────────
+            window.TeleBillQR = {
+                buildPayload: buildTelebirrPayload,
+                crc16: crc16CCITT,
+                generateQR: generateQRCode,
+                getCurrentPayload: function() { return currentPayload; },
+                getCurrentDataUrl: function() { return currentDataUrl; }
+            };
 
-                if (!text) {
-                    showError('⚠️ Please paste SMS or Telegram text first.');
-                    return;
-                }
-
-                if (text.length < 20) {
-                    showError('⚠️ Text is too short to be a valid transaction message. Please paste the full SMS/Telegram text.');
-                    return;
-                }
-
-                // Brief loading state
-                scanBtn.innerHTML = '<span class="spinner"></span> SCANNING...';
-                scanBtn.disabled = true;
-
-                setTimeout(() => {
-                    try {
-                        const platform = identifyPlatform(text);
-                        const idResult = checkTransactionID(text, platform);
-                        const kwResult = checkKeywords(text, platform);
-                        const mathResult = checkMathBalance(text, platform);
-                        const ts = findTimestamp(text);
-                        const tsResult = validateTimestamp(ts);
-
-                        const allPassed = idResult.valid && kwResult.valid && mathResult.valid && tsResult.valid;
-
-                        renderResults({
-                            platform,
-                            idResult,
-                            kwResult,
-                            mathResult,
-                            tsResult,
-                            ts,
-                            allPassed,
-                            rawText: text
-                        });
-
-                    } catch (err) {
-                        showError('⚠️ Error during scan: ' + err.message);
-                    } finally {
-                        scanBtn.innerHTML = '🔒 RUN FORENSIC SCAN';
-                        scanBtn.disabled = false;
-                    }
-                }, 350);
-            }
-
-            function showError(msg) {
-                resultsSection.classList.add('visible');
-                resultCard.className = 'result-card fail';
-                resultCard.innerHTML = `
-                    <span class="result-icon">⚠️</span>
-                    <div class="result-title">SCAN ERROR</div>
-                    <div class="result-detail">${msg}</div>
-                `;
-            }
-
-            function renderResults(data) {
-                const { platform, idResult, kwResult, mathResult, tsResult, ts, allPassed, rawText } = data;
-                const platformNames = { telebirr: '📱 Telebirr', cbe: '🏦 CBE', unknown: '❓ Unknown', ambiguous: '⚠️ Ambiguous' };
-                const platformName = platformNames[platform] || platform;
-
-                let html = '';
-
-                if (allPassed) {
-                    html += `
-                        <div class="result-card pass">
-                            <span class="result-icon">✅</span>
-                            <div class="result-title">AUDIT PASSED: AUTHENTIC TEXT TRANSACTION</div>
-                            <div class="result-detail">All structural, mathematical, and timestamp checks passed. This text appears to be a genuine ${platformName} transaction message.</div>
-                        </div>
-                    `;
-                } else {
-                    html += `
-                        <div class="result-card fail">
-                            <span class="result-icon">🚨</span>
-                            <div class="result-title">FRAUD DETECTED: RULE VIOLATION</div>
-                            <div class="result-detail">One or more forensic checks failed. Detailed breakdown below.</div>
-                        </div>
-                    `;
-                }
-
-                // Platform
-                html += `
-                    <div class="test-results">
-                        <div class="test-item ${platform !== 'unknown' && platform !== 'ambiguous' ? 'pass-item' : 'fail-item'}">
-                            <span class="test-icon">${platform !== 'unknown' && platform !== 'ambiguous' ? '✅' : '❌'}</span>
-                            <div class="test-content">
-                                <div class="test-name">Platform Identification</div>
-                                <div class="test-description">${platformName} detected.</div>
-                            </div>
-                        </div>
-                        <div class="test-item ${idResult.valid ? 'pass-item' : 'fail-item'}">
-                            <span class="test-icon">${idResult.valid ? '✅' : '❌'}</span>
-                            <div class="test-content">
-                                <div class="test-name">Transaction ID Verification</div>
-                                <div class="test-description">${idResult.details}</div>
-                                ${idResult.rawID ? `<div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;font-family:monospace;">ID: ${idResult.rawID}</div>` : ''}
-                            </div>
-                        </div>
-                        <div class="test-item ${kwResult.valid ? 'pass-item' : 'fail-item'}">
-                            <span class="test-icon">${kwResult.valid ? '✅' : '❌'}</span>
-                            <div class="test-content">
-                                <div class="test-name">Keyword & Mandatory Marker Check</div>
-                                <div class="test-description">${kwResult.details}${kwResult.foundKeywords.length ? ` Found: ${kwResult.foundKeywords.join(', ')}.` : ''}</div>
-                            </div>
-                        </div>
-                        <div class="test-item ${mathResult.valid ? 'pass-item' : 'fail-item'}">
-                            <span class="test-icon">${mathResult.valid ? '✅' : '❌'}</span>
-                            <div class="test-content">
-                                <div class="test-name">Math Balance Auditor</div>
-                                <div class="test-description">${mathResult.details}</div>
-                            </div>
-                        </div>
-                        <div class="test-item ${tsResult.valid ? 'pass-item' : 'fail-item'}">
-                            <span class="test-icon">${tsResult.valid ? '✅' : '❌'}</span>
-                            <div class="test-content">
-                                <div class="test-name">Timestamp Validity Check</div>
-                                <div class="test-description">${tsResult.details}${ts ? ` Extracted: ${ts.raw}` : ''}</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                // Extracted data section
-                html += `
-                    <div class="extracted-data">
-                        <div class="extracted-title">📊 Extracted Transaction Metrics</div>
-                        <div class="data-grid">
-                            <div class="data-item">
-                                <div class="data-label">Platform</div>
-                                <div class="data-value">${platformName}</div>
-                            </div>
-                            <div class="data-item">
-                                <div class="data-label">Transaction Amount</div>
-                                <div class="data-value amount">${mathResult.amount !== null ? 'ETB ' + mathResult.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : 'N/A'}</div>
-                            </div>
-                            <div class="data-item">
-                                <div class="data-label">Current Balance</div>
-                                <div class="data-value balance">${mathResult.currentBalance !== null ? 'ETB ' + mathResult.currentBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : 'N/A'}</div>
-                            </div>
-                            <div class="data-item">
-                                <div class="data-label">Previous Balance</div>
-                                <div class="data-value">${mathResult.previousBalance !== null ? 'ETB ' + mathResult.previousBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : 'N/A'}</div>
-                            </div>
-                            <div class="data-item">
-                                <div class="data-label">Transaction Type</div>
-                                <div class="data-value">${mathResult.isCredit === true ? 'Credit' : mathResult.isCredit === false ? 'Debit' : 'Unknown'}</div>
-                            </div>
-                            <div class="data-item">
-                                <div class="data-label">Reference ID</div>
-                                <div class="data-value ref">${idResult.rawID || 'N/A'}</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                resultCard.innerHTML = html;
-                resultsSection.classList.add('visible');
-                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-
-            // ─── Event Listeners ──────────────────────────────────────────
-            scanBtn.addEventListener('click', runScan);
-
-            clearBtn.addEventListener('click', () => {
-                smsInput.value = '';
-                resultsSection.classList.remove('visible');
-                smsInput.focus();
-            });
-
-            // Sample chips
-            sampleRow.addEventListener('click', (e) => {
-                const chip = e.target.closest('.sample-chip');
-                if (!chip) return;
-                const key = chip.dataset.sample;
-                if (SAMPLE_TEXTS[key]) {
-                    smsInput.value = SAMPLE_TEXTS[key];
-                    smsInput.focus();
-                    resultsSection.classList.remove('visible');
-                }
-            });
-
-            // Ctrl+Enter shortcut
-            smsInput.addEventListener('keydown', (e) => {
-                if (e.ctrlKey && e.key === 'Enter') {
-                    e.preventDefault();
-                    runScan();
-                }
-            });
-
-            // Auto-resize textarea
-            smsInput.addEventListener('input', () => {
-                smsInput.style.height = 'auto';
-                smsInput.style.height = Math.min(smsInput.scrollHeight, 400) + 'px';
-            });
-
-            // Initial height
-            smsInput.style.height = 'auto';
-            smsInput.style.height = Math.min(smsInput.scrollHeight, 400) + 'px';
-
-            console.log('%c🛡️ Tele-Safe AI — Forensic Engine Loaded', 'color:#10b981;font-weight:bold;font-size:14px;');
-            console.log('%c100% Client-Side | No External APIs | GitHub Pages Ready', 'color:#94a3b8;font-size:11px;');
-            console.log('%cEthiopian Digital Wallet Screener: Telebirr & CBE', 'color:#f59e0b;font-size:11px;');
         })();
     </script>
 </body>
-</html>
+    </html>
