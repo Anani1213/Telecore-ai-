@@ -2,1398 +2,983 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telecore AI-Mesh: Advanced Image Forensic Suite</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Telecore AI-Mesh — Telebirr Merchant Dashboard</title>
     <script src="https://cdn.tailwindcss.com">
     </script>
     <style>
         :root {
-            --bg-deep: #050508;
-            --bg-card: #0d0d14;
-            --bg-elevated: #131320;
-            --border-cyan: rgba(0, 240, 255, 0.25);
-            --border-cyan-strong: rgba(0, 240, 255, 0.6);
-            --cyan: #00f0ff;
-            --cyan-dim: #00a0b0;
-            --red-alert: #ff0040;
-            --orange-warn: #ff6600;
-            --green-ok: #00ff88;
-            --yellow-caution: #ffcc00;
-            --text-primary: #e8e8f0;
-            --text-secondary: #9090a8;
-            --text-muted: #505068;
-            --font-mono: 'SF Mono', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
-            --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --emerald-glow: #10b981;
+            --amber-glow: #f59e0b;
+            --rose-glow: #f43f5e;
+            --bg-dark: #0a0f0d;
+            --card-bg: rgba(16, 24, 20, 0.92);
         }
 
         * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html,
-        body {
-            background: var(--bg-deep);
-            color: var(--text-primary);
-            font-family: var(--font-sans);
-            min-height: 100vh;
-            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* Animated background grid */
-        .bg-grid {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
+        body {
+            font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
             background-image:
-                linear-gradient(rgba(0, 240, 255, 0.025) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 240, 255, 0.025) 1px, transparent 1px);
-            background-size: 42px 42px;
-            animation: gridShift 14s linear infinite;
+                radial-gradient(ellipse at 30% 20%, rgba(16, 185, 129, 0.06) 0%, transparent 55%),
+                radial-gradient(ellipse at 70% 80%, rgba(245, 158, 11, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(6, 20, 16, 0.9) 0%, var(--bg-dark) 100%);
+            min-height: 100vh;
+            min-height: 100dvh;
+            color: #e2e8f0;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
-        @keyframes gridShift {
-            0% {
-                background-position: 0 0, 0 0;
-            }
-            100% {
-                background-position: 42px 42px, 42px 42px;
-            }
+        /* Glass morphism card */
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 1.25rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .bg-glow {
-            position: fixed;
-            top: -20%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 1200px;
-            height: 700px;
-            pointer-events: none;
-            z-index: 0;
-            background: radial-gradient(ellipse at center, rgba(0, 240, 255, 0.05) 0%, rgba(0, 240, 255, 0.015) 40%, transparent 70%);
-            animation: glowPulse 6s ease-in-out infinite;
+        .glass-card-inner {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes glowPulse {
-            0%,
-            100% {
-                opacity: 0.7;
-                transform: translateX(-50%) scale(1);
-            }
-            50% {
-                opacity: 1;
-                transform: translateX(-50%) scale(1.05);
-            }
+        .glass-card-inner:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
-        .z-content {
+        /* Animated status ring */
+        .status-ring {
             position: relative;
-            z-index: 10;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Glowing borders */
-        .glow-border {
-            border: 1px solid var(--border-cyan);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1), inset 0 0 25px rgba(0, 240, 255, 0.03);
-            transition: box-shadow 0.4s ease, border-color 0.4s ease;
-        }
-        .glow-border:hover {
-            border-color: var(--border-cyan-strong);
-            box-shadow: 0 0 25px rgba(0, 240, 255, 0.2), inset 0 0 35px rgba(0, 240, 255, 0.05);
-        }
-        .glow-border-alert {
-            border: 1px solid rgba(255, 0, 64, 0.4);
-            box-shadow: 0 0 20px rgba(255, 0, 64, 0.15), inset 0 0 30px rgba(255, 0, 64, 0.03);
-        }
-        .glow-border-ok {
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.1), inset 0 0 25px rgba(0, 255, 136, 0.03);
+        .status-ring.online {
+            background: radial-gradient(circle at center, rgba(16, 185, 129, 0.25) 0%, rgba(16, 185, 129, 0.05) 60%, transparent 70%);
+            box-shadow: 0 0 60px rgba(16, 185, 129, 0.25), 0 0 120px rgba(16, 185, 129, 0.08);
         }
 
-        /* Blinking alert animation */
-        @keyframes blinkRed {
+        .status-ring.offline {
+            background: radial-gradient(circle at center, rgba(245, 158, 11, 0.25) 0%, rgba(245, 158, 11, 0.05) 60%, transparent 70%);
+            box-shadow: 0 0 60px rgba(245, 158, 11, 0.25), 0 0 120px rgba(245, 158, 11, 0.08);
+        }
+
+        .status-ring::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: ringPulse 2.5s ease-out infinite;
+        }
+
+        .status-ring.online::before {
+            border-color: rgba(16, 185, 129, 0.5);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3), inset 0 0 20px rgba(16, 185, 129, 0.1);
+        }
+
+        .status-ring.offline::before {
+            border-color: rgba(245, 158, 11, 0.5);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3), inset 0 0 20px rgba(245, 158, 11, 0.1);
+            animation-duration: 1.8s;
+        }
+
+        @keyframes ringPulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            70% {
+                transform: scale(1.08);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(1.1);
+                opacity: 0;
+            }
+        }
+
+        /* Dot pulse */
+        .dot-pulse {
+            animation: dotPulse 1.6s ease-in-out infinite;
+        }
+        @keyframes dotPulse {
             0%,
             100% {
                 opacity: 1;
-                text-shadow: 0 0 12px rgba(255, 0, 64, 0.8);
+                transform: scale(1);
             }
             50% {
                 opacity: 0.4;
-                text-shadow: 0 0 3px rgba(255, 0, 64, 0.2);
+                transform: scale(0.8);
             }
-        }
-        .blink-alert {
-            animation: blinkRed 0.8s ease-in-out infinite;
-            color: var(--red-alert) !important;
         }
 
-        @keyframes blinkOrange {
-            0%,
-            100% {
-                opacity: 1;
-                box-shadow: 0 0 20px rgba(255, 102, 0, 0.5);
-            }
-            50% {
-                opacity: 0.5;
-                box-shadow: 0 0 5px rgba(255, 102, 0, 0.15);
-            }
+        /* Smooth toggle */
+        .toggle-track {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .blink-orange {
-            animation: blinkOrange 1.2s ease-in-out infinite;
+        .toggle-track.active {
+            background: rgba(16, 185, 129, 0.25);
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+        .toggle-knob {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
-        /* Scan line animation */
-        @keyframes scanLine {
-            0% {
-                top: 0%;
-                opacity: 0;
-            }
-            5% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.9;
-            }
-            95% {
-                opacity: 1;
-            }
-            100% {
-                top: 100%;
-                opacity: 0;
-            }
+        /* Scan button glow */
+        .btn-scan {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .scan-line {
+        .btn-scan::after {
+            content: '';
             position: absolute;
-            left: 0;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .btn-scan:hover::after {
+            opacity: 1;
+        }
+        .btn-scan:active {
+            transform: scale(0.97);
+        }
+
+        /* Risk indicator bar */
+        .risk-bar {
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s;
+            border-radius: 9999px;
+            height: 8px;
+        }
+
+        /* Fade-in animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Canvas container */
+        .mesh-canvas-container {
+            border-radius: 1rem;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+        .mesh-canvas-container canvas {
+            display: block;
             width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-            box-shadow: 0 0 20px var(--cyan), 0 0 40px rgba(0, 240, 255, 0.5);
-            animation: scanLine 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-            pointer-events: none;
-            z-index: 20;
-            border-radius: 2px;
-        }
-
-        /* Progress bar shimmer */
-        @keyframes shimmer {
-            0% {
-                background-position: -200% 0;
-            }
-            100% {
-                background-position: 200% 0;
-            }
-        }
-        .progress-shimmer {
-            background: linear-gradient(90deg,
-                    rgba(0, 240, 255, 0.2) 0%,
-                    rgba(0, 240, 255, 0.8) 25%,
-                    rgba(0, 240, 255, 0.2) 50%,
-                    rgba(0, 240, 255, 0.8) 75%,
-                    rgba(0, 240, 255, 0.2) 100%);
-            background-size: 200% 100%;
-            animation: shimmer 2s linear infinite;
-        }
-
-        /* Floating + button */
-        @keyframes floatPulse {
-            0%,
-            100% {
-                transform: translateY(0) scale(1);
-                box-shadow: 0 8px 25px rgba(0, 240, 255, 0.35), 0 0 0 0 rgba(0, 240, 255, 0.4);
-            }
-            50% {
-                transform: translateY(-3px) scale(1.04);
-                box-shadow: 0 12px 35px rgba(0, 240, 255, 0.5), 0 0 0 12px rgba(0, 240, 255, 0);
-            }
-        }
-        .float-plus {
-            animation: floatPulse 2.5s ease-in-out infinite;
-        }
-
-        /* Card hover lift */
-        .card-lift {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .card-lift:hover {
-            transform: translateY(-2px);
-        }
-
-        /* Monospace data readout */
-        .data-mono {
-            font-family: var(--font-mono);
-            letter-spacing: 0.02em;
+            height: 100%;
         }
 
         /* Custom scrollbar */
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 3px;
         }
         ::-webkit-scrollbar-track {
-            background: var(--bg-deep);
+            background: transparent;
         }
         ::-webkit-scrollbar-thumb {
-            background: rgba(0, 240, 255, 0.25);
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 240, 255, 0.45);
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 99px;
         }
 
-        /* Drop zone */
-        .drop-zone {
-            transition: all 0.35s ease;
-            cursor: pointer;
+        /* Badge animation */
+        .badge-shimmer {
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.12) 50%, rgba(255, 255, 255, 0.05) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 2.5s ease-in-out infinite;
         }
-        .drop-zone:hover {
-            border-color: var(--border-cyan-strong) !important;
-            background: rgba(0, 240, 255, 0.04) !important;
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.15) !important;
-        }
-        .drop-zone.dragover {
-            border-color: var(--cyan) !important;
-            background: rgba(0, 240, 255, 0.08) !important;
-            box-shadow: 0 0 40px rgba(0, 240, 255, 0.25) !important;
-            transform: scale(1.01);
-        }
-
-        /* Layer result indicator */
-        .layer-indicator {
-            transition: all 0.5s ease;
-        }
-
-        /* Canvas container */
-        .canvas-wrap {
-            position: relative;
-            overflow: hidden;
-            border-radius: 12px;
-        }
-        .canvas-wrap canvas {
-            display: block;
-            max-width: 100%;
-            height: auto;
-            border-radius: 12px;
-        }
-
-        /* Hidden file input */
-        #fileInput {
-            display: none;
-        }
-
-        /* Blinking dot */
-        @keyframes blinkDot {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.2;
-            }
-        }
-        .blink-dot {
-            animation: blinkDot 1s ease-in-out infinite;
-        }
-
-        /* Rotating logo */
-        @keyframes spinSlow {
+        @keyframes shimmer {
             0% {
-                transform: rotate(0deg);
+                background-position: 200% 0;
             }
             100% {
-                transform: rotate(360deg);
+                background-position: -200% 0;
             }
-        }
-        .spin-slow {
-            animation: spinSlow 12s linear infinite;
         }
 
-        /* Radial burst effect */
-        @keyframes radialBurst {
-            0% {
-                transform: scale(0.2);
-                opacity: 0;
-            }
-            100% {
-                transform: scale(2.5);
-                opacity: 0;
-            }
+        /* Textarea styling */
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            letter-spacing: 0.01em;
         }
-        .radial-burst {
-            animation: radialBurst 2s ease-out infinite;
+        textarea:focus {
+            outline: none;
+            border-color: rgba(16, 185, 129, 0.5);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.25);
         }
 
-        /* Mobile responsive tweaks */
-        @media (max-width: 640px) {
-            .text-4xl {
-                font-size: 1.6rem;
-            }
-            .text-2xl {
-                font-size: 1.25rem;
-            }
-            .px-6 {
-                padding-left: 1rem;
-                padding-right: 1rem;
-            }
+        /* Responsive safe areas */
+        .safe-pb {
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        .safe-pt {
+            padding-top: env(safe-area-inset-top, 0px);
         }
     </style>
 </head>
 <body>
 
-    <!-- Background layers -->
-    <div class="bg-grid"></div>
-    <div class="bg-glow"></div>
-
-    <!-- Main content -->
-    <div class="z-content relative min-h-screen flex flex-col">
-        <!-- Header -->
-        <header class="border-b border-cyan-500/20 bg-black/40 backdrop-blur-md sticky top-0 z-40">
-            <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-                <!-- Logo -->
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full border-2 border-cyan-400/50 flex items-center justify-center glow-border" style="box-shadow: 0 0 20px rgba(0,240,255,0.3);">
-                        <svg class="w-5 h-5 text-cyan-400 spin-slow" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h1 class="text-lg sm:text-xl font-bold tracking-tight text-cyan-300 data-mono" style="text-shadow: 0 0 25px rgba(0,240,255,0.5);">
-                            TELECORE <span class="text-white">AI-MESH</span>
-                        </h1>
-                        <p class="text-[10px] text-cyan-600 data-mono tracking-widest uppercase">Advanced Image Forensic Suite v3.7</p>
-                    </div>
+    <!-- ===================== HEADER ===================== -->
+    <header class="sticky top-0 z-50 px-4 safe-pt pb-3 bg-[#0a0f0d]/90 backdrop-blur-xl border-b border-white/5">
+        <div class="max-w-md mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>
+                    </svg>
                 </div>
-                <!-- Network Tracker -->
-                <div id="networkBadge" class="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs data-mono font-semibold transition-all duration-500 border"
-                style="background: rgba(0,255,136,0.1); border-color: rgba(0,255,136,0.3); color: var(--green-ok);">
-                <span class="w-2 h-2 rounded-full blink-dot" style="background: var(--green-ok); box-shadow: 0 0 8px var(--green-ok);"></span>
-                <span id="networkText">MESH ONLINE</span>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight leading-tight bg-gradient-to-r from-emerald-300 to-teal-200 bg-clip-text text-transparent">Telecore AI-Mesh</h1>
+                    <p class="text-[10px] text-gray-400 font-medium tracking-widest uppercase">Telebirr Merchant Suite</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span id="headerStatusBadge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wide transition-all duration-500 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 dot-pulse"></span>
+                    ONLINE
+                </span>
             </div>
         </div>
     </header>
 
-    <!-- Main body -->
-    <main class="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8">
-        <!-- Upper section: Upload + Preview -->
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6 mb-6">
-            <!-- Upload Zone -->
-            <div class="lg:col-span-2">
-                <div id="dropZone" class="drop-zone glow-border rounded-xl p-6 sm:p-8 text-center h-full flex flex-col items-center justify-center min-h-[220px] sm:min-h-[280px]"
-                style="background: rgba(13,13,20,0.85); backdrop-filter: blur(10px);">
-                <div class="mb-4">
-                    <svg class="w-14 h-14 sm:w-16 sm:h-16 mx-auto text-cyan-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
-                    </svg>
+    <!-- ===================== MAIN CONTENT ===================== -->
+    <main class="max-w-md mx-auto px-4 pb-8 safe-pb space-y-5">
+
+        <!-- ===== SECTION 1: MESH STATUS INDICATOR ===== -->
+        <section class="glass-card p-5 fade-in" style="animation-delay:0.05s">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-sm font-semibold text-gray-300 tracking-wider uppercase">Network Status</h2>
+                <span id="meshModeLabel" class="text-[10px] font-medium text-gray-400 bg-white/5 px-2.5 py-1 rounded-full border border-white/10">LIVE</span>
+            </div>
+
+            <!-- Status ring + Mesh canvas -->
+            <div class="flex items-center gap-5">
+                <!-- Animated status ring -->
+                <div class="flex-shrink-0">
+                    <div id="statusRing" class="status-ring online">
+                        <div class="text-center">
+                            <svg id="statusIcon" class="w-8 h-8 mx-auto text-emerald-400 transition-colors duration-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.749.749 0 011.06 0z"/>
+                            </svg>
+                            <p id="statusLabel" class="mt-1 text-[11px] font-bold text-emerald-400 tracking-wider transition-colors duration-500">ONLINE</p>
+                        </div>
+                    </div>
                 </div>
-                <h2 class="text-lg sm:text-xl font-bold text-cyan-200 mb-1 data-mono">UPLOAD SCREENSHOT</h2>
-                <p class="text-xs sm:text-sm text-gray-500 mb-3 data-mono">Drop image here or tap to browse</p>
-                <p class="text-[10px] text-gray-600 data-mono uppercase tracking-wider">PNG · JPG · WEBP · Max 20MB</p>
-                <button id="uploadBtn" class="mt-4 px-6 py-2.5 rounded-lg bg-cyan-500/10 border border-cyan-400/40 text-cyan-300 text-sm data-mono font-semibold hover:bg-cyan-500/20 hover:border-cyan-400/70 transition-all duration-300" style="box-shadow: 0 0 18px rgba(0,240,255,0.2);">
-                    SELECT FILE
+
+                <!-- Mesh network canvas -->
+                <div class="flex-1 mesh-canvas-container h-[110px]">
+                    <canvas id="meshCanvas" class="w-full h-full"></canvas>
+                </div>
+            </div>
+
+            <!-- Toggle switch -->
+            <div class="mt-4 flex items-center justify-between">
+                <div>
+                    <p id="modeDetail" class="text-xs font-medium text-gray-300">Cellular Data Active</p>
+                    <p id="modeSubDetail" class="text-[10px] text-gray-500">Full connectivity via Telebirr network</p>
+                </div>
+                <button id="toggleBtn" class="toggle-track active relative w-14 h-8 rounded-full flex items-center px-1 cursor-pointer transition-all duration-400" aria-label="Toggle network status">
+                    <span id="toggleKnob" class="toggle-knob w-6 h-6 rounded-full bg-white flex items-center justify-center transform translate-x-0 transition-all duration-400">
+                        <svg id="toggleIcon" class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </span>
                 </button>
             </div>
-        </div>
+        </section>
 
-        <!-- Preview Area -->
-        <div class="lg:col-span-3 relative">
-            <div id="previewContainer" class="canvas-wrap glow-border rounded-xl h-full flex items-center justify-center min-h-[220px] sm:min-h-[280px]" style="background: rgba(0,0,0,0.5); overflow: hidden;">
-                <div id="placeholderPreview" class="text-center px-4">
-                    <svg class="w-16 h-16 sm:w-20 sm:h-20 mx-auto text-gray-600 mb-3" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <p class="text-gray-500 text-sm data-mono">IMAGE PREVIEW</p>
-                    <p class="text-gray-700 text-xs data-mono mt-1">Awaiting upload...</p>
-                </div>
-                <canvas id="previewCanvas" class="hidden max-w-full max-h-full" style="object-fit: contain;"></canvas>
-                <div id="scanOverlay" class="hidden absolute inset-0 pointer-events-none" style="z-index: 15;">
-                    <div class="scan-line"></div>
-                    <div class="absolute inset-0" style="background: rgba(0,240,255,0.03);"></div>
-                </div>
-                <!-- + Button -->
-                <button id="resetPlusBtn" class="hidden absolute rounded-full float-plus" style="top: 12px; right: 12px; width: 42px; height: 42px; background: rgba(0,240,255,0.15); border: 2px solid rgba(0,240,255,0.6); z-index: 30; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer;" aria-label="Reset and upload new image">
-                    <span style="font-size: 22px; color: var(--cyan); font-weight: 300; line-height: 1;">+</span>
+        <!-- ===== QUICK STATS ===== -->
+        <section class="grid grid-cols-3 gap-3 fade-in" style="animation-delay:0.1s">
+            <div class="glass-card-inner p-3 text-center">
+                <p id="statScanned" class="text-2xl font-bold text-emerald-300">0</p>
+                <p class="text-[9px] text-gray-500 font-medium tracking-wider uppercase mt-0.5">Scanned</p>
+            </div>
+            <div class="glass-card-inner p-3 text-center">
+                <p id="statFraud" class="text-2xl font-bold text-rose-400">0</p>
+                <p class="text-[9px] text-gray-500 font-medium tracking-wider uppercase mt-0.5">Blocked</p>
+            </div>
+            <div class="glass-card-inner p-3 text-center">
+                <p id="statNodes" class="text-2xl font-bold text-amber-300">12</p>
+                <p class="text-[9px] text-gray-500 font-medium tracking-wider uppercase mt-0.5">Mesh Nodes</p>
+            </div>
+        </section>
+
+        <!-- ===== SECTION 2: TRANSACTION SCANNER ===== -->
+        <section class="glass-card p-5 fade-in" style="animation-delay:0.15s">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-sm font-semibold text-gray-300 tracking-wider uppercase">Transaction Scanner</h2>
+                <span class="text-[10px] text-gray-500 bg-white/5 px-2 py-0.5 rounded-full border border-white/10">AI Fraud Detection</span>
+            </div>
+
+            <!-- Textarea -->
+            <div class="relative">
+                <textarea id="smsInput" rows="4" class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-gray-200 placeholder:text-gray-500 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-300" placeholder="Paste Telebirr SMS alert here...&#10;e.g. Telebirr: You have received 1,500.00 ETB from Abebe K. (0911xxxxxx) Ref: TB123456789"></textarea>
+                <button id="clearBtn" class="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-gray-200 transition-colors" title="Clear">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
-        </div>
-    </div>
 
-    <!-- Progress Bar Section -->
-    <div id="progressSection" class="hidden mb-6" style="transition: all 0.6s ease;">
-        <div class="glow-border rounded-xl p-4 sm:p-5" style="background: rgba(13,13,20,0.85); backdrop-filter: blur(10px);">
-            <div class="flex items-center justify-between mb-2">
-                <span id="progressLabel" class="text-xs sm:text-sm text-cyan-300 data-mono font-semibold tracking-wider">INITIALIZING...</span>
-                <span id="progressPercent" class="text-xs sm:text-sm text-cyan-400 data-mono font-bold">0%</span>
+            <!-- Sample SMS buttons -->
+            <div class="flex gap-2 mt-2 overflow-x-auto pb-1 -mx-1 px-1">
+                <button onclick="loadSample('legit')" class="flex-shrink-0 text-[10px] font-medium px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/25 hover:bg-emerald-500/20 transition-all">✓ Legit Sample</button>
+                <button onclick="loadSample('fraud')" class="flex-shrink-0 text-[10px] font-medium px-3 py-1.5 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/25 hover:bg-rose-500/20 transition-all">⚠ Fraud Sample</button>
+                <button onclick="loadSample('suspicious')" class="flex-shrink-0 text-[10px] font-medium px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/25 hover:bg-amber-500/20 transition-all">? Suspicious</button>
             </div>
-            <div class="h-2.5 rounded-full overflow-hidden" style="background: rgba(255,255,255,0.06);">
-                <div id="progressBar" class="h-full rounded-full progress-shimmer transition-all duration-300 ease-out" style="width: 0%; background: linear-gradient(90deg, #00f0ff, #00d0e0, #00f0ff);"></div>
-            </div>
-            <div class="flex gap-1 mt-3">
-                <div id="stageDot0" class="flex-1 h-1 rounded-full" style="background: rgba(255,255,255,0.08); transition: all 0.5s ease;"></div>
-                <div id="stageDot1" class="flex-1 h-1 rounded-full" style="background: rgba(255,255,255,0.08); transition: all 0.5s ease;"></div>
-                <div id="stageDot2" class="flex-1 h-1 rounded-full" style="background: rgba(255,255,255,0.08); transition: all 0.5s ease;"></div>
-                <div id="stageDot3" class="flex-1 h-1 rounded-full" style="background: rgba(255,255,255,0.08); transition: all 0.5s ease;"></div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Results Section -->
-    <div id="resultsSection" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 mb-6">
-        <!-- Layer 1 Result -->
-        <div id="layer1Result" class="glow-border rounded-xl p-4 sm:p-5 card-lift" style="background: rgba(13,13,20,0.8); backdrop-filter: blur(10px);">
-            <div class="flex items-center gap-2 mb-3">
-                <span class="w-2 h-2 rounded-full" id="layer1Dot" style="background: #505068;"></span>
-                <h3 class="text-sm font-bold text-gray-300 data-mono tracking-wider">LAYER 1: NOISE CHECK</h3>
+            <!-- Scan button -->
+            <button id="scanBtn" class="btn-scan mt-3 w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold text-sm tracking-wide shadow-lg shadow-emerald-500/25 hover:from-emerald-500 hover:to-teal-500 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+                </svg>
+                Scan for Fraud
+            </button>
+        </section>
+
+        <!-- ===== RESULTS SECTION ===== -->
+        <section id="resultsSection" class="glass-card p-5 fade-in hidden" style="animation-delay:0.05s">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-sm font-semibold text-gray-300 tracking-wider uppercase">Scan Results</h2>
+                <span id="resultTimestamp" class="text-[10px] text-gray-500"></span>
             </div>
-            <div class="space-y-2">
-                <div class="flex justify-between text-xs data-mono">
-                    <span class="text-gray-500">Noise Variance</span>
-                    <span id="layer1NoiseVar" class="text-gray-400">--</span>
+
+            <!-- Risk score -->
+            <div class="mb-4">
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-xs text-gray-400 font-medium">Risk Score</span>
+                    <span id="riskScoreText" class="text-sm font-bold text-emerald-400">0 / 100</span>
                 </div>
-                <div class="flex justify-between text-xs data-mono">
-                    <span class="text-gray-500">Uniformity</span>
-                    <span id="layer1Uniformity" class="text-gray-400">--</span>
-                </div>
-                <div class="flex justify-between text-xs data-mono">
-                    <span class="text-gray-500">Verdict</span>
-                    <span id="layer1Verdict" class="text-gray-400 font-semibold">--</span>
-                </div>
-                <div class="flex justify-between text-xs data-mono">
-                    <span class="text-gray-500">Confidence</span>
-                    <span id="layer1Confidence" class="text-gray-400">--</span>
+                <div class="w-full bg-white/5 rounded-full h-2 overflow-hidden">
+                    <div id="riskBar" class="risk-bar" style="width:0%; background:#10b981;"></div>
                 </div>
             </div>
-        </div>
-        <!-- Layer 2 Result -->
-        <div id="layer2Result" class="glow-border rounded-xl p-4 sm:p-5 card-lift" style="background: rgba(13,13,20,0.8); backdrop-filter: blur(10px);">
-            <div class="flex items-center gap-2 mb-3">
-                <span class="w-2 h-2 rounded-full" id="layer2Dot" style="background: #505068;"></span>
-                <h3 class="text-sm font-bold text-gray-300 data-mono tracking-wider">LAYER 2: EDGE SCAN</h3>
-            </div>
-            <div class="space-y-2">
-                <div class="flex justify-between text-xs data-mono">
-                    <span class="text-gray-500">Edge Delta</span>
-                    <span id="layer2EdgeDelta" class="text-gray-400">--</span>
+
+            <!-- Risk classification -->
+            <div id="riskClassification" class="mb-4 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center gap-3">
+                <div id="riskIcon" class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-emerald-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
-                <div class="flex justify-between text-xs data-mono">
-                    <span class="text-gray-500">Anomaly Ratio</span>
-                    <span id="layer2Anomaly" class="text-gray-400">--</span>
-                </div>
-                <div class="flex justify-between text-xs data-mono">
-                    <span class="text-gray-500">Verdict</span>
-                    <span id="layer2Verdict" class="text-gray-400 font-semibold">--</span>
-                </div>
-                <div class="flex justify-between text-xs data-mono">
-                    <span class="text-gray-500">Confidence</span>
-                    <span id="layer2Confidence" class="text-gray-400">--</span>
+                <div>
+                    <p id="riskTitle" class="text-sm font-bold text-emerald-300">Transaction Verified</p>
+                    <p id="riskDetail" class="text-[11px] text-emerald-200/70">No suspicious patterns detected</p>
                 </div>
             </div>
-        </div>
-        <!-- Layer 3 Result -->
-        <div id="layer3Result" class="glow-border rounded-xl p-4 sm:p-5 card-lift" style="background: rgba(13,13,20,0.8); backdrop-filter: blur(10px);">
-            <div class="flex items-center gap-2 mb-3">
-                <span class="w-2 h-2 rounded-full" id="layer3Dot" style="background: #505068;"></span>
-                <h3 class="text-sm font-bold text-gray-300 data-mono tracking-wider">LAYER 3: GEOMETRY</h3>
-            </div>
-            <div class="space-y-2">
-                <div class="flex justify-between text-xs data-mono">
-                    <span class="text-gray-500">Dimensions</span>
-                    <span id="layer3Dims" class="text-gray-400">--</span>
+
+            <!-- Extracted details -->
+            <div id="txDetails" class="space-y-2 mb-4">
+                <div class="flex justify-between text-[11px] py-1.5 border-b border-white/5">
+                    <span class="text-gray-500">Amount</span>
+                    <span id="txAmount" class="text-gray-200 font-medium">—</span>
                 </div>
-                <div class="flex justify-between text-xs data-mono">
-                    <span class="text-gray-500">Aspect Ratio</span>
-                    <span id="layer3Ratio" class="text-gray-400">--</span>
+                <div class="flex justify-between text-[11px] py-1.5 border-b border-white/5">
+                    <span class="text-gray-500">Transaction Ref</span>
+                    <span id="txRef" class="text-gray-200 font-medium">—</span>
                 </div>
-                <div class="flex justify-between text-xs data-mono">
-                    <span class="text-gray-500">Verdict</span>
-                    <span id="layer3Verdict" class="text-gray-400 font-semibold">--</span>
+                <div class="flex justify-between text-[11px] py-1.5 border-b border-white/5">
+                    <span class="text-gray-500">Counterparty</span>
+                    <span id="txParty" class="text-gray-200 font-medium">—</span>
                 </div>
-                <div class="flex justify-between text-xs data-mono">
-                    <span class="text-gray-500">Confidence</span>
-                    <span id="layer3Confidence" class="text-gray-400">--</span>
+                <div class="flex justify-between text-[11px] py-1.5">
+                    <span class="text-gray-500">Anomalies Found</span>
+                    <span id="txAnomalies" class="text-gray-200 font-medium">0</span>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Overall Verdict -->
-    <div id="overallVerdict" class="hidden mb-6">
-        <div id="verdictCard" class="glow-border rounded-xl p-5 sm:p-7 text-center" style="background: rgba(13,13,20,0.9); backdrop-filter: blur(12px);">
-            <h2 class="text-2xl sm:text-3xl font-black tracking-tight mb-1 data-mono" id="verdictTitle" style="color: var(--text-primary);">--</h2>
-            <p class="text-sm text-gray-400 data-mono mb-3" id="verdictSubtitle">--</p>
-            <div class="flex items-center justify-center gap-3 sm:gap-5">
-                <div class="text-center">
-                    <div class="text-3xl sm:text-4xl font-black data-mono" id="verdictScore" style="color: var(--cyan);">--</div>
-                    <div class="text-[10px] text-gray-500 data-mono uppercase tracking-wider">Tamper Score</div>
-                </div>
-                <div class="w-px h-10" style="background: rgba(255,255,255,0.1);"></div>
-                <div class="text-center">
-                    <div class="text-3xl sm:text-4xl font-black data-mono" id="verdictConfidence" style="color: var(--cyan);">--</div>
-                    <div class="text-[10px] text-gray-500 data-mono uppercase tracking-wider">Confidence</div>
-                </div>
-                <div class="w-px h-10" style="background: rgba(255,255,255,0.1);"></div>
-                <div class="text-center">
-                    <div class="text-xl sm:text-2xl font-bold data-mono" id="verdictTime" style="color: var(--cyan);">--</div>
-                    <div class="text-[10px] text-gray-500 data-mono uppercase tracking-wider">Scan Time</div>
-                </div>
+            <!-- Recommendations -->
+            <div id="txRecommendation" class="p-3 rounded-lg bg-white/5 border border-white/10 text-[11px] text-gray-400 leading-relaxed">
+                No action required.
             </div>
-            <div class="mt-4 flex items-center justify-center gap-2 text-xs data-mono" id="verdictBadgeContainer">
-                <span id="verdictBadge" class="px-4 py-1.5 rounded-full font-bold tracking-wider" style="background: rgba(255,255,255,0.06); color: var(--text-secondary);">--</span>
+        </section>
+
+        <!-- ===== RECENT ACTIVITY ===== -->
+        <section class="glass-card p-5 fade-in" style="animation-delay:0.2s">
+            <h2 class="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-3">Recent Scans</h2>
+            <div id="activityList" class="space-y-2">
+                <p class="text-[11px] text-gray-500 text-center py-4">No transactions scanned yet</p>
             </div>
-        </div>
-    </div>
-</main>
+        </section>
 
-<!-- Footer -->
-<footer class="border-t border-cyan-500/10 py-4 text-center text-[10px] text-gray-600 data-mono tracking-widest">
-    TELECORE AI-MESH · CLIENT-SIDE FORENSIC ENGINE · NO DATA LEAVES DEVICE
-</footer>
-</div>
+        <!-- ===== FOOTER ===== -->
+        <footer class="text-center pb-4 pt-2 fade-in" style="animation-delay:0.25s">
+            <p class="text-[10px] text-gray-600 tracking-wide">Telecore AI-Mesh • Telebirr Merchant Suite v2.1</p>
+            <p class="text-[9px] text-gray-700 mt-0.5">Built for Tech Innovation Demo 2025</p>
+        </footer>
+    </main>
 
-<!-- Hidden file input -->
-<input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp,image/bmp" capture="environment">
-
-<script>
-    (function() {
-        'use strict';
-
-        // ===== STATE =====
-        const state = {
-            imageData: null,
-            imageDimensions: null,
-            canvasContext: null,
-            analysisResult: null,
-            isAnalyzing: false,
-            hasResult: false,
-            scanStartTime: null,
-            scanEndTime: null,
-            animationFrame: null,
-            progressInterval: null,
-            currentProgress: 0,
-            stageDots: [false, false, false, false],
-            networkOnline: navigator.onLine,
-        };
-
-        // ===== DOM REFERENCES =====
-        const dropZone = document.getElementById('dropZone');
-        const uploadBtn = document.getElementById('uploadBtn');
-        const fileInput = document.getElementById('fileInput');
-        const previewCanvas = document.getElementById('previewCanvas');
-        const placeholderPreview = document.getElementById('placeholderPreview');
-        const scanOverlay = document.getElementById('scanOverlay');
-        const resetPlusBtn = document.getElementById('resetPlusBtn');
-        const progressSection = document.getElementById('progressSection');
-        const resultsSection = document.getElementById('resultsSection');
-        const overallVerdict = document.getElementById('overallVerdict');
-        const progressBar = document.getElementById('progressBar');
-        const progressLabel = document.getElementById('progressLabel');
-        const progressPercent = document.getElementById('progressPercent');
-        const networkBadge = document.getElementById('networkBadge');
-        const networkText = document.getElementById('networkText');
-        const stageDots = [
-            document.getElementById('stageDot0'),
-            document.getElementById('stageDot1'),
-            document.getElementById('stageDot2'),
-            document.getElementById('stageDot3'),
-        ];
-
-        // Layer 1 DOM
-        const layer1Dot = document.getElementById('layer1Dot');
-        const layer1NoiseVar = document.getElementById('layer1NoiseVar');
-        const layer1Uniformity = document.getElementById('layer1Uniformity');
-        const layer1Verdict = document.getElementById('layer1Verdict');
-        const layer1Confidence = document.getElementById('layer1Confidence');
-        const layer1ResultCard = document.getElementById('layer1Result');
-
-        // Layer 2 DOM
-        const layer2Dot = document.getElementById('layer2Dot');
-        const layer2EdgeDelta = document.getElementById('layer2EdgeDelta');
-        const layer2Anomaly = document.getElementById('layer2Anomaly');
-        const layer2Verdict = document.getElementById('layer2Verdict');
-        const layer2Confidence = document.getElementById('layer2Confidence');
-        const layer2ResultCard = document.getElementById('layer2Result');
-
-        // Layer 3 DOM
-        const layer3Dot = document.getElementById('layer3Dot');
-        const layer3Dims = document.getElementById('layer3Dims');
-        const layer3Ratio = document.getElementById('layer3Ratio');
-        const layer3Verdict = document.getElementById('layer3Verdict');
-        const layer3Confidence = document.getElementById('layer3Confidence');
-        const layer3ResultCard = document.getElementById('layer3Result');
-
-        // Overall DOM
-        const verdictTitle = document.getElementById('verdictTitle');
-        const verdictSubtitle = document.getElementById('verdictSubtitle');
-        const verdictScore = document.getElementById('verdictScore');
-        const verdictConfidence = document.getElementById('verdictConfidence');
-        const verdictTime = document.getElementById('verdictTime');
-        const verdictBadge = document.getElementById('verdictBadge');
-        const verdictCard = document.getElementById('verdictCard');
-
-        // ===== NETWORK TRACKER =====
-        function updateNetworkStatus() {
-            if (navigator.onLine) {
-                networkBadge.style.background = 'rgba(0,255,136,0.1)';
-                networkBadge.style.borderColor = 'rgba(0,255,136,0.3)';
-                networkBadge.style.color = '#00ff88';
-                networkBadge.classList.remove('blink-orange');
-                networkBadge.querySelector('.blink-dot').style.background = '#00ff88';
-                networkBadge.querySelector('.blink-dot').style.boxShadow = '0 0 8px #00ff88';
-                networkText.textContent = 'MESH ONLINE';
-                networkText.style.color = '#00ff88';
-            } else {
-                networkBadge.style.background = 'rgba(255,102,0,0.15)';
-                networkBadge.style.borderColor = 'rgba(255,102,0,0.5)';
-                networkBadge.style.color = '#ff6600';
-                networkBadge.classList.add('blink-orange');
-                networkBadge.querySelector('.blink-dot').style.background = '#ff6600';
-                networkBadge.querySelector('.blink-dot').style.boxShadow = '0 0 8px #ff6600';
-                networkText.textContent = 'MESH ACTIVE / OFFLINE';
-                networkText.style.color = '#ff6600';
-            }
-        }
-        updateNetworkStatus();
-        window.addEventListener('online', updateNetworkStatus);
-        window.addEventListener('offline', updateNetworkStatus);
-
-        // ===== FILE INPUT HANDLING =====
-        function openFilePicker() {
-            fileInput.click();
-        }
-
-        uploadBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            openFilePicker();
-        });
-
-        dropZone.addEventListener('click', function(e) {
-            if (e.target === uploadBtn || uploadBtn.contains(e.target)) return;
-            openFilePicker();
-        });
-
-        fileInput.addEventListener('change', function(e) {
-            if (e.target.files && e.target.files.length > 0) {
-                handleFile(e.target.files[0]);
-            }
-            e.target.value = '';
-        });
-
-        // Drag and drop
-        dropZone.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            dropZone.classList.add('dragover');
-        });
-        dropZone.addEventListener('dragleave', function(e) {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-        });
-        dropZone.addEventListener('drop', function(e) {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                handleFile(e.dataTransfer.files[0]);
-            }
-        });
-
-        // ===== RESET + BUTTON =====
-        resetPlusBtn.addEventListener('click', function() {
-            resetAllState();
-            openFilePicker();
-        });
-
-        // ===== RESET FUNCTION =====
-        function resetAllState() {
-            // Cancel any ongoing analysis
-            if (state.progressInterval) {
-                clearInterval(state.progressInterval);
-                state.progressInterval = null;
-            }
-            if (state.animationFrame) {
-                cancelAnimationFrame(state.animationFrame);
-                state.animationFrame = null;
-            }
-            state.isAnalyzing = false;
-            state.hasResult = false;
-            state.analysisResult = null;
-            state.imageData = null;
-            state.imageDimensions = null;
-            state.currentProgress = 0;
-            state.stageDots = [false, false, false, false];
-
-            // Clear canvas
-            if (state.canvasContext) {
-                state.canvasContext.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-            }
-            previewCanvas.classList.add('hidden');
-            placeholderPreview.classList.remove('hidden');
-            scanOverlay.classList.add('hidden');
-            resetPlusBtn.classList.add('hidden');
-
-            // Reset UI
-            progressSection.classList.add('hidden');
-            resultsSection.classList.add('hidden');
-            overallVerdict.classList.add('hidden');
-
-            // Reset stage dots
-            stageDots.forEach(function(dot) {
-                dot.style.background = 'rgba(255,255,255,0.08)';
-            });
-
-            // Reset progress
-            progressBar.style.width = '0%';
-            progressLabel.textContent = 'INITIALIZING...';
-            progressPercent.textContent = '0%';
-
-            // Reset layer indicators
-            resetLayerIndicators();
-
-            // Reset verdict card
-            verdictCard.className = 'glow-border rounded-xl p-5 sm:p-7 text-center';
-            verdictCard.style.background = 'rgba(13,13,20,0.9)';
-        }
-
-        function resetLayerIndicators() {
-            layer1Dot.style.background = '#505068';
-            layer2Dot.style.background = '#505068';
-            layer3Dot.style.background = '#505068';
-            layer1ResultCard.className = 'glow-border rounded-xl p-4 sm:p-5 card-lift';
-            layer2ResultCard.className = 'glow-border rounded-xl p-4 sm:p-5 card-lift';
-            layer3ResultCard.className = 'glow-border rounded-xl p-4 sm:p-5 card-lift';
-            layer1NoiseVar.textContent = '--';
-            layer1Uniformity.textContent = '--';
-            layer1Verdict.textContent = '--';
-            layer1Confidence.textContent = '--';
-            layer2EdgeDelta.textContent = '--';
-            layer2Anomaly.textContent = '--';
-            layer2Verdict.textContent = '--';
-            layer2Confidence.textContent = '--';
-            layer3Dims.textContent = '--';
-            layer3Ratio.textContent = '--';
-            layer3Verdict.textContent = '--';
-            layer3Confidence.textContent = '--';
-        }
-
-        // ===== FILE HANDLING =====
-        function handleFile(file) {
-            // Validate file type
-            const validTypes = ['image/png', 'image/jpeg', 'image/webp', 'image/bmp'];
-            if (!validTypes.includes(file.type)) {
-                alert('Please upload a valid image file (PNG, JPG, WEBP, BMP).');
-                return;
-            }
-            // Validate file size (20MB max)
-            if (file.size > 20 * 1024 * 1024) {
-                alert('File size exceeds 20MB limit.');
-                return;
-            }
-
-            // Reset any previous state
-            resetAllState();
-
-            // Read the file
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    setupCanvas(img);
-                    runAnalysis(img, file);
-                };
-                img.onerror = function() {
-                    alert('Failed to load image. The file may be corrupted.');
-                };
-                img.src = e.target.result;
+    <script>
+        (function() {
+            // ==================== STATE ====================
+            const state = {
+                isOnline: true,
+                scannedCount: 0,
+                fraudCount: 0,
+                meshNodes: 12,
+                activity: [], // {time, ref, amount, risk, status}
+                scanHistoryRefs: new Set(), // for duplicate detection
             };
-            reader.onerror = function() {
-                alert('Failed to read file.');
-            };
-            reader.readAsDataURL(file);
-        }
 
-        // ===== CANVAS SETUP =====
-        function setupCanvas(img) {
-            const maxDim = 1200;
-            let w = img.naturalWidth;
-            let h = img.naturalHeight;
-            const scale = Math.min(1, maxDim / Math.max(w, h));
-            const dispW = Math.round(w * scale);
-            const dispH = Math.round(h * scale);
+            // ==================== DOM REFS ====================
+            const $ = (id) => document.getElementById(id);
+            const statusRing = $('statusRing');
+            const statusIcon = $('statusIcon');
+            const statusLabel = $('statusLabel');
+            const modeDetail = $('modeDetail');
+            const modeSubDetail = $('modeSubDetail');
+            const headerBadge = $('headerStatusBadge');
+            const meshModeLabel = $('meshModeLabel');
+            const toggleBtn = $('toggleBtn');
+            const toggleKnob = $('toggleKnob');
+            const toggleIcon = $('toggleIcon');
+            const toggleTrack = $('toggleBtn');
+            const meshCanvas = $('meshCanvas');
+            const smsInput = $('smsInput');
+            const scanBtn = $('scanBtn');
+            const clearBtn = $('clearBtn');
+            const resultsSection = $('resultsSection');
+            const resultTimestamp = $('resultTimestamp');
+            const riskScoreText = $('riskScoreText');
+            const riskBar = $('riskBar');
+            const riskClassification = $('riskClassification');
+            const riskIcon = $('riskIcon');
+            const riskTitle = $('riskTitle');
+            const riskDetail = $('riskDetail');
+            const txAmount = $('txAmount');
+            const txRef = $('txRef');
+            const txParty = $('txParty');
+            const txAnomalies = $('txAnomalies');
+            const txRecommendation = $('txRecommendation');
+            const txDetails = $('txDetails');
+            const activityList = $('activityList');
+            const statScanned = $('statScanned');
+            const statFraud = $('statFraud');
+            const statNodes = $('statNodes');
 
-            previewCanvas.width = dispW;
-            previewCanvas.height = dispH;
-            const ctx = previewCanvas.getContext('2d');
-            ctx.clearRect(0, 0, dispW, dispH);
-            ctx.drawImage(img, 0, 0, dispW, dispH);
+            // ==================== MESH CANVAS ANIMATION ====================
+            const ctx = meshCanvas.getContext('2d');
+            let meshFrameId = null;
+            let particles = [];
 
-            state.canvasContext = ctx;
-            state.imageDimensions = { width: w, height: h, displayWidth: dispW, displayHeight: dispH };
-            state.imageData = ctx.getImageData(0, 0, dispW, dispH);
-
-            // Show canvas
-            previewCanvas.classList.remove('hidden');
-            placeholderPreview.classList.add('hidden');
-        }
-
-        // ===== ANALYSIS ENGINE =====
-        function runAnalysis(img, file) {
-            state.isAnalyzing = true;
-            state.scanStartTime = performance.now();
-            state.hasResult = false;
-
-            // Show progress section
-            progressSection.classList.remove('hidden');
-            resultsSection.classList.add('hidden');
-            overallVerdict.classList.add('hidden');
-
-            // Start progress simulation
-            let progress = 0;
-            const stages = [
-                { label: 'Loading forensic buffer...', pct: 12, duration: 500 },
-                { label: 'Layer 1: Luminance Noise Analysis...', pct: 38, duration: 900 },
-                { label: 'Layer 2: Font-Edge Contrast Scan...', pct: 62, duration: 800 },
-                { label: 'Layer 3: Geometric Verification...', pct: 82, duration: 650 },
-                { label: 'Cross-referencing mesh data...', pct: 94, duration: 450 },
-                { label: 'Finalizing forensic report...', pct: 100, duration: 350 },
-            ];
-
-            let stageIndex = 0;
-            state.progressInterval = setInterval(function() {
-                if (stageIndex < stages.length) {
-                    const stage = stages[stageIndex];
-                    const targetPct = stage.pct;
-                    const step = Math.max(0.5, (targetPct - progress) / (stage.duration / 30));
-                    progress = Math.min(targetPct, progress + step);
-                    updateProgress(progress, stage.label);
-                    if (progress >= targetPct) {
-                        stageIndex++;
-                    }
-                } else {
-                    // Done with progress
-                    clearInterval(state.progressInterval);
-                    state.progressInterval = null;
-                    // Perform actual analysis
-                    performForensicAnalysis(img, file);
+            function initParticles() {
+                particles = [];
+                const nodeCount = 10;
+                const w = meshCanvas.width;
+                const h = meshCanvas.height;
+                for (let i = 0; i < nodeCount; i++) {
+                    particles.push({
+                        x: Math.random() * w,
+                        y: Math.random() * h,
+                        vx: (Math.random() - 0.5) * 0.4,
+                        vy: (Math.random() - 0.5) * 0.4,
+                        r: 2 + Math.random() * 3,
+                        phase: Math.random() * Math.PI * 2,
+                        pulseSpeed: 0.02 + Math.random() * 0.04,
+                    });
                 }
-            }, 30);
-
-            // Show scan overlay
-            scanOverlay.classList.remove('hidden');
-        }
-
-        function updateProgress(pct, label) {
-            state.currentProgress = pct;
-            progressBar.style.width = pct + '%';
-            progressPercent.textContent = Math.round(pct) + '%';
-            progressLabel.textContent = label;
-
-            // Update stage dots
-            const activeDots = Math.min(4, Math.floor(pct / 25));
-            stageDots.forEach(function(dot, i) {
-                if (i < activeDots) {
-                    dot.style.background = 'rgba(0,240,255,0.7)';
-                    dot.style.boxShadow = '0 0 8px rgba(0,240,255,0.4)';
-                } else {
-                    dot.style.background = 'rgba(255,255,255,0.08)';
-                    dot.style.boxShadow = 'none';
-                }
-            });
-        }
-
-        // ===== FORENSIC ANALYSIS ALGORITHMS =====
-        function performForensicAnalysis(img, file) {
-            const dims = state.imageDimensions;
-            if (!dims || !state.imageData) {
-                finishAnalysis(null, 'ERROR: No image data available.');
-                return;
             }
 
-            const pixelData = state.imageData.data;
-            const dispW = dims.displayWidth;
-            const dispH = dims.displayHeight;
+            function resizeMeshCanvas() {
+                const rect = meshCanvas.parentElement.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                meshCanvas.width = rect.width * dpr;
+                meshCanvas.height = rect.height * dpr;
+                meshCanvas.style.width = rect.width + 'px';
+                meshCanvas.style.height = rect.height + 'px';
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                initParticles();
+            }
 
-            // ---- LAYER 1: LUMINANCE GRADIENT NOISE CHECK ----
-            const layer1Result = analyzeNoise(pixelData, dispW, dispH);
+            function drawMeshNetwork(timestamp) {
+                const w = meshCanvas.width / (window.devicePixelRatio || 1);
+                const h = meshCanvas.height / (window.devicePixelRatio || 1);
+                ctx.clearRect(0, 0, w, h);
 
-            // ---- LAYER 2: FONT-EDGE CONTRAST & PIXEL ANOMALY SCAN ----
-            const layer2Result = analyzeEdges(pixelData, dispW, dispH);
+                const baseColor = state.isOnline ? '16,185,129' : '245,158,11';
+                const centerX = w / 2;
+                const centerY = h / 2;
 
-            // ---- LAYER 3: GEOMETRIC ASPECT RATIO & METADATA CHECK ----
-            const layer3Result = analyzeGeometry(img, file, dims);
+                // Update particles
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0 || p.x > w) p.vx *= -1;
+                    if (p.y < 0 || p.y > h) p.vy *= -1;
+                    p.phase += p.pulseSpeed;
+                });
 
-            // Aggregate results
-            const aggregate = aggregateResults(layer1Result, layer2Result, layer3Result, dims);
+                // Draw connection lines to center
+                particles.forEach(p => {
+                    const dist = Math.hypot(p.x - centerX, p.y - centerY);
+                    const alpha = Math.max(0.08, 0.45 - dist / 300);
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.lineTo(p.x, p.y);
+                    ctx.strokeStyle = `rgba(${baseColor},${alpha})`;
+                    ctx.lineWidth = 0.8;
+                    ctx.stroke();
+                });
 
-            state.scanEndTime = performance.now();
-            finishAnalysis(aggregate, null);
-        }
-
-        // ---- LAYER 1 IMPLEMENTATION ----
-        function analyzeNoise(pixelData, w, h) {
-            const results = {
-                noiseVariance: 0,
-                uniformity: 0,
-                verdict: 'PASS',
-                confidence: 0,
-                score: 0, // 0=genuine, 100=AI
-            };
-
-            try {
-                const rowStep = Math.max(2, Math.floor(h / 40));
-                const segSize = Math.max(4, Math.floor(w / 30));
-                const varianceArray = [];
-
-                for (let y = 0; y < h - rowStep; y += rowStep) {
-                    for (let x = 0; x < w - segSize; x += segSize) {
-                        let sumLum = 0;
-                        let sumLumSq = 0;
-                        let count = 0;
-                        for (let yy = y; yy < Math.min(y + rowStep, h); yy += 2) {
-                            for (let xx = x; xx < Math.min(x + segSize, w); xx += 2) {
-                                const idx = (yy * w + xx) * 4;
-                                const r = pixelData[idx];
-                                const g = pixelData[idx + 1];
-                                const b = pixelData[idx + 2];
-                                const lum = 0.299 * r + 0.587 * g + 0.114 * b;
-                                sumLum += lum;
-                                sumLumSq += lum * lum;
-                                count++;
-                            }
-                        }
-                        if (count > 4) {
-                            const mean = sumLum / count;
-                            const variance = Math.max(0, sumLumSq / count - mean * mean);
-                            varianceArray.push(variance);
+                // Draw inter-particle connections
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const d = Math.hypot(particles[i].x - particles[j].x, particles[i].y - particles[j].y);
+                        if (d < 65) {
+                            const alpha = 0.18 * (1 - d / 65);
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(${baseColor},${alpha})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.stroke();
                         }
                     }
                 }
 
-                if (varianceArray.length > 10) {
-                    // Compute mean and std of variances
-                    const n = varianceArray.length;
-                    const meanVar = varianceArray.reduce(function(a, b) { return a + b; }, 0) / n;
-                    const varOfVariances = varianceArray.reduce(function(a, b) {
-                        return a + (b - meanVar) * (b - meanVar);
-                    }, 0) / n;
-                    const stdOfVariances = Math.sqrt(varOfVariances);
-                    const cv = meanVar > 0 ? stdOfVariances / meanVar : 0;
+                // Draw center hub
+                const hubGlow = 20 + Math.sin(timestamp * 0.004) * 6;
+                const hubGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, hubGlow + 15);
+                hubGrad.addColorStop(0, `rgba(${baseColor},0.6)`);
+                hubGrad.addColorStop(0.5, `rgba(${baseColor},0.2)`);
+                hubGrad.addColorStop(1, `rgba(${baseColor},0)`);
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, hubGlow + 15, 0, Math.PI * 2);
+                ctx.fillStyle = hubGrad;
+                ctx.fill();
 
-                    results.noiseVariance = meanVar.toFixed(2);
-                    results.uniformity = (100 - Math.min(100, cv * 40)).toFixed(1) + '%';
+                // Center dot
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 4.5, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${baseColor},0.9)`;
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 8, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${baseColor},0.2)`;
+                ctx.fill();
 
-                    // Higher CV = more irregular = more likely AI
-                    const cvThreshold = 0.35;
-                    if (cv > cvThreshold) {
-                        results.verdict = 'IRREGULAR';
-                        results.score = Math.min(100, 30 + (cv - cvThreshold) * 180);
-                    } else if (cv > cvThreshold * 0.65) {
-                        results.verdict = 'SUSPICIOUS';
-                        results.score = Math.min(100, 15 + (cv - cvThreshold * 0.65) * 140);
-                    } else {
-                        results.verdict = 'UNIFORM';
-                        results.score = Math.max(0, cv * 30);
-                    }
-                    results.confidence = Math.min(97, 55 + Math.min(42, cv * 35)).toFixed(1) + '%';
-                } else {
-                    results.verdict = 'INSUFFICIENT';
-                    results.confidence = '30.0%';
-                    results.score = 30;
-                }
-            } catch (err) {
-                results.verdict = 'ERROR';
-                results.confidence = '20.0%';
-                results.score = 40;
+                // Draw peripheral nodes
+                particles.forEach(p => {
+                    const pulse = 0.5 + Math.sin(p.phase) * 0.5;
+                    const r = p.r * (0.8 + pulse * 0.5);
+                    const glowR = r * 3.5;
+                    const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowR);
+                    grad.addColorStop(0, `rgba(${baseColor},${0.65 * pulse})`);
+                    grad.addColorStop(1, `rgba(${baseColor},0)`);
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, glowR, 0, Math.PI * 2);
+                    ctx.fillStyle = grad;
+                    ctx.fill();
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${baseColor},${0.7 + pulse * 0.3})`;
+                    ctx.fill();
+                });
+
+                // Animated pulse traveling along connections
+                const travelTime = timestamp * 0.002;
+                particles.forEach((p, idx) => {
+                    const pulseT = (travelTime + idx * 0.37) % 1;
+                    const px = centerX + (p.x - centerX) * pulseT;
+                    const py = centerY + (p.y - centerY) * pulseT;
+                    const pulseR = 2.5 + Math.sin(pulseT * Math.PI) * 1.5;
+                    ctx.beginPath();
+                    ctx.arc(px, py, pulseR, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${baseColor},${0.85 * Math.sin(pulseT * Math.PI)})`;
+                    ctx.fill();
+                });
             }
 
-            return results;
-        }
-
-        // ---- LAYER 2 IMPLEMENTATION ----
-        function analyzeEdges(pixelData, w, h) {
-            const results = {
-                edgeDelta: 0,
-                anomalyRatio: 0,
-                verdict: 'PASS',
-                confidence: 0,
-                score: 0,
-            };
-
-            try {
-                const rowStep = Math.max(2, Math.floor(h / 35));
-                const colStep = Math.max(2, Math.floor(w / 35));
-                const edgeDeltas = [];
-                const anomalyEdges = [];
-                let totalEdges = 0;
-                let sharpEdges = 0;
-
-                for (let y = 1; y < h - 1; y += rowStep) {
-                    for (let x = 1; x < w - 1; x += colStep) {
-                        const idx = (y * w + x) * 4;
-                        const idxLeft = (y * w + (x - 1)) * 4;
-                        const idxRight = (y * w + (x + 1)) * 4;
-                        const idxUp = ((y - 1) * w + x) * 4;
-                        const idxDown = ((y + 1) * w + x) * 4;
-
-                        const lumCenter = 0.299 * pixelData[idx] + 0.587 * pixelData[idx + 1] + 0.114 * pixelData[
-                        idx + 2];
-                        const lumLeft = 0.299 * pixelData[idxLeft] + 0.587 * pixelData[idxLeft + 1] + 0.114 *
-                            pixelData[idxLeft + 2];
-                        const lumRight = 0.299 * pixelData[idxRight] + 0.587 * pixelData[idxRight + 1] + 0.114 *
-                            pixelData[idxRight + 2];
-                        const lumUp = 0.299 * pixelData[idxUp] + 0.587 * pixelData[idxUp + 1] + 0.114 * pixelData[
-                            idxUp + 2];
-                        const lumDown = 0.299 * pixelData[idxDown] + 0.587 * pixelData[idxDown + 1] + 0.114 *
-                            pixelData[idxDown + 2];
-
-                        const gradX = Math.abs(lumRight - lumLeft);
-                        const gradY = Math.abs(lumDown - lumUp);
-                        const gradientMagnitude = Math.sqrt(gradX * gradX + gradY * gradY);
-
-                        if (gradientMagnitude > 5) {
-                            totalEdges++;
-                            edgeDeltas.push(gradientMagnitude);
-                            // "Sharp" edges are those with very high contrast in small neighborhood
-                            const sharpness = Math.abs(gradX - gradY) + gradientMagnitude;
-                            if (sharpness > 60 || gradientMagnitude > 45) {
-                                sharpEdges++;
-                            }
-                        }
-                    }
-                }
-
-                if (edgeDeltas.length > 10) {
-                    const meanDelta = edgeDeltas.reduce(function(a, b) { return a + b; }, 0) / edgeDeltas.length;
-                    const maxDelta = Math.max.apply(null, edgeDeltas);
-                    const minDelta = Math.min.apply(null, edgeDeltas);
-                    const spread = maxDelta - minDelta;
-                    const sharpRatio = totalEdges > 0 ? sharpEdges / totalEdges : 0;
-
-                    results.edgeDelta = meanDelta.toFixed(2);
-                    results.anomalyRatio = (sharpRatio * 100).toFixed(1) + '%';
-
-                    // High sharpRatio or high meanDelta indicates artificial edges
-                    const sharpThreshold = 0.35;
-                    if (sharpRatio > sharpThreshold) {
-                        results.verdict = 'ANOMALOUS';
-                        results.score = Math.min(100, 35 + (sharpRatio - sharpThreshold) * 200);
-                    } else if (sharpRatio > sharpThreshold * 0.55) {
-                        results.verdict = 'SUSPICIOUS';
-                        results.score = Math.min(100, 20 + (sharpRatio - sharpThreshold * 0.55) * 160);
-                    } else {
-                        results.verdict = 'NATURAL';
-                        results.score = Math.max(0, sharpRatio * 45);
-                    }
-                    results.confidence = Math.min(96, 50 + Math.min(46, sharpRatio * 50)).toFixed(1) + '%';
-                } else {
-                    results.verdict = 'INSUFFICIENT';
-                    results.confidence = '25.0%';
-                    results.score = 25;
-                }
-            } catch (err) {
-                results.verdict = 'ERROR';
-                results.confidence = '18.0%';
-                results.score = 35;
+            function animateMesh(timestamp) {
+                drawMeshNetwork(timestamp);
+                meshFrameId = requestAnimationFrame(animateMesh);
             }
 
-            return results;
-        }
+            // ==================== STATUS TOGGLE ====================
+            function updateStatusUI() {
+                const isOnline = state.isOnline;
 
-        // ---- LAYER 3 IMPLEMENTATION ----
-        function analyzeGeometry(img, file, dims) {
-            const results = {
-                dimensions: dims.width + 'x' + dims.height,
-                aspectRatio: (dims.width / dims.height).toFixed(4),
-                verdict: 'PASS',
-                confidence: 0,
-                score: 0,
+                // Status ring
+                statusRing.classList.toggle('online', isOnline);
+                statusRing.classList.toggle('offline', !isOnline);
+
+                // Status icon & label
+                if (isOnline) {
+                    statusIcon.innerHTML =
+                        '<path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.749.749 0 011.06 0z"/>';
+                    statusIcon.className =
+                        'w-8 h-8 mx-auto text-emerald-400 transition-colors duration-500';
+                    statusLabel.textContent = 'ONLINE';
+                    statusLabel.className = 'mt-1 text-[11px] font-bold text-emerald-400 tracking-wider transition-colors duration-500';
+                    modeDetail.textContent = 'Cellular Data Active';
+                    modeSubDetail.textContent = 'Full connectivity via Telebirr network';
+                    headerBadge.className =
+                        'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wide transition-all duration-500 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+                    headerBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 dot-pulse"></span> ONLINE';
+                    meshModeLabel.textContent = 'LIVE';
+                    toggleTrack.className =
+                        'toggle-track active relative w-14 h-8 rounded-full flex items-center px-1 cursor-pointer transition-all duration-400';
+                    toggleKnob.style.transform = 'translateX(0)';
+                    toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>';
+                    toggleIcon.className = 'w-3.5 h-3.5 text-emerald-500';
+                    statNodes.textContent = state.meshNodes;
+                } else {
+                    statusIcon.innerHTML =
+                        '<path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636a9 9 0 010 12.728m-2.828-9.9a5 5 0 010 7.07m-9.9-7.07a5 5 0 010 7.07m-2.828-9.9a9 9 0 010 12.728"/>';
+                    statusIcon.className =
+                        'w-8 h-8 mx-auto text-amber-400 transition-colors duration-500';
+                    statusLabel.textContent = 'OFFLINE';
+                    statusLabel.className =
+                        'mt-1 text-[11px] font-bold text-amber-400 tracking-wider transition-colors duration-500';
+                    modeDetail.textContent = 'Mesh Fallback Enabled';
+                    modeSubDetail.textContent = 'Routing via 12 nearby mesh nodes';
+                    headerBadge.className =
+                        'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wide transition-all duration-500 bg-amber-500/15 text-amber-300 border border-amber-500/30';
+                    headerBadge.innerHTML =
+                        '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 dot-pulse"></span> MESH FALLBACK';
+                    meshModeLabel.textContent = 'MESH MODE';
+                    toggleTrack.className =
+                        'toggle-track relative w-14 h-8 rounded-full flex items-center px-1 cursor-pointer transition-all duration-400';
+                    toggleKnob.style.transform = 'translateX(24px)';
+                    toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>';
+                    toggleIcon.className = 'w-3.5 h-3.5 text-amber-500';
+                    statNodes.textContent = state.meshNodes + 4; // More nodes join in mesh mode
+                }
+            }
+
+            function toggleStatus() {
+                state.isOnline = !state.isOnline;
+                updateStatusUI();
+            }
+
+            toggleBtn.addEventListener('click', toggleStatus);
+
+            // ==================== SAMPLE SMS DATA ====================
+            const samples = {
+                legit: 'Telebirr: You have received 1,500.00 ETB from Abebe Kebede (0911xxxxxx) on 12/03/2025 14:30. Ref: TB202503121430889',
+                fraud: 'URGENT Telebirr: Your account needs verification! Send your PIN and OTP to 0911xxxxxx immediately. Ref: XX9999. Amount: 50,000 ETB. Click http://fake-telebirr.et/verify',
+                suspicious: 'Telebirr: You received 25,000 ETB from unknown sender. Ref: TB999999999. Please verify your identity by sending OTP.',
             };
 
-            try {
-                const ratio = dims.width / dims.height;
-                // Common smartphone screenshot aspect ratios
-                const knownRatios = [
-                    { ratio: 16 / 9, label: '16:9', tolerance: 0.02 },
-                    { ratio: 18 / 9, label: '18:9', tolerance: 0.02 },
-                    { ratio: 19 / 9, label: '19:9', tolerance: 0.025 },
-                    { ratio: 19.5 / 9, label: '19.5:9', tolerance: 0.025 },
-                    { ratio: 20 / 9, label: '20:9', tolerance: 0.025 },
-                    { ratio: 20.5 / 9, label: '20.5:9', tolerance: 0.03 },
-                    { ratio: 21 / 9, label: '21:9', tolerance: 0.03 },
-                    { ratio: 4 / 3, label: '4:3', tolerance: 0.03 },
-                    { ratio: 3 / 2, label: '3:2', tolerance: 0.03 },
-                    { ratio: 1 / 1, label: '1:1', tolerance: 0.02 },
+            window.loadSample = function(type) {
+                smsInput.value = samples[type] || '';
+                smsInput.focus();
+                // Trigger scan automatically for demo purposes
+                setTimeout(() => performScan(), 350);
+            };
+
+            // ==================== FRAUD DETECTION ENGINE ====================
+            function detectFraud(smsText) {
+                const anomalies = [];
+                let riskScore = 0;
+                const text = smsText.toLowerCase();
+                const textUpper = smsText.toUpperCase();
+
+                // Extract amount
+                const amountMatch = smsText.match(/([\d,]+(?:\.\d{1,2})?)\s*(?:ETB|birr|Br)/i);
+                let amount = amountMatch ? amountMatch[1] : 'Unknown';
+                const amountNum = amountMatch ? parseFloat(amountMatch[1].replace(/,/g, '')) : null;
+
+                // Extract ref
+                const refMatch = smsText.match(/ref[:\s]*([A-Za-z0-9]+)/i) || smsText.match(/TB[\d]+/i);
+                let ref = refMatch ? refMatch[1] || refMatch[0] : 'Not found';
+                if (ref !== 'Not found' && ref.length > 3 && !ref.toUpperCase().startsWith('TB')) {
+                    ref = ref.toUpperCase();
+                }
+
+                // Extract counterparty
+                const partyMatch = smsText.match(/(?:from|to|by)\s+([A-Za-z\s.]+?)(?:\s*\(|\s+on\s+|\s+Ref|$)/i);
+                let party = partyMatch ? partyMatch[1].trim() : 'Unknown party';
+
+                // Check 1: Suspicious keywords
+                const fraudKeywords = ['urgent', 'verify', 'password', 'pin', 'otp', 'click', 'link',
+                    'suspend', 'blocked', 'confirm your', 'identity', 'update your', 'warning',
+                    'immediately', 'send your', 'account will', 'deactivated'
                 ];
+                const foundKeywords = fraudKeywords.filter(k => text.includes(k));
+                if (foundKeywords.length > 0) {
+                    anomalies.push(`Suspicious keywords: ${foundKeywords.slice(0, 3).join(', ')}`);
+                    riskScore += 22 * Math.min(foundKeywords.length, 3);
+                }
 
-                let matchedRatio = null;
-                for (var i = 0; i < knownRatios.length; i++) {
-                    var kr = knownRatios[i];
-                    if (Math.abs(ratio - kr.ratio) < kr.tolerance) {
-                        matchedRatio = kr;
-                        break;
+                // Check 2: Phishing URLs
+                if (/http[s]?:\/\//i.test(smsText) && !/telebirr\.et|ethiotelecom\.et/i.test(smsText)) {
+                    anomalies.push('Phishing URL detected');
+                    riskScore += 25;
+                }
+
+                // Check 3: Extremely large amount
+                if (amountNum !== null && amountNum > 20000) {
+                    anomalies.push(`High-value transaction (${amountNum.toLocaleString()} ETB)`);
+                    riskScore += 15;
+                }
+
+                // Check 4: Amount anomaly (round multiples of 10000)
+                if (amountNum !== null && amountNum >= 10000 && amountNum % 5000 === 0) {
+                    anomalies.push('Suspicious round amount pattern');
+                    riskScore += 8;
+                }
+
+                // Check 5: Missing transaction reference
+                if (ref === 'Not found' || ref === 'XX9999') {
+                    anomalies.push('Missing or invalid transaction reference');
+                    riskScore += 18;
+                }
+
+                // Check 6: Unknown party
+                if (party === 'unknown sender' || party === 'Unknown party') {
+                    anomalies.push('Counterparty identity not verified');
+                    riskScore += 12;
+                }
+
+                // Check 7: Duplicate reference
+                if (ref !== 'Not found' && state.scanHistoryRefs.has(ref.toUpperCase())) {
+                    anomalies.push('Duplicate transaction reference detected');
+                    riskScore += 30;
+                } else if (ref !== 'Not found' && ref !== 'XX9999') {
+                    state.scanHistoryRefs.add(ref.toUpperCase());
+                }
+
+                // Check 8: Generic greeting / unusual format
+                if (!/telebirr/i.test(smsText)) {
+                    anomalies.push('Not a standard Telebirr SMS format');
+                    riskScore += 10;
+                }
+
+                // Check 9: Phone number anomalies
+                const phoneMatches = smsText.match(/09\d{8}/g);
+                if (phoneMatches) {
+                    const hasInvalidPhone = phoneMatches.some(p => !/^09\d{8}$/.test(p));
+                    if (hasInvalidPhone) {
+                        anomalies.push('Invalid phone number format');
+                        riskScore += 8;
                     }
                 }
 
-                // Check file metadata
-                const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-                const fileExt = (file.name.split('.').pop() || '').toLowerCase();
-                const mimeType = file.type;
+                // Clamp risk score
+                riskScore = Math.min(riskScore, 100);
+                riskScore = Math.round(riskScore);
 
-                // Suspicious file size (very small for the resolution)
-                const expectedSizeMin = (dims.width * dims.height) * 0.00015; // rough heuristic
-                const isSuspiciouslySmall = file.size < expectedSizeMin;
-
-                if (matchedRatio) {
-                    results.verdict = 'NATIVE RATIO';
-                    results.score = 0;
-                    results.confidence = '92.0%';
-                } else if (ratio > 0.5 && ratio < 3.0) {
-                    results.verdict = 'UNUSUAL RATIO';
-                    results.score = 45;
-                    results.confidence = '67.0%';
+                // Determine classification
+                let classification, riskClass, iconSvg, title, detail;
+                if (riskScore >= 60) {
+                    classification = 'HIGH RISK';
+                    riskClass = 'rose';
+                    iconSvg =
+                        '<svg class="w-5 h-5 text-rose-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>';
+                    title = 'Fraud Alert — Block Transaction';
+                    detail = 'Multiple critical anomalies detected. Do not proceed.';
+                } else if (riskScore >= 30) {
+                    classification = 'SUSPICIOUS';
+                    riskClass = 'amber';
+                    iconSvg =
+                        '<svg class="w-5 h-5 text-amber-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0 3.75h.008v.008H12v-.008zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+                    title = 'Suspicious — Manual Review Needed';
+                    detail = 'Some patterns require human verification.';
                 } else {
-                    results.verdict = 'ANOMALOUS';
-                    results.score = 70;
-                    results.confidence = '78.0%';
+                    classification = 'VERIFIED';
+                    riskClass = 'emerald';
+                    iconSvg =
+                        '<svg class="w-5 h-5 text-emerald-300" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+                    title = 'Transaction Verified';
+                    detail = 'No suspicious patterns detected';
                 }
 
-                // Additional penalty for suspicious file size
-                if (isSuspiciouslySmall && results.score < 50) {
-                    results.score += 15;
-                    results.verdict = 'SUSPICIOUS SIZE';
+                return {
+                    amount,
+                    ref,
+                    party,
+                    riskScore,
+                    classification,
+                    riskClass,
+                    iconSvg,
+                    title,
+                    detail,
+                    anomalies,
+                    recommendations: buildRecommendations(riskScore, anomalies),
+                };
+            }
+
+            function buildRecommendations(riskScore, anomalies) {
+                if (riskScore >= 60) {
+                    return '⚠ CRITICAL: Do NOT process this transaction. Contact Telebirr fraud hotline at 994 immediately. Preserve the SMS message as evidence.';
+                } else if (riskScore >= 30) {
+                    return '⚡ Caution advised. Verify the sender\'s identity through the official Telebirr merchant portal before processing. Consider contacting the customer directly.';
+                } else {
+                    return '✓ All clear. This transaction appears legitimate. You may proceed with confidence.';
+                }
+            }
+
+            // ==================== PERFORM SCAN ====================
+            function performScan() {
+                const smsText = smsInput.value.trim();
+                if (!smsText) {
+                    // Simple shake animation
+                    smsInput.classList.add('animate-pulse');
+                    setTimeout(() => smsInput.classList.remove('animate-pulse'), 800);
+                    return;
                 }
 
-                // Clamp score
-                results.score = Math.min(100, results.score);
+                const result = detectFraud(smsText);
 
-                // Adjust confidence based on additional checks
-                if (results.score > 40) {
-                    results.confidence = Math.min(96, 60 + results.score * 0.3).toFixed(1) + '%';
+                // Update stats
+                state.scannedCount++;
+                state.activity.unshift({
+                    time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+                    ref: result.ref,
+                    amount: result.amount,
+                    risk: result.riskScore,
+                    classification: result.classification,
+                    riskClass: result.riskClass,
+                });
+                if (result.riskScore >= 30) {
+                    state.fraudCount++;
                 }
+                if (state.activity.length > 8) state.activity.length = 8;
 
-            } catch (err) {
-                results.verdict = 'ERROR';
-                results.confidence = '20.0%';
-                results.score = 40;
+                // Update UI
+                statScanned.textContent = state.scannedCount;
+                statFraud.textContent = state.fraudCount;
+
+                // Show results
+                resultsSection.classList.remove('hidden');
+                resultTimestamp.textContent = new Date().toLocaleString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true,
+                });
+
+                // Animate risk bar
+                riskScoreText.textContent = `${result.riskScore} / 100`;
+                riskScoreText.className = `text-sm font-bold text-${result.riskClass}-400`;
+                riskBar.style.width = '0%';
+                setTimeout(() => {
+                    riskBar.style.width = `${result.riskScore}%`;
+                    riskBar.style.backgroundColor = result.riskClass === 'rose' ? '#f43f5e' :
+                        result.riskClass === 'amber' ? '#f59e0b' : '#10b981';
+                }, 50);
+
+                // Classification
+                riskClassification.className =
+                    `mb-4 p-3.5 rounded-xl bg-${result.riskClass}-500/10 border border-${result.riskClass}-500/25 flex items-center gap-3 transition-all duration-500`;
+                riskIcon.innerHTML = result.iconSvg;
+                riskIcon.className =
+                    `w-10 h-10 rounded-full bg-${result.riskClass}-500/20 flex items-center justify-center flex-shrink-0 transition-all duration-500`;
+                riskTitle.textContent = result.title;
+                riskTitle.className = `text-sm font-bold text-${result.riskClass}-300`;
+                riskDetail.textContent = result.detail;
+                riskDetail.className = `text-[11px] text-${result.riskClass}-200/70`;
+
+                // Transaction details
+                txAmount.textContent = result.amount !== 'Unknown' ? `${result.amount} ETB` : 'Unknown';
+                txRef.textContent = result.ref;
+                txParty.textContent = result.party;
+                txAnomalies.textContent = result.anomalies.length;
+                txAnomalies.className = `text-gray-200 font-medium ${result.anomalies.length > 0 ? 'text-rose-300' : ''}`;
+                txRecommendation.textContent = result.recommendations;
+
+                // Update activity list
+                renderActivity();
             }
 
-            return results;
-        }
-
-        // ---- AGGREGATE RESULTS ----
-        function aggregateResults(l1, l2, l3, dims) {
-            const weights = { l1: 0.35, l2: 0.35, l3: 0.30 };
-            const totalScore = l1.score * weights.l1 + l2.score * weights.l2 + l3.score * weights.l3;
-
-            const avgConfidence = (
-                parseFloat(l1.confidence) +
-                parseFloat(l2.confidence) +
-                parseFloat(l3.confidence)
-            ) / 3;
-
-            let verdictTitle, verdictSubtitle, badgeText, badgeBg;
-            const normalizedScore = Math.round(Math.min(100, Math.max(0, totalScore)));
-
-            if (normalizedScore < 25) {
-                verdictTitle = 'GENUINE SCREENSHOT';
-                verdictSubtitle = 'Analysis indicates authentic mobile capture with uniform noise characteristics';
-                badgeText = 'VERIFIED AUTHENTIC';
-                badgeBg = 'rgba(0,255,136,0.15)';
-            } else if (normalizedScore < 45) {
-                verdictTitle = 'LIKELY GENUINE';
-                verdictSubtitle = 'Minor irregularities detected but within natural variance thresholds';
-                badgeText = 'LOW RISK';
-                badgeBg = 'rgba(0,255,136,0.1)';
-            } else if (normalizedScore < 60) {
-                verdictTitle = 'SUSPICIOUS';
-                verdictSubtitle = 'Multiple forensic markers suggest potential digital manipulation';
-                badgeText = 'MODERATE RISK';
-                badgeBg = 'rgba(255,204,0,0.15)';
-            } else if (normalizedScore < 75) {
-                verdictTitle = 'LIKELY MANIPULATED';
-                verdictSubtitle = 'Significant anomalies detected in pixel statistics and edge patterns';
-                badgeText = 'HIGH RISK';
-                badgeBg = 'rgba(255,102,0,0.18)';
-            } else {
-                verdictTitle = 'AI-GENERATED / DEEPFAKE';
-                verdictSubtitle = 'Critical forensic markers indicate synthetic or heavily modified content';
-                badgeText = 'CRITICAL ALERT';
-                badgeBg = 'rgba(255,0,64,0.2)';
+            // ==================== RENDER ACTIVITY ====================
+            function renderActivity() {
+                if (state.activity.length === 0) {
+                    activityList.innerHTML =
+                        '<p class="text-[11px] text-gray-500 text-center py-4">No transactions scanned yet</p>';
+                    return;
+                }
+                activityList.innerHTML = state.activity.map(item => {
+                    const dotColor = item.riskClass === 'rose' ? 'bg-rose-400' :
+                        item.riskClass === 'amber' ? 'bg-amber-400' : 'bg-emerald-400';
+                    const textColor = item.riskClass === 'rose' ? 'text-rose-300' :
+                        item.riskClass === 'amber' ? 'text-amber-300' : 'text-emerald-300';
+                    return `
+                    <div class="glass-card-inner px-3.5 py-2.5 flex items-center justify-between fade-in">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <span class="w-1.5 h-1.5 rounded-full ${dotColor} flex-shrink-0"></span>
+                            <div class="min-w-0">
+                                <p class="text-[11px] font-medium text-gray-200 truncate">${item.ref}</p>
+                                <p class="text-[9px] text-gray-500">${item.time} • ${item.amount} ETB</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-bold ${textColor} flex-shrink-0 ml-2">${item.classification}</span>
+                    </div>`;
+                }).join('');
             }
 
-            const scanTimeMs = state.scanEndTime - state.scanStartTime;
-            const scanTimeStr = (scanTimeMs / 1000).toFixed(2) + 's';
+            // ==================== EVENT LISTENERS ====================
+            scanBtn.addEventListener('click', performScan);
+            clearBtn.addEventListener('click', () => {
+                smsInput.value = '';
+                smsInput.focus();
+            });
+            smsInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    performScan();
+                }
+            });
 
-            return {
-                score: normalizedScore,
-                confidence: avgConfidence.toFixed(1),
-                title: verdictTitle,
-                subtitle: verdictSubtitle,
-                badgeText: badgeText,
-                badgeBg: badgeBg,
-                scanTime: scanTimeStr,
-                layer1: l1,
-                layer2: l2,
-                layer3: l3,
-            };
-        }
+            // ==================== INIT ====================
+            function init() {
+                resizeMeshCanvas();
+                animateMesh(0);
+                updateStatusUI();
+                renderActivity();
 
-        // ===== FINISH ANALYSIS =====
-        function finishAnalysis(aggregate, errorMsg) {
-            state.isAnalyzing = false;
-            scanOverlay.classList.add('hidden');
-            progressSection.classList.add('hidden');
+                // Handle window resize
+                window.addEventListener('resize', () => {
+                    resizeMeshCanvas();
+                });
 
-            if (errorMsg) {
-                alert(errorMsg);
-                resetAllState();
-                return;
+                // Handle orientation change
+                window.addEventListener('orientationchange', () => {
+                    setTimeout(resizeMeshCanvas, 300);
+                });
             }
 
-            if (!aggregate) {
-                alert('Analysis failed. Please try again.');
-                resetAllState();
-                return;
-            }
-
-            state.analysisResult = aggregate;
-            state.hasResult = true;
-
-            // Display results
-            displayResults(aggregate);
-            resetPlusBtn.classList.remove('hidden');
-        }
-
-        // ===== DISPLAY RESULTS =====
-        function displayResults(aggregate) {
-            resultsSection.classList.remove('hidden');
-            overallVerdict.classList.remove('hidden');
-
-            // Layer 1
-            layer1NoiseVar.textContent = aggregate.layer1.noiseVariance;
-            layer1Uniformity.textContent = aggregate.layer1.uniformity;
-            layer1Verdict.textContent = aggregate.layer1.verdict;
-            layer1Confidence.textContent = aggregate.layer1.confidence;
-            updateLayerDot(layer1Dot, aggregate.layer1.score);
-            updateLayerCard(layer1ResultCard, aggregate.layer1.score);
-
-            // Layer 2
-            layer2EdgeDelta.textContent = aggregate.layer2.edgeDelta;
-            layer2Anomaly.textContent = aggregate.layer2.anomalyRatio;
-            layer2Verdict.textContent = aggregate.layer2.verdict;
-            layer2Confidence.textContent = aggregate.layer2.confidence;
-            updateLayerDot(layer2Dot, aggregate.layer2.score);
-            updateLayerCard(layer2ResultCard, aggregate.layer2.score);
-
-            // Layer 3
-            layer3Dims.textContent = aggregate.layer3.dimensions;
-            layer3Ratio.textContent = aggregate.layer3.aspectRatio;
-            layer3Verdict.textContent = aggregate.layer3.verdict;
-            layer3Confidence.textContent = aggregate.layer3.confidence;
-            updateLayerDot(layer3Dot, aggregate.layer3.score);
-            updateLayerCard(layer3ResultCard, aggregate.layer3.score);
-
-            // Overall verdict
-            verdictTitle.textContent = aggregate.title;
-            verdictSubtitle.textContent = aggregate.subtitle;
-            verdictScore.textContent = aggregate.score + '%';
-            verdictConfidence.textContent = aggregate.confidence + '%';
-            verdictTime.textContent = aggregate.scanTime;
-            verdictBadge.textContent = aggregate.badgeText;
-            verdictBadge.style.background = aggregate.badgeBg;
-
-            // Style overall card
-            if (aggregate.score < 25) {
-                verdictCard.className = 'glow-border glow-border-ok rounded-xl p-5 sm:p-7 text-center';
-                verdictCard.style.background = 'rgba(0,20,10,0.9)';
-                verdictTitle.style.color = '#00ff88';
-                verdictScore.style.color = '#00ff88';
-                verdictConfidence.style.color = '#00ff88';
-            } else if (aggregate.score < 45) {
-                verdictCard.className = 'glow-border glow-border-ok rounded-xl p-5 sm:p-7 text-center';
-                verdictCard.style.background = 'rgba(0,15,10,0.85)';
-                verdictTitle.style.color = '#00e070';
-                verdictScore.style.color = '#00e070';
-                verdictConfidence.style.color = '#00e070';
-            } else if (aggregate.score < 60) {
-                verdictCard.className = 'glow-border rounded-xl p-5 sm:p-7 text-center';
-                verdictCard.style.background = 'rgba(20,15,0,0.88)';
-                verdictTitle.style.color = '#ffcc00';
-                verdictScore.style.color = '#ffcc00';
-                verdictConfidence.style.color = '#ffcc00';
-            } else if (aggregate.score < 75) {
-                verdictCard.className = 'glow-border rounded-xl p-5 sm:p-7 text-center';
-                verdictCard.style.background = 'rgba(25,10,0,0.88)';
-                verdictTitle.style.color = '#ff6600';
-                verdictScore.style.color = '#ff6600';
-                verdictConfidence.style.color = '#ff6600';
-            } else {
-                verdictCard.className = 'glow-border glow-border-alert rounded-xl p-5 sm:p-7 text-center';
-                verdictCard.style.background = 'rgba(25,0,5,0.9)';
-                verdictTitle.style.color = '#ff0040';
-                verdictTitle.classList.add('blink-alert');
-                verdictScore.style.color = '#ff0040';
-                verdictConfidence.style.color = '#ff0040';
-            }
-
-            // Scroll to results
-            setTimeout(function() {
-                overallVerdict.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 200);
-        }
-
-        function updateLayerDot(dotEl, score) {
-            if (score < 25) {
-                dotEl.style.background = '#00ff88';
-                dotEl.style.boxShadow = '0 0 8px #00ff88';
-            } else if (score < 45) {
-                dotEl.style.background = '#00e070';
-                dotEl.style.boxShadow = '0 0 6px #00e070';
-            } else if (score < 60) {
-                dotEl.style.background = '#ffcc00';
-                dotEl.style.boxShadow = '0 0 8px #ffcc00';
-            } else if (score < 75) {
-                dotEl.style.background = '#ff6600';
-                dotEl.style.boxShadow = '0 0 8px #ff6600';
-            } else {
-                dotEl.style.background = '#ff0040';
-                dotEl.style.boxShadow = '0 0 10px #ff0040';
-            }
-        }
-
-        function updateLayerCard(cardEl, score) {
-            if (score < 25) {
-                cardEl.className = 'glow-border glow-border-ok rounded-xl p-4 sm:p-5 card-lift';
-                cardEl.style.background = 'rgba(0,20,10,0.75)';
-            } else if (score < 45) {
-                cardEl.className = 'glow-border glow-border-ok rounded-xl p-4 sm:p-5 card-lift';
-                cardEl.style.background = 'rgba(0,15,10,0.7)';
-            } else if (score < 60) {
-                cardEl.className = 'glow-border rounded-xl p-4 sm:p-5 card-lift';
-                cardEl.style.background = 'rgba(20,15,0,0.75)';
-            } else if (score < 75) {
-                cardEl.className = 'glow-border rounded-xl p-4 sm:p-5 card-lift';
-                cardEl.style.background = 'rgba(25,10,0,0.75)';
-            } else {
-                cardEl.className = 'glow-border glow-border-alert rounded-xl p-4 sm:p-5 card-lift';
-                cardEl.style.background = 'rgba(25,0,5,0.8)';
-            }
-        }
-
-        // ===== INITIALIZATION =====
-        console.log('Telecore AI-Mesh: Advanced Image Forensic Suite initialized');
-        console.log('All systems ready. Awaiting screenshot upload...');
-        console.log('Network status:', navigator.onLine ? 'ONLINE' : 'OFFLINE');
-
-        // Ensure file input can be reused
-        fileInput.addEventListener('click', function() {
-            this.value = '';
-        });
-
-    })();
-</script>
+            init();
+        })();
+    </script>
 </body>
 </html>
